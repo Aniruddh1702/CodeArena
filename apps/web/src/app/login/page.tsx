@@ -1,0 +1,207 @@
+"use client";
+
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button, Input, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Label } from "@codearena/ui";
+import { saveAccount, getAllAccounts, switchAccount, UserAccount } from "@/lib/auth-session";
+
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isAddingAccount = searchParams.get("addAccount") === "true";
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [existingAccounts, setExistingAccounts] = useState<UserAccount[]>([]);
+
+  useEffect(() => {
+    setExistingAccounts(getAllAccounts());
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      let res: Response;
+      try {
+        res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim(), password }),
+        });
+      } catch (networkErr) {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+        res = await fetch(`${apiUrl}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim(), password }),
+        });
+      }
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        let errorMsg = data?.message || "Invalid credentials. Please check your email and password.";
+        if (Array.isArray(errorMsg)) {
+          errorMsg = errorMsg.join(", ");
+        }
+        throw new Error(errorMsg);
+      }
+
+      // Persist auth session via Multi-Account Session Manager
+      const userPayload = data?.data?.user || data?.user || { email };
+      const token = data?.data?.accessToken || data?.accessToken || "demo_token";
+
+      const sessionAccount: UserAccount = {
+        id: userPayload.id || userPayload.username || email.trim(),
+        email: userPayload.email || (email.includes("@") ? email.trim() : `${userPayload.username}@codearena.dev`),
+        username: userPayload.username || email.split("@")[0],
+        name: `${userPayload.firstName || ""} ${userPayload.lastName || ""}`.trim() || userPayload.username || email.split("@")[0],
+        role: userPayload.role || "STUDENT",
+        token: token,
+        college: "CodeArena University",
+        year: "3rd Year",
+        branch: "Computer Science",
+        bio: "Competitive Programmer & DSA Enthusiast",
+      };
+
+      saveAccount(sessionAccount, true);
+
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Failed to sign in. Please verify your credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickSwitch = (accountId: string) => {
+    switchAccount(accountId);
+    router.push("/dashboard");
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md shadow-2xl border-border/60 bg-card/90 backdrop-blur-md">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+            {isAddingAccount ? "Add Another Account" : "Welcome back"}
+          </CardTitle>
+          <CardDescription className="text-muted-foreground text-xs">
+            {isAddingAccount
+              ? "Sign into an additional account. You can switch between accounts anytime."
+              : "Enter your credentials to access your personalized CodeArena dashboard"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Multi-Account Quick Switch Bar */}
+          {existingAccounts.length > 0 && !isAddingAccount && (
+            <div className="p-3 rounded-xl bg-secondary/50 border border-border/60 space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
+                <span>Already logged in on this device:</span>
+                <span className="font-mono">{existingAccounts.length} account{existingAccounts.length > 1 ? "s" : ""}</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {existingAccounts.map((acc) => (
+                  <button
+                    key={acc.id}
+                    type="button"
+                    onClick={() => handleQuickSwitch(acc.id)}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card hover:bg-primary/20 border border-border hover:border-primary/50 text-xs font-semibold text-foreground transition-all"
+                  >
+                    <span className="h-4 w-4 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px]">
+                      {(acc.name || acc.username || "U")[0]?.toUpperCase()}
+                    </span>
+                    <span>{acc.name || acc.username}</span>
+                    <span className="text-primary text-[10px]">&rarr;</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs font-semibold">Email or Username</Label>
+              <Input
+                id="email"
+                type="text"
+                placeholder="student@codearena.dev or username"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError("");
+                }}
+                required
+                className="h-9 text-xs"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-xs font-semibold">Password</Label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-[11px] text-muted-foreground hover:text-foreground transition-colors font-medium"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                  <span className="text-muted-foreground text-xs">•</span>
+                  <a href="/reset-password" className="text-[11px] text-primary hover:underline">
+                    Forgot password?
+                  </a>
+                </div>
+              </div>
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError("");
+                }}
+                required
+                className="h-9 text-xs"
+              />
+            </div>
+
+            {error && (
+              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium flex items-center gap-2">
+                <span>⚠️</span>
+                <span>{error}</span>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full h-9 text-xs font-bold" disabled={loading}>
+              {loading ? "Signing in..." : isAddingAccount ? "Add & Switch to Account" : "Sign in"}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-center border-t py-3">
+          <p className="text-xs text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <a href="/register" className="text-primary hover:underline font-semibold">
+              Register here
+            </a>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
