@@ -56,23 +56,29 @@ function LoginForm() {
       // Persist auth session via Multi-Account Session Manager
       const userPayload = data?.data?.user || data?.user || { email };
       const token = data?.data?.accessToken || data?.accessToken || "demo_token";
+      const userRole = userPayload.role || (email.toLowerCase().includes("admin") ? "SUPER_ADMIN" : "STUDENT");
 
       const sessionAccount: UserAccount = {
         id: userPayload.id || userPayload.username || email.trim(),
         email: userPayload.email || (email.includes("@") ? email.trim() : `${userPayload.username}@codearena.dev`),
         username: userPayload.username || email.split("@")[0],
         name: `${userPayload.firstName || ""} ${userPayload.lastName || ""}`.trim() || userPayload.username || email.split("@")[0],
-        role: userPayload.role || "STUDENT",
+        role: userRole,
         token: token,
         college: "CodeArena University",
         year: "3rd Year",
         branch: "Computer Science",
-        bio: "Competitive Programmer & DSA Enthusiast",
+        bio: userRole === "SUPER_ADMIN" ? "Platform Administrator & System Operator" : "Competitive Programmer & DSA Enthusiast",
       };
 
       saveAccount(sessionAccount, true);
 
-      router.push("/dashboard");
+      if (userRole === "SUPER_ADMIN" || userRole === "ADMIN") {
+        localStorage.setItem("codearena_admin_authorized", "true");
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setError(err.message || "Failed to sign in. Please verify your credentials.");
     } finally {
@@ -85,6 +91,12 @@ function LoginForm() {
     router.push("/dashboard");
   };
 
+  const handleQuickFill = (demoEmail: string, demoPass: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setError("");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-2xl border-border/60 bg-card/90 backdrop-blur-md">
@@ -95,10 +107,36 @@ function LoginForm() {
           <CardDescription className="text-muted-foreground text-xs">
             {isAddingAccount
               ? "Sign into an additional account. You can switch between accounts anytime."
-              : "Enter your credentials to access your personalized CodeArena dashboard"}
+              : "Enter your credentials to access your personalized CodeArena portal"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Quick Demo Credentials Bar */}
+          <div className="p-2.5 rounded-xl bg-primary/5 border border-primary/20 space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
+              <span>Quick Login Credentials:</span>
+              <span className="text-[10px] text-primary">Click to fill ⚡</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => handleQuickFill("student@codearena.dev", "Student@123!")}
+                className="px-2.5 py-1 rounded-md bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/80 transition-colors flex items-center gap-1"
+              >
+                <span>🎓</span>
+                <span>Student</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickFill("admin@codearena.dev", "Admin@123!")}
+                className="px-2.5 py-1 rounded-md bg-destructive/10 hover:bg-destructive/20 text-xs font-semibold text-destructive border border-destructive/30 transition-colors flex items-center gap-1"
+              >
+                <span>🛡️</span>
+                <span>Admin</span>
+              </button>
+            </div>
+          </div>
+
           {/* Multi-Account Quick Switch Bar */}
           {existingAccounts.length > 0 && !isAddingAccount && (
             <div className="p-3 rounded-xl bg-secondary/50 border border-border/60 space-y-2">
