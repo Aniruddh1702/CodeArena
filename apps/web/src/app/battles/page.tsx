@@ -52,11 +52,6 @@ export default function BattlesLobbyPage() {
                   <span>👤</span> Profile
                 </Button>
               </Link>
-              <Link href="/admin">
-                <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
-                  <span>🛡️</span> Admin Panel
-                </Button>
-              </Link>
               <AccountSwitcher />
             </div>
         </div>

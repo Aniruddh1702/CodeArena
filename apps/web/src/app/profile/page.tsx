@@ -172,11 +172,6 @@ export default function ProfilePage() {
             <Link href="/profile" className="text-primary font-semibold drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]">Profile</Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/admin">
-              <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
-                <span>🛡️</span> Admin Panel
-              </Button>
-            </Link>
             <AccountSwitcher />
           </div>
         </div>

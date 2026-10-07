@@ -12,7 +12,7 @@ import {
   ProblemDefinition,
   TestCase,
 } from "@/lib/problems-data";
-import { getActiveAccount, getAllAccounts } from "@/lib/auth-session";
+import { getActiveAccount, getAllAccounts, getUserStats } from "@/lib/auth-session";
 
 const AVAILABLE_TOPICS = [
   "Arrays",
@@ -130,6 +130,77 @@ export default function AdminPortalPage() {
   const [importFeedback, setImportFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // User Accounts State
+  const [allUsersList, setAllUsersList] = useState<any[]>([]);
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userRoleFeedback, setUserRoleFeedback] = useState<string | null>(null);
+
+  const loadUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await fetch("/api/leaderboard");
+      const json = await res.json().catch(() => null);
+      const dbItems = json?.items || [];
+      const sessionAccounts = getAllAccounts();
+
+      const map = new Map<string, any>();
+      for (const u of dbItems) {
+        map.set(u.username.toLowerCase(), {
+          userId: u.userId || u.id,
+          username: u.username,
+          name: u.name || u.username,
+          email: `${u.username}@codearena.dev`,
+          role: "STUDENT",
+          score: u.score || 1450,
+          problemsSolved: u.problemsSolved || 0,
+          org: u.org || "CodeArena Academy",
+        });
+      }
+      for (const s of sessionAccounts) {
+        const stats = getUserStats(s.id);
+        map.set(s.username.toLowerCase(), {
+          userId: s.id,
+          username: s.username,
+          name: s.name,
+          email: s.email,
+          role: s.role || "STUDENT",
+          score: stats.dsaRating,
+          problemsSolved: stats.problemsSolved,
+          org: s.college || "CodeArena Academy",
+        });
+      }
+      setAllUsersList(Array.from(map.values()));
+    } catch (e) {
+      console.error("Error loading users:", e);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const handleToggleUserRole = (username: string, currentRole: string) => {
+    const nextRole = currentRole === "SUPER_ADMIN" ? "STUDENT" : "SUPER_ADMIN";
+    const accounts = getAllAccounts();
+    const updated = accounts.map((a) => {
+      if (a.username.toLowerCase() === username.toLowerCase()) {
+        return { ...a, role: nextRole };
+      }
+      return a;
+    });
+    localStorage.setItem("codearena_accounts", JSON.stringify(updated));
+
+    const active = getActiveAccount();
+    if (active && active.username.toLowerCase() === username.toLowerCase()) {
+      localStorage.setItem("user", JSON.stringify({ ...active, role: nextRole }));
+    }
+
+    setAllUsersList((prev) =>
+      prev.map((u) => (u.username.toLowerCase() === username.toLowerCase() ? { ...u, role: nextRole } : u))
+    );
+    setUserRoleFeedback(`Successfully updated @${username} to ${nextRole}`);
+    setTimeout(() => setUserRoleFeedback(null), 3500);
+  };
+
   // Check auth session on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -139,6 +210,7 @@ export default function AdminPortalPage() {
         setIsAuthorized(true);
       }
       loadQuestions();
+      loadUsers();
     }
   }, []);
 
@@ -619,23 +691,15 @@ export default function AdminPortalPage() {
               </Button>
             </form>
 
-            <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setPasscode("codearena-admin-2026");
-                }}
-                className="text-[11px] text-muted-foreground hover:text-foreground h-8"
-              >
-                Insert Default Passcode (codearena-admin-2026)
-              </Button>
-
+            <div className="pt-3 border-t border-border/50 flex flex-col gap-2">
+              <p className="text-[11px] text-center text-muted-foreground">
+                Restricted portal. Unauthorized access attempts are logged and prohibited. Contact the platform administrator if you require master access.
+              </p>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => router.push("/dashboard")}
-                className="text-xs text-muted-foreground hover:text-primary h-8"
+                className="text-xs text-muted-foreground hover:text-primary h-8 gap-1.5"
               >
                 &larr; Return to Student Dashboard
               </Button>
@@ -685,6 +749,15 @@ export default function AdminPortalPage() {
               className={`transition-colors ${activeTab === "system" ? "text-primary border-b-2 border-primary pb-1" : "text-muted-foreground hover:text-foreground"}`}
             >
               System Health
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("users");
+                loadUsers();
+              }}
+              className={`transition-colors ${activeTab === "users" ? "text-primary border-b-2 border-primary pb-1" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Users & Access ({allUsersList.length})
             </button>
           </nav>
 
@@ -745,6 +818,17 @@ export default function AdminPortalPage() {
                 className="h-8 text-xs font-semibold gap-1.5 border-primary/40 text-primary hover:bg-primary/10"
               >
                 <span>📁</span> Drop / Import File
+              </Button>
+              <Button
+                variant={activeTab === "users" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setActiveTab("users");
+                  loadUsers();
+                }}
+                className="h-8 text-xs font-semibold gap-1.5"
+              >
+                <span>👥</span> Users & Access
               </Button>
               <Button
                 variant="secondary"
@@ -1513,6 +1597,136 @@ export default function AdminPortalPage() {
                   >
                     Reset to Factory
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TAB 5: USER MANAGEMENT */}
+          <TabsContent value="users" className="space-y-6 m-0 focus-visible:outline-none">
+            <Card className="bg-card/80 backdrop-blur-md border-border/80 shadow-xl overflow-hidden">
+              <CardHeader className="border-b border-border/60 pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-xl font-bold flex items-center gap-2">
+                      <span>👥</span> Platform User Accounts & Access Controls
+                    </CardTitle>
+                    <CardDescription className="text-xs text-muted-foreground mt-1">
+                      Manage administrator roles, review user algorithmic progress, and control system privileges.
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Search by username or name..."
+                      value={userSearchQuery}
+                      onChange={(e) => setUserSearchQuery(e.target.value)}
+                      className="h-8 text-xs w-64 bg-background"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={loadUsers}
+                      className="h-8 text-xs font-semibold gap-1"
+                    >
+                      <span>🔄</span> Refresh
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {userRoleFeedback && (
+                  <div className="m-4 p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-2">
+                    <span>✅</span>
+                    <span>{userRoleFeedback}</span>
+                  </div>
+                )}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-muted/40 border-b border-border/60 text-xs uppercase tracking-wider text-muted-foreground">
+                      <tr>
+                        <th className="px-5 py-3.5 font-bold">User</th>
+                        <th className="px-5 py-3.5 font-bold hidden sm:table-cell">Organization</th>
+                        <th className="px-5 py-3.5 font-bold">Role</th>
+                        <th className="px-5 py-3.5 font-bold text-right">Solved</th>
+                        <th className="px-5 py-3.5 font-bold text-right text-primary">DSA Rating</th>
+                        <th className="px-5 py-3.5 font-bold text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40">
+                      {loadingUsers ? (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground animate-pulse">
+                            Loading platform users...
+                          </td>
+                        </tr>
+                      ) : allUsersList.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                            No users registered yet.
+                          </td>
+                        </tr>
+                      ) : (
+                        allUsersList
+                          .filter((u) => {
+                            if (!userSearchQuery.trim()) return true;
+                            const q = userSearchQuery.toLowerCase().trim();
+                            return (
+                              u.username.toLowerCase().includes(q) ||
+                              u.name.toLowerCase().includes(q) ||
+                              (u.org && u.org.toLowerCase().includes(q))
+                            );
+                          })
+                          .map((u) => {
+                            const isSuper = u.role === "SUPER_ADMIN";
+                            return (
+                              <tr key={u.userId || u.username} className="hover:bg-muted/20 transition-colors">
+                                <td className="px-5 py-3.5">
+                                  <div className="flex items-center gap-3">
+                                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center font-bold text-xs text-primary-foreground">
+                                      {u.name ? u.name[0].toUpperCase() : "U"}
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-foreground text-xs">{u.name}</p>
+                                      <p className="text-[11px] text-muted-foreground font-mono">@{u.username}</p>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-5 py-3.5 hidden sm:table-cell text-xs text-muted-foreground">
+                                  {u.org || "CodeArena Academy"}
+                                </td>
+                                <td className="px-5 py-3.5">
+                                  <span
+                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                      isSuper
+                                        ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                                        : "bg-secondary text-secondary-foreground border-border"
+                                    }`}
+                                  >
+                                    {u.role}
+                                  </span>
+                                </td>
+                                <td className="px-5 py-3.5 text-right font-mono text-xs font-semibold">
+                                  {u.problemsSolved}
+                                </td>
+                                <td className="px-5 py-3.5 text-right font-mono text-xs font-bold text-primary">
+                                  {u.score}
+                                </td>
+                                <td className="px-5 py-3.5 text-right">
+                                  <Button
+                                    size="sm"
+                                    variant={isSuper ? "destructive" : "outline"}
+                                    onClick={() => handleToggleUserRole(u.username, u.role)}
+                                    className="h-7 text-[11px] font-semibold"
+                                  >
+                                    {isSuper ? "Revoke Admin" : "Make Super Admin"}
+                                  </Button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>

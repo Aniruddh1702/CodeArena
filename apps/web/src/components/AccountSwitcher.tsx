@@ -287,16 +287,18 @@ export function AccountSwitcher() {
               <span>Open My Profile & Achievements</span>
             </button>
 
-            <button
-              onClick={() => {
-                setOpen(false);
-                router.push("/admin");
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold text-destructive hover:bg-destructive/10 transition-colors text-left"
-            >
-              <span>🛡️</span>
-              <span>Admin Question Portal</span>
-            </button>
+            {(activeAccount?.role === "SUPER_ADMIN" || activeAccount?.role === "ADMIN") && (
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  router.push("/admin");
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold text-destructive hover:bg-destructive/10 transition-colors text-left"
+              >
+                <span>🛡️</span>
+                <span>Admin Command Center</span>
+              </button>
+            )}
 
             <button
               onClick={handleAddAccount}
