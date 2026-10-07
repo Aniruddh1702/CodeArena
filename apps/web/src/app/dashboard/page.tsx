@@ -103,6 +103,7 @@ export default function DashboardPage() {
 
         // 3. Dynamic rank based on authentic leaderboard algorithm for THIS user
         const leaderboardStandings = getLeaderboards({
+          username: active.username,
           name: currentUserName,
           score: currentRating,
           problemsSolved: solvedCount,
@@ -213,8 +214,14 @@ export default function DashboardPage() {
                 <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">Assessments</Link>
                 <Link href="/battles" className="text-muted-foreground hover:text-foreground transition-colors">Battles</Link>
                 <Link href="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">Leaderboard</Link>
+                <Link href="/profile" className="text-muted-foreground hover:text-foreground transition-colors">Profile</Link>
             </nav>
             <div className="flex items-center gap-3">
+                <Link href="/profile">
+                  <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
+                    <span>👤</span> Profile
+                  </Button>
+                </Link>
                 <Link href="/admin">
                   <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
                     <span>🛡️</span> Admin Panel
@@ -236,7 +243,7 @@ export default function DashboardPage() {
                   Track your mastery, conquer your weak areas, and rise through the competitive ranks.
                 </p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
                 <Button 
                   onClick={() => router.push('/problems')} 
                   className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 rounded-full px-8 h-12 text-base font-semibold transition-all hover:scale-105 active:scale-95"
@@ -249,6 +256,14 @@ export default function DashboardPage() {
                   className="shrink-0 rounded-full px-8 h-12 text-base font-semibold transition-all hover:scale-105 active:scale-95 border-primary/30 hover:border-primary"
                 >
                     Enter Battle Arena
+                </Button>
+                <Button 
+                  onClick={() => router.push('/profile')} 
+                  variant="secondary" 
+                  className="shrink-0 rounded-full px-6 h-12 text-base font-semibold transition-all hover:scale-105 active:scale-95 border border-border shadow-sm flex items-center gap-2 hover:border-primary/50"
+                  title="Open full profile with stats, heatmap, and achievements"
+                >
+                    <span>👤</span> View Full Profile
                 </Button>
             </div>
         </div>

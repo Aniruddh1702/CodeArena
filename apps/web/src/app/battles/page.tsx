@@ -44,8 +44,19 @@ export default function BattlesLobbyPage() {
                 <Link href="/assessments" className="hover:text-primary transition-colors">Assessments</Link>
                 <Link href="/battles" className="text-primary font-semibold">Battles</Link>
                 <Link href="/leaderboard" className="hover:text-primary transition-colors">Leaderboard</Link>
+                <Link href="/profile" className="hover:text-primary transition-colors">Profile</Link>
             </nav>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Link href="/profile">
+                <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
+                  <span>👤</span> Profile
+                </Button>
+              </Link>
+              <Link href="/admin">
+                <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
+                  <span>🛡️</span> Admin Panel
+                </Button>
+              </Link>
               <AccountSwitcher />
             </div>
         </div>

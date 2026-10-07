@@ -40,34 +40,98 @@ export function getAllAccounts(): UserAccount[] {
       // Check legacy single-account migration
       const legacyUser = localStorage.getItem("user");
       const legacyToken = localStorage.getItem("token");
-      if (legacyUser && legacyToken) {
-        const u = JSON.parse(legacyUser);
-        const legacyProfile = localStorage.getItem("userProfile");
-        const prof = legacyProfile ? JSON.parse(legacyProfile) : {};
+      const legacyProfile = localStorage.getItem("userProfile");
+
+      if (legacyUser || legacyProfile) {
+        let u: any = {};
+        if (legacyUser) {
+          try { u = JSON.parse(legacyUser); } catch {}
+        }
+        let prof: any = {};
+        if (legacyProfile) {
+          try { prof = JSON.parse(legacyProfile); } catch {}
+        }
+
         const migrated: UserAccount = {
-          id: u.id || u.username || u.email || "default_user",
+          id: u.id || u.username || u.email || prof.username || "student",
           email: u.email || prof.email || "student@codearena.dev",
           username: u.username || prof.username || "student",
-          name: prof.name || `${u.firstName || ""} ${u.lastName || ""}`.trim() || u.username || "Student",
+          name: prof.name || (u.firstName ? `${u.firstName || ""} ${u.lastName || ""}`.trim() : "") || u.username || "CodeArena Student",
           role: u.role || "STUDENT",
-          token: legacyToken,
-          college: prof.college || "CodeArena University",
+          token: legacyToken || "session_token_default",
+          college: prof.college || prof.organization || "CodeArena Academy",
           branch: prof.branch || "Computer Science",
           year: prof.year || "3rd Year",
           bio: prof.bio || "Competitive Programmer & DSA Enthusiast",
+          github: prof.github || u.username || "student",
           lastActiveAt: new Date().toISOString(),
         };
         localStorage.setItem(ACCOUNTS_KEY, JSON.stringify([migrated]));
         localStorage.setItem(ACTIVE_ACCOUNT_ID_KEY, migrated.id);
         return [migrated];
       }
-      return [];
+
+      // Default active student fallback if first time visitor
+      const defaultStudent: UserAccount = {
+        id: "student",
+        email: "student@codearena.dev",
+        username: "student",
+        name: "CodeArena Student",
+        role: "STUDENT",
+        token: "session_token_student",
+        college: "CodeArena Academy",
+        branch: "Computer Science",
+        year: "3rd Year",
+        bio: "Passionate competitive programmer & software engineer. Mastering advanced algorithms, system design, and competitive DSA.",
+        github: "codearena-student",
+        lastActiveAt: new Date().toISOString(),
+      };
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify([defaultStudent]));
+      localStorage.setItem(ACTIVE_ACCOUNT_ID_KEY, defaultStudent.id);
+      return [defaultStudent];
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+
+    // In case empty array was stored
+    const defaultStudent: UserAccount = {
+      id: "student",
+      email: "student@codearena.dev",
+      username: "student",
+      name: "CodeArena Student",
+      role: "STUDENT",
+      token: "session_token_student",
+      college: "CodeArena Academy",
+      branch: "Computer Science",
+      year: "3rd Year",
+      bio: "Passionate competitive programmer & software engineer.",
+      github: "codearena-student",
+      lastActiveAt: new Date().toISOString(),
+    };
+    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify([defaultStudent]));
+    localStorage.setItem(ACTIVE_ACCOUNT_ID_KEY, defaultStudent.id);
+    return [defaultStudent];
   } catch (e) {
     console.error("Failed to read accounts:", e);
     return [];
+  }
+}
+
+/**
+ * Update active account properties (name, bio, college, github, etc.)
+ */
+export function updateActiveAccount(updates: Partial<UserAccount>): UserAccount | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const active = getActiveAccount();
+    if (!active) return null;
+
+    const updated = { ...active, ...updates, lastActiveAt: new Date().toISOString() };
+    saveAccount(updated, true);
+    return updated;
+  } catch (e) {
+    console.error("Failed to update active account:", e);
+    return null;
   }
 }
 
@@ -150,8 +214,27 @@ export function setActiveAccount(accountId: string): UserAccount | null {
       year: target.year || "3rd Year",
       branch: target.branch || "Computer Science",
       bio: target.bio || "Competitive Programmer & DSA Enthusiast",
+      github: target.github || target.username,
     })
   );
+
+  // Synchronize target user's authentic isolated stats to active storage
+  // (For a new user, this sets solvedProblems=[], problemsSolved=0, dsaRating=1450, recentActivity=[])
+  const targetStats = getUserStats(target.id);
+  localStorage.setItem("solvedProblems", JSON.stringify(targetStats.solvedProblems));
+  localStorage.setItem("problemsSolved", targetStats.problemsSolved.toString());
+  localStorage.setItem("dsaRating", targetStats.dsaRating.toString());
+  localStorage.setItem("recentActivity", JSON.stringify(targetStats.recentActivity));
+
+  // Purge any unscoped old submitted code caches so new users start completely fresh
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith("submissions_") && !k.startsWith("codearena_")) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch (e) {}
 
   // Sync session cookie
   document.cookie = `token=${target.token}; path=/; max-age=604800; SameSite=Lax`;
@@ -202,6 +285,21 @@ export function logoutAll(): void {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   localStorage.removeItem("userProfile");
+  localStorage.removeItem("solvedProblems");
+  localStorage.removeItem("problemsSolved");
+  localStorage.removeItem("dsaRating");
+  localStorage.removeItem("recentActivity");
+
+  // Wipe any unscoped or legacy submission data
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith("submissions_") || k.startsWith("codearena_"))) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch (e) {}
+
   document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
   window.dispatchEvent(new CustomEvent("codearena_account_changed", { detail: null }));
 }
@@ -366,9 +464,4 @@ export function saveUserProblemSubmission(userId: string, slug: string, submissi
   const existing = getUserProblemSubmissions(safeId, slug);
   const updated = [submission, ...existing].slice(0, 30);
   localStorage.setItem(getUserScopedKey(safeId, `submissions_${slug}`), JSON.stringify(updated));
-
-  const activeAcc = getActiveAccount();
-  if (activeAcc && (activeAcc.id === userId || activeAcc.username === userId)) {
-    localStorage.setItem(`submissions_${slug}`, JSON.stringify(updated));
-  }
 }

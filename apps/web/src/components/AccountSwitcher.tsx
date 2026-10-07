@@ -105,52 +105,91 @@ export function AccountSwitcher() {
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Account Trigger Button */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-secondary/60 hover:bg-secondary border border-border/80 transition-all hover:border-primary/40 text-left shadow-sm group"
-        title="Switch or manage logged-in accounts"
-      >
-        <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-primary-foreground font-black text-xs shadow-sm">
+      <div className="flex items-center rounded-full bg-secondary/60 hover:bg-secondary border border-border/80 transition-all hover:border-primary/40 shadow-sm group">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push('/profile');
+          }}
+          className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-primary-foreground font-black text-xs shadow-sm hover:scale-105 transition-transform ml-1 cursor-pointer"
+          title="Open Full Profile (Click avatar)"
+        >
           {initial}
-        </div>
-        <div className="hidden sm:block text-left leading-tight">
-          <div className="text-xs font-bold text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5">
-            <span>{activeAccount.name || activeAccount.username}</span>
-            {accounts.length > 1 && (
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/20 text-primary font-mono font-bold">
-                +{accounts.length - 1}
-              </span>
-            )}
+        </button>
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-2 px-2.5 py-1.5 text-left"
+          title="Switch accounts or view profile"
+        >
+          <div className="hidden sm:block text-left leading-tight">
+            <div className="text-xs font-bold text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5">
+              <span>{activeAccount.name || activeAccount.username}</span>
+              {accounts.length > 1 && (
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/20 text-primary font-mono font-bold">
+                  +{accounts.length - 1}
+                </span>
+              )}
+            </div>
+            <div className="text-[10px] text-muted-foreground font-mono">
+              {activeStats.dsaRating} pts • {activeStats.problemsSolved} solved
+            </div>
           </div>
-          <div className="text-[10px] text-muted-foreground font-mono">
-            {activeStats.dsaRating} pts • {activeStats.problemsSolved} solved
-          </div>
-        </div>
-        <span className="text-muted-foreground text-xs ml-1 transition-transform duration-200 group-hover:text-foreground">
-          {open ? "▲" : "▼"}
-        </span>
-      </button>
+          <span className="text-muted-foreground text-xs ml-0.5 transition-transform duration-200 group-hover:text-foreground">
+            {open ? "▲" : "▼"}
+          </span>
+        </button>
+      </div>
 
       {/* Dropdown Menu */}
       {open && (
         <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-card/95 backdrop-blur-xl border border-border/80 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          {/* Header */}
-          <div className="p-4 border-b border-border/60 bg-secondary/30">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold tracking-tight text-foreground uppercase tracking-wider">
-                Accounts ({accounts.length})
-              </span>
-              <span className="text-[11px] text-muted-foreground">
-                Multiple Logins Active
-              </span>
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Each account has independent real-time ratings, solved problems, and submissions.
-            </p>
+          {/* Prominent Profile Access Card */}
+          <div className="p-3 border-b border-border/60 bg-gradient-to-r from-primary/15 via-secondary/50 to-purple-600/15">
+            <button
+              onClick={() => {
+                setOpen(false);
+                router.push("/profile");
+              }}
+              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-card border border-primary/40 hover:border-primary hover:shadow-lg transition-all group text-left shadow-sm"
+              title="Open full profile, heatmap, badges, and submissions"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-primary-foreground font-black text-sm shadow-md shrink-0 group-hover:scale-105 transition-transform">
+                  {initial}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                      {activeAccount.name || activeAccount.username}
+                    </span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+                      Active
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    @{activeAccount.username} • {activeStats.dsaRating} rating
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-xs font-bold text-primary group-hover:translate-x-1 transition-transform shrink-0 ml-2">
+                <span>Profile</span>
+                <span>&rarr;</span>
+              </div>
+            </button>
+          </div>
+
+          {/* Accounts Subtitle Header */}
+          <div className="px-4 py-2 border-b border-border/40 bg-secondary/20 flex items-center justify-between">
+            <span className="text-[10px] font-bold tracking-tight text-muted-foreground uppercase tracking-wider">
+              Connected Accounts ({accounts.length})
+            </span>
+            <span className="text-[10px] text-muted-foreground font-mono">
+              Real-time Sync
+            </span>
           </div>
 
           {/* Accounts List */}
-          <div className="p-2 space-y-1.5 max-h-72 overflow-y-auto">
+          <div className="p-2 space-y-1.5 max-h-64 overflow-y-auto">
             {accounts.map((acc) => {
               const isActive = acc.id === activeAccount.id;
               const accStats = getUserStats(acc.id);
@@ -166,7 +205,18 @@ export function AccountSwitcher() {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                    <div 
+                      className="flex items-center gap-2.5 min-w-0 cursor-pointer flex-1"
+                      onClick={() => {
+                        if (isActive) {
+                          setOpen(false);
+                          router.push('/profile');
+                        } else {
+                          handleSwitch(acc.id);
+                        }
+                      }}
+                      title={isActive ? "Open profile" : "Switch to this account"}
+                    >
                       <div
                         className={`h-9 w-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm ${
                           isActive
@@ -196,7 +246,19 @@ export function AccountSwitcher() {
                       </div>
                     </div>
 
-                    {!isActive && (
+                    {isActive ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setOpen(false);
+                          router.push('/profile');
+                        }}
+                        className="h-7 px-2 text-[11px] font-semibold text-primary hover:text-primary hover:bg-primary/10 transition-all shrink-0"
+                      >
+                        Profile &rarr;
+                      </Button>
+                    ) : (
                       <Button
                         size="sm"
                         variant="outline"
@@ -217,6 +279,17 @@ export function AccountSwitcher() {
             <button
               onClick={() => {
                 setOpen(false);
+                router.push("/profile");
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold text-primary hover:bg-primary/10 transition-colors text-left"
+            >
+              <span>👤</span>
+              <span>Open My Profile & Achievements</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setOpen(false);
                 router.push("/admin");
               }}
               className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold text-destructive hover:bg-destructive/10 transition-colors text-left"
@@ -227,7 +300,7 @@ export function AccountSwitcher() {
 
             <button
               onClick={handleAddAccount}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-primary hover:bg-primary/10 transition-colors text-left"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors text-left"
             >
               <span>➕</span>
               <span>Add Another Account</span>

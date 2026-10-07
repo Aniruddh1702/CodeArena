@@ -116,31 +116,46 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
   useEffect(() => {
     const prob = getProblem(params.slug);
     setQuestion(prob);
-    setCode(prob.starterCode.javascript);
+    setCode(prob.starterCode[language] || prob.starterCode.javascript);
+    setRunResult(null);
+    setSubmitFeedback(null);
+    setHasRun(false);
 
     if (typeof window !== "undefined") {
       const activeAcc = getActiveAccount();
       const activeId = activeAcc?.id || "default";
 
-      // 1. Load submissions scoped to active account
+      // 1. Load submissions strictly scoped to active account (never leak other users)
       const userSubs = getUserProblemSubmissions(activeId, params.slug);
-      if (userSubs.length > 0) {
-        setSubmissions(userSubs);
-      } else {
-        const legacy = localStorage.getItem(`submissions_${params.slug}`);
-        if (legacy) {
-          try {
-            setSubmissions(JSON.parse(legacy));
-          } catch (e) {}
-        }
-      }
+      setSubmissions(userSubs);
 
       // 2. Check if problem is solved by active account
       const stats = getUserStats(activeId);
       const isSolved = stats.solvedProblems.some((p: any) => p.slug === params.slug);
       setIsProblemSolved(isSolved);
+
+      // 3. React to account changes so new user starts completely from new
+      const handleAccountChange = () => {
+        const currentAcc = getActiveAccount();
+        const currentId = currentAcc?.id || "default";
+        const subs = getUserProblemSubmissions(currentId, params.slug);
+        setSubmissions(subs);
+        const s = getUserStats(currentId);
+        setIsProblemSolved(s.solvedProblems.some((p: any) => p.slug === params.slug));
+        const p = getProblem(params.slug);
+        setCode(p.starterCode[language] || p.starterCode.javascript);
+        clearEditorMarkers();
+        setRunResult(null);
+        setSubmitFeedback(null);
+        setHasRun(false);
+      };
+
+      window.addEventListener("codearena_account_changed", handleAccountChange);
+      return () => {
+        window.removeEventListener("codearena_account_changed", handleAccountChange);
+      };
     }
-  }, [params.slug]);
+  }, [params.slug, language]);
 
   // Handle language switch
   const handleLanguageChange = (val: "javascript" | "python" | "cpp" | "java") => {

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Tabs, TabsList, TabsTrigger, TabsContent } from "@codearena/ui";
+import Link from "next/link";
+import { AccountSwitcher } from "@/components/AccountSwitcher";
 
 export default function AssessmentsPage() {
   const router = useRouter();
@@ -33,20 +35,25 @@ export default function AssessmentsPage() {
                 Code<span className="text-destructive">Arena</span>
             </div>
             <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
-                <a href="/dashboard" className="hover:text-primary transition-colors">Dashboard</a>
-                <a href="/problems" className="hover:text-primary transition-colors">Practice</a>
-                <a href="/assessments" className="text-primary font-semibold">Assessments</a>
-                <a href="/battles" className="hover:text-primary transition-colors">Battles</a>
-                <a href="/leaderboard" className="hover:text-primary transition-colors">Leaderboard</a>
+                <Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
+                <Link href="/problems" className="hover:text-primary transition-colors">Practice</Link>
+                <Link href="/assessments" className="text-primary font-semibold">Assessments</Link>
+                <Link href="/battles" className="hover:text-primary transition-colors">Battles</Link>
+                <Link href="/leaderboard" className="hover:text-primary transition-colors">Leaderboard</Link>
+                <Link href="/profile" className="hover:text-primary transition-colors">Profile</Link>
             </nav>
-            <div className="flex items-center gap-4">
-              <div 
-                className="h-9 w-9 rounded-full bg-secondary border border-border flex items-center justify-center text-secondary-foreground font-bold hover:ring-2 hover:ring-primary/60 transition-all cursor-pointer shadow-inner"
-                onClick={() => router.push('/profile')}
-                title="View Profile"
-              >
-                U
-              </div>
+            <div className="flex items-center gap-3">
+              <Link href="/profile">
+                <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
+                  <span>👤</span> Profile
+                </Button>
+              </Link>
+              <Link href="/admin">
+                <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
+                  <span>🛡️</span> Admin Panel
+                </Button>
+              </Link>
+              <AccountSwitcher />
             </div>
         </div>
       </header>

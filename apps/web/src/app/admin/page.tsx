@@ -699,6 +699,11 @@ export default function AdminPortalPage() {
                 Dashboard
               </Button>
             </Link>
+            <Link href="/profile">
+              <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold text-muted-foreground hover:text-primary">
+                👤 Profile
+              </Button>
+            </Link>
             <Button
               variant="destructive"
               size="sm"

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Tabs, TabsList, TabsTrigger, TabsContent, Input } from "@codearena/ui";
-import { getLeaderboards, LeaderboardUser } from "@/lib/leaderboard-data";
+import { getLeaderboards, LeaderboardUser, setCachedDbUsers, getCachedDbUsers } from "@/lib/leaderboard-data";
 import { getActiveAccount, getUserStats } from "@/lib/auth-session";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
 
@@ -24,38 +24,71 @@ export default function LeaderboardPage() {
   const [currentUsername, setCurrentUsername] = useState("student");
   const [currentFullName, setCurrentFullName] = useState("CodeArena Student");
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const active = getActiveAccount();
-      const activeId = active?.id || "default";
-      const stats = getUserStats(activeId);
+  const loadLeaderboard = (extraDbUsers?: LeaderboardUser[]) => {
+    if (typeof window === "undefined") return;
+    const active = getActiveAccount();
+    const activeId = active?.id || "default";
+    const stats = getUserStats(activeId);
 
-      const pName = active?.name || "CodeArena Student";
-      const pUsername = active?.username || "student";
-      const pOrg = active?.college || "CodeArena Academy";
+    const pName = active?.name || "CodeArena Student";
+    const pUsername = active?.username || "student";
+    const pOrg = active?.college || "CodeArena Academy";
 
-      setCurrentSolved(stats.problemsSolved);
-      setCurrentRating(stats.dsaRating);
-      setCurrentFullName(pName);
-      setCurrentUsername(pUsername);
-      setUserOrgName(pOrg);
+    setCurrentSolved(stats.problemsSolved);
+    setCurrentRating(stats.dsaRating);
+    setCurrentFullName(pName);
+    setCurrentUsername(pUsername);
+    setUserOrgName(pOrg);
 
-      // Calculate dynamic leaderboard standings
-      const results = getLeaderboards({
+    // Calculate authentic standings from real users only
+    const results = getLeaderboards(
+      {
         username: pUsername,
         name: pName,
         org: pOrg,
         score: stats.dsaRating,
         problemsSolved: stats.problemsSolved,
+      },
+      extraDbUsers || getCachedDbUsers()
+    );
+
+    setGlobalLeaders(results.globalRanked);
+    setOrgLeaders(results.orgRanked);
+    setUserGlobalRank(results.currentUserGlobalRank);
+    setUserOrgRank(results.currentUserOrgRank);
+    setUserOrgName(results.orgName);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    // 1. Initial immediate load from real session accounts
+    loadLeaderboard();
+
+    // 2. Fetch all real registered platform users from backend database
+    fetch("/api/leaderboard")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.items)) {
+          setCachedDbUsers(data.items);
+          loadLeaderboard(data.items);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch database leaderboard:", err);
       });
 
-      setGlobalLeaders(results.globalRanked);
-      setOrgLeaders(results.orgRanked);
-      setUserGlobalRank(results.currentUserGlobalRank);
-      setUserOrgRank(results.currentUserOrgRank);
-      setUserOrgName(results.orgName);
-      setLoading(false);
-    }
+    // 3. Listen for account switches and multi-account state updates
+    const handleAccountChange = () => {
+      loadLeaderboard();
+    };
+
+    window.addEventListener("codearena_account_changed", handleAccountChange);
+    window.addEventListener("storage", handleAccountChange);
+
+    return () => {
+      window.removeEventListener("codearena_account_changed", handleAccountChange);
+      window.removeEventListener("storage", handleAccountChange);
+    };
   }, []);
 
   const getTierColor = (tier: string) => {
@@ -100,8 +133,19 @@ export default function LeaderboardPage() {
             <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">Assessments</Link>
             <Link href="/battles" className="text-muted-foreground hover:text-foreground transition-colors">Battles</Link>
             <Link href="/leaderboard" className="text-primary font-semibold drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]">Leaderboard</Link>
+            <Link href="/profile" className="text-muted-foreground hover:text-foreground transition-colors">Profile</Link>
           </nav>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Link href="/profile">
+              <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
+                <span>👤</span> Profile
+              </Button>
+            </Link>
+            <Link href="/admin">
+              <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
+                <span>🛡️</span> Admin Panel
+              </Button>
+            </Link>
             <AccountSwitcher />
           </div>
         </div>

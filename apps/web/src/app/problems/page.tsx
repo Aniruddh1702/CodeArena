@@ -106,6 +106,19 @@ function ProblemsContent() {
       const stats = getUserStats(activeId);
       const uniqueSlugs = stats.solvedProblems.map((item: any) => item.slug).filter(Boolean);
       setSolvedSlugs(uniqueSlugs);
+
+      const handleAccountChange = () => {
+        const acc = getActiveAccount();
+        const accId = acc?.id || "default";
+        const s = getUserStats(accId);
+        const slugs = s.solvedProblems.map((item: any) => item.slug).filter(Boolean);
+        setSolvedSlugs(slugs);
+      };
+
+      window.addEventListener("codearena_account_changed", handleAccountChange);
+      return () => {
+        window.removeEventListener("codearena_account_changed", handleAccountChange);
+      };
     }
   }, [searchParams]);
 
@@ -160,8 +173,14 @@ function ProblemsContent() {
             <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">Assessments</Link>
             <Link href="/battles" className="text-muted-foreground hover:text-foreground transition-colors">Battles</Link>
             <Link href="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">Leaderboard</Link>
+            <Link href="/profile" className="text-muted-foreground hover:text-foreground transition-colors">Profile</Link>
           </nav>
           <div className="flex items-center gap-3">
+            <Link href="/profile">
+              <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
+                <span>👤</span> Profile
+              </Button>
+            </Link>
             <Link href="/admin">
               <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
                 <span>🛡️</span> Admin Panel

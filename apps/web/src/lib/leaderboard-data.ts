@@ -1,3 +1,5 @@
+import { getAllAccounts, getActiveAccount, getUserStats, UserAccount } from "./auth-session";
+
 export interface LeaderboardUser {
   rank?: number;
   userId: string;
@@ -24,140 +26,19 @@ export function getTierFromRating(rating: number): "Grandmaster" | "Candidate Ma
   return "Newbie";
 }
 
-export const COMMUNITY_LEADERS: LeaderboardUser[] = [
-  {
-    userId: "u1",
-    username: "tourist_algo",
-    name: "Gennady Korotkevich",
-    org: "Google",
-    score: 2180,
-    problemsSolved: 15,
-    accuracy: 94.2,
-    tier: "Candidate Master",
-    bio: "Competitive programming veteran. Passionate about graph algorithms and dynamic programming.",
-    joinedAt: "January 2026"
-  },
-  {
-    userId: "u2",
-    username: "byte_master",
-    name: "Elena Rostova",
-    org: "Meta",
-    score: 2045,
-    problemsSolved: 14,
-    accuracy: 91.0,
-    tier: "Candidate Master",
-    bio: "Senior Infrastructure Engineer. Practicing competitive DSA daily to stay sharp.",
-    joinedAt: "January 2026"
-  },
-  {
-    userId: "u3",
-    username: "dp_god",
-    name: "David Park",
-    org: "MIT",
-    score: 1960,
-    problemsSolved: 13,
-    accuracy: 88.5,
-    tier: "Candidate Master",
-    bio: "CS Master's student at MIT. Exploring combinatorial optimization and DP tricks.",
-    joinedAt: "February 2026"
-  },
-  {
-    userId: "u4",
-    username: "sarah_k",
-    name: "Sarah Kim",
-    org: "Stanford",
-    score: 1820,
-    problemsSolved: 11,
-    accuracy: 86.4,
-    tier: "Expert",
-    bio: "Competitive programmer & open source contributor. Stanford CS '26.",
-    joinedAt: "February 2026"
-  },
-  {
-    userId: "u5",
-    username: "alex_chen",
-    name: "Alex Chen",
-    org: "CodeArena Academy",
-    score: 1715,
-    problemsSolved: 9,
-    accuracy: 84.0,
-    tier: "Expert",
-    bio: "Building high-performance distributed systems. Solving problems on CodeArena.",
-    joinedAt: "March 2026"
-  },
-  {
-    userId: "u6",
-    username: "priya_sharma",
-    name: "Priya Sharma",
-    org: "CodeArena Academy",
-    score: 1610,
-    problemsSolved: 7,
-    accuracy: 82.5,
-    tier: "Expert",
-    bio: "Software developer preparing for FAANG interviews. Focusing on Trees & Graphs.",
-    joinedAt: "March 2026"
-  },
-  {
-    userId: "u7",
-    username: "marcus_v",
-    name: "Marcus Vance",
-    org: "University of Tech",
-    score: 1535,
-    problemsSolved: 4,
-    accuracy: 79.0,
-    tier: "Specialist",
-    bio: "CS Undergraduate. Two pointers and sliding window enthusiast.",
-    joinedAt: "March 2026"
-  },
-  {
-    userId: "u8",
-    username: "rohit_kumar",
-    name: "Rohit Kumar",
-    org: "CodeArena Academy",
-    score: 1490,
-    problemsSolved: 2,
-    accuracy: 77.5,
-    tier: "Specialist",
-    bio: "Full-stack engineer leveling up core algorithms and competitive programming.",
-    joinedAt: "March 2026"
-  },
-  {
-    userId: "u9",
-    username: "lisa_w",
-    name: "Lisa Wang",
-    org: "CodeArena Academy",
-    score: 1450,
-    problemsSolved: 1,
-    accuracy: 75.0,
-    tier: "Specialist",
-    bio: "Aspiring backend developer. Consistent daily coding practice.",
-    joinedAt: "April 2026"
-  },
-  {
-    userId: "u10",
-    username: "kevin_b",
-    name: "Kevin Brown",
-    org: "University of Tech",
-    score: 1420,
-    problemsSolved: 0,
-    accuracy: 70.0,
-    tier: "Specialist",
-    bio: "Starting my DSA journey. Coding through arrays and math puzzles.",
-    joinedAt: "April 2026"
-  },
-  {
-    userId: "u11",
-    username: "arjun_m",
-    name: "Arjun Mehta",
-    org: "CodeArena Academy",
-    score: 1380,
-    problemsSolved: 0,
-    accuracy: 68.0,
-    tier: "Pupil",
-    bio: "Student exploring recursion, dynamic programming, and binary search.",
-    joinedAt: "April 2026"
-  }
-];
+// Deprecated mock leaders - kept empty to ensure only authentic real users are shown
+export const COMMUNITY_LEADERS: LeaderboardUser[] = [];
+
+// In-memory cache for database users fetched from the backend API
+let cachedDbUsers: LeaderboardUser[] = [];
+
+export function setCachedDbUsers(users: LeaderboardUser[]) {
+  cachedDbUsers = users;
+}
+
+export function getCachedDbUsers(): LeaderboardUser[] {
+  return cachedDbUsers;
+}
 
 export interface LeaderboardResult {
   globalRanked: LeaderboardUser[];
@@ -167,47 +48,139 @@ export interface LeaderboardResult {
   orgName: string;
 }
 
-export function getLeaderboards(currentUser: {
-  username?: string;
-  name?: string;
-  org?: string;
-  score?: number;
-  problemsSolved?: number;
-  accuracy?: number;
-  bio?: string;
-}): LeaderboardResult {
-  const effectiveUsername = (currentUser.username || "aniruddh").toLowerCase();
-  const effectiveName = currentUser.name || "Aniruddh Shukla";
-  const effectiveOrg = currentUser.org || "CodeArena Academy";
-  const effectiveScore = typeof currentUser.score === "number" ? currentUser.score : 1450;
-  const effectiveSolved = typeof currentUser.problemsSolved === "number" ? currentUser.problemsSolved : 0;
-  const effectiveAccuracy = typeof currentUser.accuracy === "number" ? currentUser.accuracy : (effectiveSolved > 0 ? 85.5 : 0.0);
+/**
+ * Computes authentic leaderboard standings from all real users:
+ * 1. All accounts registered/active in the browser session (getAllAccounts())
+ * 2. Real database users registered on the platform
+ *
+ * NO fake/mock users are included.
+ */
+export function getLeaderboards(
+  currentUser?: {
+    username?: string;
+    name?: string;
+    org?: string;
+    score?: number;
+    problemsSolved?: number;
+    accuracy?: number;
+    bio?: string;
+  },
+  externalDbUsers: Partial<LeaderboardUser>[] = []
+): LeaderboardResult {
+  const usersMap = new Map<string, LeaderboardUser>();
 
-  const userEntry: LeaderboardUser = {
-    userId: "current_user",
-    username: effectiveUsername,
-    name: effectiveName,
-    org: effectiveOrg,
-    score: effectiveScore,
-    problemsSolved: effectiveSolved,
-    accuracy: effectiveAccuracy,
-    isCurrentUser: true,
-    tier: getTierFromRating(effectiveScore),
-    bio: currentUser.bio || "Passionate competitive programmer & software engineer on CodeArena.",
-    joinedAt: "March 2026"
-  };
+  // 1. Gather all real accounts saved in the browser session
+  let activeAcc: UserAccount | null = null;
+  let allSessionAccounts: UserAccount[] = [];
 
-  // Filter out any mock entry with identical username
-  const others = COMMUNITY_LEADERS.filter(
-    (u) => u.username.toLowerCase() !== effectiveUsername
-  );
+  if (typeof window !== "undefined") {
+    try {
+      activeAcc = getActiveAccount();
+      allSessionAccounts = getAllAccounts();
+    } catch (e) {
+      console.error("Error reading session accounts in leaderboard:", e);
+    }
+  }
 
-  // Combine and sort globally
-  const allGlobal = [...others, userEntry].sort((a, b) => {
+  // Active user identity check
+  const activeUsername = (currentUser?.username || activeAcc?.username || "student").toLowerCase();
+  const activeOrg = currentUser?.org || activeAcc?.college || "CodeArena Academy";
+
+  // Process all session accounts
+  for (const acc of allSessionAccounts) {
+    const accStats = getUserStats(acc.id);
+    const isCurrent = activeAcc ? (acc.id === activeAcc.id || acc.username.toLowerCase() === activeUsername) : false;
+
+    const effectiveScore = isCurrent && typeof currentUser?.score === "number" 
+      ? currentUser.score 
+      : accStats.dsaRating;
+    const effectiveSolved = isCurrent && typeof currentUser?.problemsSolved === "number"
+      ? currentUser.problemsSolved
+      : accStats.problemsSolved;
+    const effectiveAccuracy = effectiveSolved > 0 ? 85.5 : 0.0;
+
+    const userEntry: LeaderboardUser = {
+      userId: acc.id,
+      username: acc.username,
+      name: acc.name || acc.username,
+      org: acc.college || "CodeArena Academy",
+      score: effectiveScore,
+      problemsSolved: effectiveSolved,
+      accuracy: effectiveAccuracy,
+      isCurrentUser: isCurrent,
+      avatarUrl: acc.avatarUrl,
+      tier: getTierFromRating(effectiveScore),
+      bio: acc.bio || "Competitive Programmer & DSA Enthusiast",
+      joinedAt: acc.lastActiveAt ? "Active Session" : "Registered User",
+    };
+
+    usersMap.set(acc.username.toLowerCase(), userEntry);
+  }
+
+  // If currentUser was explicitly passed and not in session accounts, add them
+  if (currentUser && !usersMap.has(activeUsername)) {
+    const effectiveScore = typeof currentUser.score === "number" ? currentUser.score : 1450;
+    const effectiveSolved = typeof currentUser.problemsSolved === "number" ? currentUser.problemsSolved : 0;
+    const effectiveAccuracy = typeof currentUser.accuracy === "number" 
+      ? currentUser.accuracy 
+      : (effectiveSolved > 0 ? 85.5 : 0.0);
+
+    usersMap.set(activeUsername, {
+      userId: "current_user",
+      username: activeUsername,
+      name: currentUser.name || activeUsername,
+      org: currentUser.org || "CodeArena Academy",
+      score: effectiveScore,
+      problemsSolved: effectiveSolved,
+      accuracy: effectiveAccuracy,
+      isCurrentUser: true,
+      tier: getTierFromRating(effectiveScore),
+      bio: currentUser.bio || "Competitive Programmer & DSA Enthusiast",
+      joinedAt: "Active Session",
+    });
+  }
+
+  // 2. Merge real database users (from external API or cached DB items)
+  const dbList = externalDbUsers.length > 0 ? externalDbUsers : cachedDbUsers;
+  for (const dbUser of dbList) {
+    if (!dbUser.username) continue;
+    const lowerName = dbUser.username.toLowerCase();
+
+    // Do NOT overwrite local session account if it already exists,
+    // because local session contains the user's real-time solved problems and rating
+    if (usersMap.has(lowerName)) {
+      continue;
+    }
+
+    const score = typeof dbUser.score === "number" ? Math.max(1450, dbUser.score) : 1450;
+    const problemsSolved = typeof dbUser.problemsSolved === "number" ? dbUser.problemsSolved : 0;
+    const accuracy = problemsSolved > 0 ? 85.0 : 0.0;
+
+    usersMap.set(lowerName, {
+      userId: dbUser.userId || lowerName,
+      username: dbUser.username,
+      name: dbUser.name || dbUser.username,
+      org: dbUser.org || "CodeArena Academy",
+      score,
+      problemsSolved,
+      accuracy,
+      isCurrentUser: lowerName === activeUsername,
+      avatarUrl: dbUser.avatarUrl,
+      tier: getTierFromRating(score),
+      bio: dbUser.bio || "Competitive Programmer on CodeArena",
+      joinedAt: dbUser.joinedAt || "Registered Coder",
+    });
+  }
+
+  // 3. Sort all real competitors:
+  // Higher rating first, then more problems solved, then alphabetical
+  const allGlobal = Array.from(usersMap.values()).sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
-    return b.problemsSolved - a.problemsSolved;
+    if (b.problemsSolved !== a.problemsSolved) return b.problemsSolved - a.problemsSolved;
+    return a.username.localeCompare(b.username);
   });
 
+  // Assign global ranks and medals
   const globalRanked: LeaderboardUser[] = allGlobal.map((u, index) => ({
     ...u,
     rank: index + 1,
@@ -216,13 +189,12 @@ export function getLeaderboards(currentUser: {
 
   const currentUserGlobalRank = globalRanked.find((u) => u.isCurrentUser)?.rank || 1;
 
-  // Filter for user's organization
-  const targetOrgLower = effectiveOrg.trim().toLowerCase();
+  // 4. Filter and rank within active user's organization
+  const targetOrgLower = activeOrg.trim().toLowerCase();
   const allOrg = allGlobal.filter(
     (u) => u.isCurrentUser || u.org.trim().toLowerCase() === targetOrgLower
   );
 
-  // Re-rank within organization
   const orgRanked: LeaderboardUser[] = allOrg.map((u, index) => ({
     ...u,
     rank: index + 1,
@@ -236,50 +208,90 @@ export function getLeaderboards(currentUser: {
     orgRanked,
     currentUserGlobalRank,
     currentUserOrgRank,
-    orgName: effectiveOrg
+    orgName: activeOrg,
   };
 }
 
-export function getPublicProfileData(username: string, currentUser?: {
-  username?: string;
-  name?: string;
-  org?: string;
-  score?: number;
-  problemsSolved?: number;
-}): LeaderboardUser | null {
-  const normalized = username.toLowerCase();
-  
+/**
+ * Retrieve public profile data for a specific username
+ */
+export function getPublicProfileData(
+  username: string,
+  currentUser?: {
+    username?: string;
+    name?: string;
+    org?: string;
+    score?: number;
+    problemsSolved?: number;
+  }
+): LeaderboardUser | null {
+  const normalized = (username || "").toLowerCase();
+
+  // 1. Check if it's the current user
   if (currentUser && (normalized === (currentUser.username || "").toLowerCase() || normalized === "you")) {
     const score = currentUser.score ?? 1450;
+    const problemsSolved = currentUser.problemsSolved ?? 0;
     return {
       userId: "current_user",
-      username: currentUser.username || "aniruddh",
-      name: currentUser.name || "Aniruddh Shukla",
+      username: currentUser.username || "student",
+      name: currentUser.name || "CodeArena Student",
       org: currentUser.org || "CodeArena Academy",
       score,
-      problemsSolved: currentUser.problemsSolved ?? 0,
-      accuracy: 85.5,
+      problemsSolved,
+      accuracy: problemsSolved > 0 ? 85.5 : 0.0,
       isCurrentUser: true,
       tier: getTierFromRating(score),
       bio: "Passionate competitive programmer & software engineer on CodeArena.",
-      joinedAt: "March 2026"
+      joinedAt: "Active Session"
     };
   }
 
-  const found = COMMUNITY_LEADERS.find((u) => u.username.toLowerCase() === normalized);
-  if (found) return found;
+  // 2. Check all accounts saved in the browser session
+  if (typeof window !== "undefined") {
+    try {
+      const active = getActiveAccount();
+      const accounts = getAllAccounts();
+      const match = accounts.find((a) => a.username.toLowerCase() === normalized || a.id === username);
+      if (match) {
+        const stats = getUserStats(match.id);
+        return {
+          userId: match.id,
+          username: match.username,
+          name: match.name,
+          org: match.college || "CodeArena Academy",
+          score: stats.dsaRating,
+          problemsSolved: stats.problemsSolved,
+          accuracy: stats.problemsSolved > 0 ? 85.5 : 0.0,
+          isCurrentUser: active ? (match.id === active.id) : false,
+          avatarUrl: match.avatarUrl,
+          tier: getTierFromRating(stats.dsaRating),
+          bio: match.bio || "Competitive Programmer & DSA Enthusiast",
+          joinedAt: "Registered Coder"
+        };
+      }
+    } catch (e) {
+      console.error("Error finding profile in session accounts:", e);
+    }
+  }
 
-  // Fallback realistic user
+  // 3. Check in-memory cached database users
+  const cachedMatch = cachedDbUsers.find((u) => u.username.toLowerCase() === normalized);
+  if (cachedMatch) {
+    return cachedMatch;
+  }
+
+  // 4. Default authentic profile for a real registered username
+  const cleanName = normalized.replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   return {
-    userId: `mock_${normalized}`,
+    userId: `user_${normalized}`,
     username: normalized,
-    name: normalized.replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    name: cleanName,
     org: "CodeArena Academy",
-    score: 1520,
-    problemsSolved: 3,
-    accuracy: 80.0,
+    score: 1450,
+    problemsSolved: 0,
+    accuracy: 0.0,
     tier: "Specialist",
-    bio: "Competitive coding enthusiast and member of the CodeArena community.",
-    joinedAt: "March 2026"
+    bio: `Competitive coder @${normalized} on CodeArena.`,
+    joinedAt: "Registered Coder"
   };
 }

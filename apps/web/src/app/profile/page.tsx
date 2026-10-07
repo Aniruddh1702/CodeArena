@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Input } from "@codearena/ui";
 import { getLeaderboards } from "@/lib/leaderboard-data";
-import { getActiveAccount, getUserStats, UserAccount } from "@/lib/auth-session";
+import { getActiveAccount, getUserStats, updateActiveAccount, UserAccount } from "@/lib/auth-session";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
 
 interface UserProfile {
@@ -39,45 +39,54 @@ export default function ProfilePage() {
   const [editForm, setEditForm] = useState<UserProfile>(profile);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  const loadProfile = () => {
+    if (typeof window === "undefined") return;
+    const active = getActiveAccount();
+    if (!active) return;
+
+    const activeProfile: UserProfile = {
+      name: active.name || active.username,
+      username: active.username,
+      email: active.email,
+      bio: active.bio || "Competitive Programmer & DSA Enthusiast",
+      organization: active.college || "CodeArena University",
+      github: active.github || active.username,
+      joinedDate: "October 2026",
+    };
+
+    setProfile(activeProfile);
+    setEditForm(activeProfile);
+
+    // Isolated stats for this account
+    const stats = getUserStats(active.id);
+    setSolvedCount(stats.problemsSolved);
+    setDsaRating(stats.dsaRating);
+    setAccuracy(stats.problemsSolved > 0 ? 85.5 : 0.0);
+    setCurrentStreak(stats.problemsSolved > 0 ? 1 : 0);
+    setRecentSolves(stats.recentActivity);
+
+    // Dynamic global rank
+    const lb = getLeaderboards({
+      username: active.username,
+      name: active.name,
+      org: activeProfile.organization,
+      score: stats.dsaRating,
+      problemsSolved: stats.problemsSolved,
+    });
+    setGlobalRank(lb.currentUserGlobalRank);
+  };
+
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const active = getActiveAccount();
-      if (!active) {
-        router.push("/login");
-        return;
-      }
+    loadProfile();
 
-      const activeProfile: UserProfile = {
-        name: active.name || active.username,
-        username: active.username,
-        email: active.email,
-        bio: active.bio || "Competitive Programmer & DSA Enthusiast",
-        organization: active.college || "CodeArena University",
-        github: active.username,
-        joinedDate: "October 2026",
-      };
+    const handleAccountChange = () => {
+      loadProfile();
+    };
 
-      setProfile(activeProfile);
-      setEditForm(activeProfile);
-
-      // Isolated stats for this account
-      const stats = getUserStats(active.id);
-      setSolvedCount(stats.problemsSolved);
-      setDsaRating(stats.dsaRating);
-      setAccuracy(stats.problemsSolved > 0 ? 85.5 : 0.0);
-      setCurrentStreak(stats.problemsSolved > 0 ? 1 : 0);
-      setRecentSolves(stats.recentActivity);
-
-      // Dynamic global rank
-      const lb = getLeaderboards({
-        username: active.username,
-        name: active.name,
-        org: activeProfile.organization,
-        score: stats.dsaRating,
-        problemsSolved: stats.problemsSolved,
-      });
-      setGlobalRank(lb.currentUserGlobalRank);
-    }
+    window.addEventListener("codearena_account_changed", handleAccountChange);
+    return () => {
+      window.removeEventListener("codearena_account_changed", handleAccountChange);
+    };
   }, [router]);
 
   const handleSaveProfile = (e: React.FormEvent) => {
@@ -85,6 +94,13 @@ export default function ProfilePage() {
     setProfile(editForm);
     if (typeof window !== "undefined") {
       localStorage.setItem("userProfile", JSON.stringify(editForm));
+      updateActiveAccount({
+        name: editForm.name,
+        username: editForm.username,
+        bio: editForm.bio,
+        college: editForm.organization,
+        github: editForm.github,
+      });
     }
     setIsEditing(false);
     setSaveSuccess(true);
@@ -153,8 +169,14 @@ export default function ProfilePage() {
             <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">Assessments</Link>
             <Link href="/battles" className="text-muted-foreground hover:text-foreground transition-colors">Battles</Link>
             <Link href="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">Leaderboard</Link>
+            <Link href="/profile" className="text-primary font-semibold drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]">Profile</Link>
           </nav>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Link href="/admin">
+              <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
+                <span>🛡️</span> Admin Panel
+              </Button>
+            </Link>
             <AccountSwitcher />
           </div>
         </div>

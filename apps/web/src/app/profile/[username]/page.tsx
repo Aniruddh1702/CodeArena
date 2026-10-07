@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@codearena/ui";
 import { getPublicProfileData, LeaderboardUser } from "@/lib/leaderboard-data";
+import { getActiveAccount, getUserStats } from "@/lib/auth-session";
 
 export default function PublicProfilePage({ params }: { params: { username: string } }) {
   const router = useRouter();
@@ -15,48 +16,49 @@ export default function PublicProfilePage({ params }: { params: { username: stri
     let currentUserStats: any = undefined;
 
     if (typeof window !== "undefined") {
-      let uniqueSolved = 0;
-      try {
-        const rawSolved = localStorage.getItem("solvedProblems");
-        if (rawSolved) {
-          const list = JSON.parse(rawSolved);
-          if (Array.isArray(list)) uniqueSolved = list.length;
-        } else {
-          uniqueSolved = parseInt(localStorage.getItem("problemsSolved") || "0");
-        }
-      } catch {
-        uniqueSolved = parseInt(localStorage.getItem("problemsSolved") || "0");
-      }
-
-      const storedRating = localStorage.getItem("dsaRating");
-      const rating = storedRating ? parseInt(storedRating) : (1450 + uniqueSolved * 15);
-
-      let pName = "Aniruddh Shukla";
-      let pUsername = "aniruddh";
-      let pOrg = "CodeArena Academy";
-
-      const storedProfile = localStorage.getItem("userProfile");
-      if (storedProfile) {
-        try {
-          const parsed = JSON.parse(storedProfile);
-          if (parsed.name) pName = parsed.name;
-          if (parsed.username) pUsername = parsed.username;
-          if (parsed.organization) pOrg = parsed.organization;
-        } catch {}
-      }
+      const active = getActiveAccount();
+      const activeId = active?.id || "default";
+      const stats = getUserStats(activeId);
 
       currentUserStats = {
-        username: pUsername,
-        name: pName,
-        org: pOrg,
-        score: rating,
-        problemsSolved: uniqueSolved
+        username: active?.username || "student",
+        name: active?.name || "CodeArena Student",
+        org: active?.college || "CodeArena Academy",
+        score: stats.dsaRating,
+        problemsSolved: stats.problemsSolved,
       };
     }
 
     const data = getPublicProfileData(params.username, currentUserStats);
     setProfile(data);
     setLoading(false);
+
+    // If profile was not in local session accounts, check backend database
+    fetch("/api/leaderboard")
+      .then((res) => res.json())
+      .then((resData) => {
+        if (resData?.success && Array.isArray(resData.items)) {
+          const match = resData.items.find(
+            (u: any) => u.username?.toLowerCase() === (params.username || "").toLowerCase()
+          );
+          if (match) {
+            setProfile((prev) => ({
+              ...(prev || {}),
+              userId: match.userId || match.id,
+              username: match.username,
+              name: match.name,
+              score: match.score || 1450,
+              problemsSolved: match.problemsSolved || 0,
+              accuracy: (match.problemsSolved || 0) > 0 ? 85.0 : 0.0,
+              tier: match.score >= 1600 ? "Expert" : match.score >= 1400 ? "Specialist" : "Pupil",
+              org: match.org || "CodeArena Academy",
+              bio: `Competitive programmer @${match.username} on CodeArena.`,
+              joinedAt: "Registered Coder",
+            } as LeaderboardUser));
+          }
+        }
+      })
+      .catch(() => {});
   }, [params.username]);
 
   if (loading || !profile) {
