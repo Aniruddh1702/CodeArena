@@ -185,13 +185,19 @@ function LoginForm() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center border-t py-3">
+        <CardFooter className="flex flex-col gap-2 items-center justify-center border-t py-3">
           <p className="text-xs text-muted-foreground">
             Don&apos;t have an account?{" "}
             <a href="/register" className="text-primary hover:underline font-semibold">
               Register here
             </a>
           </p>
+          <div className="pt-1 border-t border-border/40 w-full text-center">
+            <Link href="/admin" className="text-[11px] text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 font-medium">
+              <span>🛡️</span>
+              <span>Platform Administrator Portal &rarr;</span>
+            </Link>
+          </div>
         </CardFooter>
       </Card>
     </div>
