@@ -138,16 +138,39 @@ export function getProblem(slug: string): ProblemDefinition | null {
   return PROBLEMS_DATABASE[normSlug] || PROBLEMS_DATABASE[slug] || null;
 }
 
+const BASIC_SLUGS_ORDER = [
+  "check-bar-entry-status",
+  "area-of-square",
+  "area-of-triangle",
+  "area-of-circle",
+  "area-of-rectangle",
+  "even-or-odd",
+  "max-of-two-numbers",
+  "check-voting-eligibility",
+  "grade-calculator",
+  "check-number-sign"
+];
+
 export function getAllProblems(): ProblemDefinition[] {
-  const builtIn = Object.values(PROBLEMS_DATABASE);
+  const basic = Object.values(BASIC_PRACTICE_PROBLEMS);
+  const dsa = Object.values(DSA_150_PROBLEMS);
   const custom = Object.values(getCustomProblems());
   const map = new Map<string, ProblemDefinition>();
 
-  for (const p of builtIn) {
-    // Skip duplicate alias from listing
+  // 1. Insert basic problems first (EASY)
+  for (const p of basic) {
     if (p.slug === "check-bar-entry") continue;
     map.set(p.slug, p);
   }
+
+  // 2. Insert DSA 150 problems
+  for (const p of dsa) {
+    if (!map.has(p.slug)) {
+      map.set(p.slug, p);
+    }
+  }
+
+  // 3. Insert / override with custom problems
   for (const p of custom) {
     if (p.slug === "check-bar-entry") continue;
     map.set(p.slug, p);
@@ -156,22 +179,42 @@ export function getAllProblems(): ProblemDefinition[] {
   const allList = Array.from(map.values());
   const customOrder = getQuestionOrder();
 
-  if (customOrder && Array.isArray(customOrder) && customOrder.length > 0) {
-    const orderMap = new Map<string, number>();
-    customOrder.forEach((slug, idx) => orderMap.set(slug, idx));
+  const diffScore: Record<string, number> = { EASY: 1, MEDIUM: 2, HARD: 3 };
 
-    return [...allList].sort((a, b) => {
-      const idxA = orderMap.has(a.slug) ? orderMap.get(a.slug)! : 9999;
-      const idxB = orderMap.has(b.slug) ? orderMap.get(b.slug)! : 9999;
-      if (idxA !== idxB) return idxA - idxB;
+  const getSubOrder = (prob: ProblemDefinition, orderMap: Map<string, number> | null): number => {
+    // If it's one of the basic beginner problems, order them first in Easy
+    const basicIdx = BASIC_SLUGS_ORDER.indexOf(prob.slug);
+    if (basicIdx !== -1) {
+      return basicIdx - 1000;
+    }
+    if (orderMap && orderMap.has(prob.slug)) {
+      return orderMap.get(prob.slug)!;
+    }
+    return 500;
+  };
 
-      // Fallback to standard difficulty tiering
-      const diffScore: Record<string, number> = { EASY: 1, MEDIUM: 2, HARD: 3 };
-      return (diffScore[a.difficulty] || 2) - (diffScore[b.difficulty] || 2);
-    });
-  }
+  const orderMap = customOrder && Array.isArray(customOrder) && customOrder.length > 0
+    ? new Map<string, number>(customOrder.map((slug, idx) => [slug, idx]))
+    : null;
 
-  // Default clean order
-  return allList;
+  return [...allList].sort((a, b) => {
+    const diffA = diffScore[a.difficulty] || 2;
+    const diffB = diffScore[b.difficulty] || 2;
+
+    // Strict Primary Sort: Difficulty (EASY -> MEDIUM -> HARD)
+    if (diffA !== diffB) {
+      return diffA - diffB;
+    }
+
+    // Secondary Sort within same difficulty
+    const subA = getSubOrder(a, orderMap);
+    const subB = getSubOrder(b, orderMap);
+    if (subA !== subB) {
+      return subA - subB;
+    }
+
+    return a.title.localeCompare(b.title);
+  });
 }
+
 
