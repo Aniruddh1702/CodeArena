@@ -11,9 +11,6 @@ export default function Home() {
             <span className="font-bold text-xl tracking-tight text-primary">Code<span className="text-destructive">Arena</span></span>
           </div>
           <nav className="hidden md:flex gap-6 text-sm font-medium items-center">
-            <Link href="/dashboard" className="text-primary font-semibold hover:text-primary/80 transition-colors flex items-center gap-1">
-              <span>📊</span> Student Dashboard
-            </Link>
             <Link href="/problems" className="transition-colors hover:text-primary font-medium">
               Practice (150 DSA)
             </Link>
@@ -25,9 +22,19 @@ export default function Home() {
             </Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/dashboard">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-md">
-                Student Panel &rarr;
+            <Link href="/login">
+              <Button variant="ghost" size="sm" className="text-xs font-semibold text-muted-foreground hover:text-foreground">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-md text-xs">
+                Student Login &rarr;
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button size="sm" variant="outline" className="text-xs font-semibold">
+                Register
               </Button>
             </Link>
           </div>
@@ -53,11 +60,11 @@ export default function Home() {
                         The definitive platform for learning Data Structures, practicing algorithms, and competing in live contests.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                        <Link href="/dashboard" className="w-full sm:w-auto">
-                            <Button size="lg" className="w-full text-base h-12 px-8 font-bold">Open Student Panel 🚀</Button>
+                        <Link href="/login" className="w-full sm:w-auto">
+                            <Button size="lg" className="w-full text-base h-12 px-8 font-bold">Student Login & Enter Arena 🚀</Button>
                         </Link>
                         <Link href="/problems" className="w-full sm:w-auto">
-                            <Button variant="outline" size="lg" className="w-full text-base h-12 px-8">Practice 150 DSA</Button>
+                            <Button variant="outline" size="lg" className="w-full text-base h-12 px-8">Explore 150 Problems</Button>
                         </Link>
                     </div>
                 </div>

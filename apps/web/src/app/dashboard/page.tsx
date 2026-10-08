@@ -72,22 +72,8 @@ export default function DashboardPage() {
       try {
         let active = getActiveAccount();
         if (!active) {
-          // Auto initialize standard student profile for zero-friction access
-          const defaultStudent: UserAccount = {
-            id: "student",
-            email: "student@codearena.dev",
-            username: "student",
-            name: "CodeArena Student",
-            role: "STUDENT",
-            token: "session_token_student",
-            college: "CodeArena Academy",
-            branch: "Computer Science",
-            year: "3rd Year",
-            bio: "Passionate competitive programmer & software engineer. Mastering advanced algorithms, system design, and competitive DSA.",
-            github: "codearena-student",
-            lastActiveAt: new Date().toISOString(),
-          };
-          active = defaultStudent;
+          router.push("/login");
+          return;
         }
 
         setActiveAccount(active);

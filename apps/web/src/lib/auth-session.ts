@@ -71,46 +71,12 @@ export function getAllAccounts(): UserAccount[] {
         return [migrated];
       }
 
-      // Default active student fallback if first time visitor
-      const defaultStudent: UserAccount = {
-        id: "student",
-        email: "student@codearena.dev",
-        username: "student",
-        name: "CodeArena Student",
-        role: "STUDENT",
-        token: "session_token_student",
-        college: "CodeArena Academy",
-        branch: "Computer Science",
-        year: "3rd Year",
-        bio: "Passionate competitive programmer & software engineer. Mastering advanced algorithms, system design, and competitive DSA.",
-        github: "codearena-student",
-        lastActiveAt: new Date().toISOString(),
-      };
-      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify([defaultStudent]));
-      localStorage.setItem(ACTIVE_ACCOUNT_ID_KEY, defaultStudent.id);
-      return [defaultStudent];
+      // First-time visitor has no active accounts until they log in
+      return [];
     }
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-
-    // In case empty array was stored
-    const defaultStudent: UserAccount = {
-      id: "student",
-      email: "student@codearena.dev",
-      username: "student",
-      name: "CodeArena Student",
-      role: "STUDENT",
-      token: "session_token_student",
-      college: "CodeArena Academy",
-      branch: "Computer Science",
-      year: "3rd Year",
-      bio: "Passionate competitive programmer & software engineer.",
-      github: "codearena-student",
-      lastActiveAt: new Date().toISOString(),
-    };
-    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify([defaultStudent]));
-    localStorage.setItem(ACTIVE_ACCOUNT_ID_KEY, defaultStudent.id);
-    return [defaultStudent];
+    if (Array.isArray(parsed)) return parsed;
+    return [];
   } catch (e) {
     console.error("Failed to read accounts:", e);
     return [];
