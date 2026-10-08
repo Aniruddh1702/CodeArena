@@ -46,22 +46,11 @@ export default function RegisterPage() {
     }
 
     try {
-      // 1. Try relative same-origin Next.js proxy route first, fallback to direct API
-      let res: Response;
-      try {
-        res = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-      } catch (networkErr) {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-        res = await fetch(`${apiUrl}/api/auth/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-      }
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       const data = await res.json().catch(() => null);
 

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendApiUrl } from "@/lib/api-config";
 
 export async function GET(req: NextRequest) {
   try {
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = getBackendApiUrl();
     const res = await fetch(`${apiUrl}/api/questions?pageSize=100`, {
       headers: { "Content-Type": "application/json" },
     });
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = getBackendApiUrl();
 
     // Extract authorization header or token cookie
     let authHeader = req.headers.get("authorization");

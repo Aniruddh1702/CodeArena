@@ -43,6 +43,11 @@ services:
           type: web
           name: codearena-api
           property: host
+      - key: API_URL
+        fromService:
+          type: web
+          name: codearena-api
+          property: host
 
 # ---------------------------------------------------------------
 # 3. PostgreSQL Database

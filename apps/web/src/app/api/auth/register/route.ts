@@ -1,15 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendApiUrl } from "@/lib/api-config";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = getBackendApiUrl();
 
-    const res = await fetch(`${apiUrl}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${apiUrl}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch (networkErr: any) {
+      // If primary API url fails with network error, try standard Render public domain
+      if (!apiUrl.includes("onrender.com") && apiUrl.includes("codearena-api")) {
+        const fallbackUrl = `https://${apiUrl.replace(/https?:\/\//, "")}.onrender.com`;
+        res = await fetch(`${fallbackUrl}/api/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      } else {
+        throw networkErr;
+      }
+    }
 
     const data = await res.json().catch(() => null);
 

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserRegistry, recordUserLoginEvent } from "@/lib/userActivity";
+import { getBackendApiUrl } from "@/lib/api-config";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = getBackendApiUrl();
     const map = getUserRegistry();
 
     // 1. Fetch real registered users from PostgreSQL Database via NestJS API
@@ -141,7 +142,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Also forward suspend/activate to backend if status changed
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = getBackendApiUrl();
     if (userId && status) {
       try {
         const endpoint = status === "SUSPENDED" ? `${apiUrl}/api/users/${userId}/suspend` : `${apiUrl}/api/users/${userId}/activate`;
@@ -163,7 +164,7 @@ export async function DELETE(req: NextRequest) {
     const { clearUserRegistry } = await import("@/lib/userActivity");
     clearUserRegistry();
 
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = getBackendApiUrl();
     try {
       await fetch(`${apiUrl}/api/users/clear-all`, { method: "DELETE" });
       await fetch(`${apiUrl}/api/users/clear-all`, { method: "POST" });

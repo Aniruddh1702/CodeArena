@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
     // Passcode verified! If userId is provided, try elevating user in backend DB
     if (userId) {
       try {
-        const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+        const { getBackendApiUrl } = await import("@/lib/api-config");
+        const apiUrl = getBackendApiUrl();
         // Elevate user if API is reachable
         await fetch(`${apiUrl}/api/users/${userId}/elevate`, {
           method: "PATCH",

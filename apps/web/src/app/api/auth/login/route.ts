@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendApiUrl } from "@/lib/api-config";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = getBackendApiUrl();
 
     const emailLower = (body.email || body.username || "").toLowerCase().trim();
     const isAniruddhPass = body.password === "Aniruddh#1702" || body.password === "codearena-admin-2026" || body.password === "admin123" || body.password === "codearena2026";
@@ -30,16 +31,30 @@ export async function POST(req: NextRequest) {
       return resObj;
     }
 
-    const res = await fetch(`${apiUrl}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${apiUrl}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch (networkErr: any) {
+      if (!apiUrl.includes("onrender.com") && apiUrl.includes("codearena-api")) {
+        const fallbackUrl = `https://${apiUrl.replace(/https?:\/\//, "")}.onrender.com`;
+        res = await fetch(`${fallbackUrl}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      } else {
+        throw networkErr;
+      }
+    }
 
     const data = await res.json().catch(() => null);
 
     if (!res.ok) {
-      let message = "Login failed";
+      let message = "Invalid email or password. Please register if you don't have an account.";
       if (data && data.message) {
         message = Array.isArray(data.message) ? data.message.join(", ") : data.message;
       }

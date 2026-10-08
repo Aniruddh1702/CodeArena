@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserRegistry } from "@/lib/userActivity";
+import { getBackendApiUrl } from "@/lib/api-config";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = getBackendApiUrl();
     const userMap = new Map<string, any>();
 
     // 1. Fetch from database leaderboard and users endpoints
