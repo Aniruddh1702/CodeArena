@@ -1,0 +1,55 @@
+services:
+  # -------------------------------------------------------------
+  # 1. Backend API (NestJS)
+  # -------------------------------------------------------------
+  - type: web
+    name: codearena-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install -g pnpm && pnpm install && pnpm db:generate && pnpm --filter @codearena/api build
+    startCommand: pnpm --filter @codearena/api start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DATABASE_URL
+        fromDatabase:
+          name: codearena-postgres
+          property: connectionString
+
+  # -------------------------------------------------------------
+  # 2. Frontend Web (Next.js)
+  # -------------------------------------------------------------
+  - type: web
+    name: codearena-web
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install -g pnpm && pnpm install && pnpm --filter @codearena/web build
+    startCommand: pnpm --filter @codearena/web start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: codearena-api
+          property: host
+
+# ---------------------------------------------------------------
+# 3. PostgreSQL Database
+# ---------------------------------------------------------------
+databases:
+  - name: codearena-postgres
+    plan: free
+    region: oregon
+    databaseName: codearena
+    user: codearena_user
