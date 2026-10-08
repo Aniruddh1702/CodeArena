@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Tabs, TabsList, TabsTrigger, TabsContent, Input } from "@codearena/ui";
@@ -12,6 +12,7 @@ import { NotificationCenter } from "@/components/NotificationCenter";
 export default function LeaderboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("global");
 
@@ -25,7 +26,7 @@ export default function LeaderboardPage() {
   const [currentUsername, setCurrentUsername] = useState("student");
   const [currentFullName, setCurrentFullName] = useState("CodeArena Student");
 
-  const loadLeaderboard = (extraDbUsers?: LeaderboardUser[]) => {
+  const loadLeaderboard = useCallback((extraDbUsers?: LeaderboardUser[]) => {
     if (typeof window === "undefined") return;
     const active = getActiveAccount();
     const activeId = active?.id || "default";
@@ -59,38 +60,53 @@ export default function LeaderboardPage() {
     setUserOrgRank(results.currentUserOrgRank);
     setUserOrgName(results.orgName);
     setLoading(false);
-  };
+  }, []);
+
+  const fetchRealLeaderboard = useCallback(async (manual: boolean = false) => {
+    if (manual) setIsRefreshing(true);
+    try {
+      const res = await fetch("/api/leaderboard", { cache: "no-store" });
+      const data = await res.json().catch(() => null);
+      if (data?.success && Array.isArray(data.items)) {
+        setCachedDbUsers(data.items);
+        loadLeaderboard(data.items);
+      }
+    } catch (err) {
+      console.error("Failed to fetch database leaderboard:", err);
+    } finally {
+      if (manual) {
+        setTimeout(() => setIsRefreshing(false), 500);
+      }
+    }
+  }, [loadLeaderboard]);
 
   useEffect(() => {
     // 1. Initial immediate load from real session accounts
     loadLeaderboard();
 
-    // 2. Fetch all real registered platform users from backend database
-    fetch("/api/leaderboard")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.success && Array.isArray(data.items)) {
-          setCachedDbUsers(data.items);
-          loadLeaderboard(data.items);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch database leaderboard:", err);
-      });
+    // 2. Initial fetch of real platform competitors
+    fetchRealLeaderboard(false);
 
-    // 3. Listen for account switches and multi-account state updates
+    // 3. Live polling every 6 seconds to capture any newly signed-in students in real time
+    const interval = setInterval(() => {
+      fetchRealLeaderboard(false);
+    }, 6000);
+
+    // 4. Listen for account switches and multi-account state updates
     const handleAccountChange = () => {
       loadLeaderboard();
+      fetchRealLeaderboard(false);
     };
 
     window.addEventListener("codearena_account_changed", handleAccountChange);
     window.addEventListener("storage", handleAccountChange);
 
     return () => {
+      clearInterval(interval);
       window.removeEventListener("codearena_account_changed", handleAccountChange);
       window.removeEventListener("storage", handleAccountChange);
     };
-  }, []);
+  }, [loadLeaderboard, fetchRealLeaderboard]);
 
   const getTierColor = (tier: string) => {
     switch (tier) {
@@ -154,19 +170,37 @@ export default function LeaderboardPage() {
         {/* Header & User Standing Card */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-muted-foreground">
-              Competitive Leaderboard
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-muted-foreground">
+                Competitive Leaderboard
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                LIVE
+              </span>
+            </div>
             <p className="text-muted-foreground mt-1 text-sm">
-              Authentic DSA ratings and rankings calculated directly from solved algorithmic challenges.
+              Authentic DSA ratings and rankings calculated directly from solved algorithmic challenges and real signed-in coders.
             </p>
           </div>
-          <Button 
-            onClick={() => router.push('/problems')}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md rounded-full px-6 h-10 text-sm font-semibold shrink-0"
-          >
-            Solve Problems to Rank Up &rarr;
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchRealLeaderboard(true)}
+              disabled={isRefreshing}
+              className="h-10 text-xs font-semibold gap-1.5 border-border/80"
+            >
+              <span className={isRefreshing ? "animate-spin" : ""}>🔄</span>
+              {isRefreshing ? "Refreshing..." : "Refresh Standings"}
+            </Button>
+            <Button 
+              onClick={() => router.push('/problems')}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md rounded-full px-6 h-10 text-sm font-semibold shrink-0"
+            >
+              Solve Problems to Rank Up &rarr;
+            </Button>
+          </div>
         </div>
 
         {/* Live Personal Standing Banner */}

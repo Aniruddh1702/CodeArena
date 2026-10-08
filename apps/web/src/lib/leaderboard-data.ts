@@ -146,9 +146,16 @@ export function getLeaderboards(
     if (!dbUser.username) continue;
     const lowerName = dbUser.username.toLowerCase();
 
-    // Do NOT overwrite local session account if it already exists,
-    // because local session contains the user's real-time solved problems and rating
+    // If user already exists, update properties unless it is the active local session user
     if (usersMap.has(lowerName)) {
+      const existing = usersMap.get(lowerName)!;
+      if (!existing.isCurrentUser) {
+        if (typeof dbUser.score === "number" && dbUser.score > 0) existing.score = dbUser.score;
+        if (typeof dbUser.problemsSolved === "number") existing.problemsSolved = dbUser.problemsSolved;
+        if (dbUser.org) existing.org = dbUser.org;
+        if (dbUser.name) existing.name = dbUser.name;
+        existing.tier = getTierFromRating(existing.score);
+      }
       continue;
     }
 
