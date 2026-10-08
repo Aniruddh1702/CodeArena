@@ -19,7 +19,7 @@ function LoginForm() {
   const [existingAccounts, setExistingAccounts] = useState<UserAccount[]>([]);
 
   useEffect(() => {
-    // Only show student accounts in student login
+    // Only show real student accounts already registered/saved on this device
     const all = getAllAccounts();
     const studentsOnly = all.filter((a) => a.role !== "SUPER_ADMIN" && a.role !== "ADMIN");
     setExistingAccounts(studentsOnly);
@@ -30,48 +30,56 @@ function LoginForm() {
     setLoading(true);
     setError("");
 
-    try {
-      const cleanEmail = email.trim();
-      let userPayload: any = null;
-      let token = "demo_token_" + Date.now();
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !password) {
+      setError("Please enter both your email/username and password.");
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: cleanEmail, password }),
-        });
-        const data = await res.json().catch(() => null);
-        if (res.ok && data) {
-          userPayload = data?.data?.user || data?.user;
-          token = data?.data?.accessToken || data?.accessToken || token;
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail, password }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        let errorMsg = data?.message || "Invalid credentials. If you haven't registered, please create an account first.";
+        if (Array.isArray(errorMsg)) {
+          errorMsg = errorMsg.join(", ");
         }
-      } catch (networkErr) {
-        // Fallback gracefully
+        setError(errorMsg);
+        setLoading(false);
+        return;
       }
 
-      // Check existing accounts on device if backend didn't return user
-      const accounts = getAllAccounts();
-      const existing = accounts.find(
-        (a) => a.email.toLowerCase() === cleanEmail.toLowerCase() || a.username.toLowerCase() === cleanEmail.toLowerCase()
-      );
+      const userPayload = data?.data?.user || data?.user;
+      const token = data?.data?.accessToken || data?.accessToken;
 
-      const username = userPayload?.username || existing?.username || (cleanEmail.includes("@") ? cleanEmail.split("@")[0] : cleanEmail);
-      const userRole = userPayload?.role || existing?.role || "STUDENT";
+      if (!userPayload) {
+        setError("Account not found. Please register to create a new student account.");
+        setLoading(false);
+        return;
+      }
+
+      const username = userPayload.username || (cleanEmail.includes("@") ? cleanEmail.split("@")[0] : cleanEmail);
+      const userRole = userPayload.role || "STUDENT";
+      const fullName = `${userPayload.firstName || ""} ${userPayload.lastName || ""}`.trim() || userPayload.name || username;
 
       const sessionAccount: UserAccount = {
-        id: userPayload?.id || existing?.id || username,
-        email: userPayload?.email || existing?.email || (cleanEmail.includes("@") ? cleanEmail : `${username}@codearena.dev`),
+        id: userPayload.id || username,
+        email: userPayload.email || cleanEmail,
         username: username,
-        name: userPayload?.firstName 
-          ? `${userPayload.firstName} ${userPayload.lastName || ""}`.trim() 
-          : (existing?.name || username),
+        name: fullName,
         role: userRole,
-        token: token,
-        college: existing?.college || "CodeArena University",
-        year: existing?.year || "3rd Year",
-        branch: existing?.branch || "Computer Science",
-        bio: existing?.bio || "Competitive Programmer & DSA Enthusiast",
+        token: token || `token_${Date.now()}`,
+        college: userPayload.college || "CodeArena University",
+        year: "3rd Year",
+        branch: "Computer Science",
+        bio: "Competitive Programmer & DSA Enthusiast",
       };
 
       saveAccount(sessionAccount, true);
@@ -83,7 +91,7 @@ function LoginForm() {
         router.push("/dashboard");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to sign in. Please verify your credentials.");
+      setError(err.message || "Failed to sign in. Please verify your credentials or register.");
     } finally {
       setLoading(false);
     }
@@ -92,12 +100,6 @@ function LoginForm() {
   const handleQuickSwitch = (accountId: string) => {
     switchAccount(accountId);
     router.push("/dashboard");
-  };
-
-  const handleQuickFill = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setError("");
   };
 
   return (
@@ -109,50 +111,16 @@ function LoginForm() {
           </CardTitle>
           <CardDescription className="text-muted-foreground text-xs">
             {isAddingAccount
-              ? "Sign into an additional account. You can switch between accounts anytime."
-              : "Enter your student credentials to access your CodeArena dashboard & practice arena"}
+              ? "Sign into an additional verified account. You can switch between accounts anytime."
+              : "Enter your registered student credentials to access your dashboard & practice arena"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Quick Demo Credentials Bar */}
-          <div className="p-2.5 rounded-xl bg-primary/5 border border-primary/20 space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-              <span>Quick Student Profiles:</span>
-              <span className="text-[10px] text-primary">Click to fill ⚡</span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => handleQuickFill("alex.chen@codearena.dev", "Student@123!")}
-                className="px-2.5 py-1 rounded-md bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/80 transition-colors flex items-center gap-1"
-              >
-                <span>👨‍💻</span>
-                <span>Alex Chen</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill("priya.patel@codearena.dev", "Student@123!")}
-                className="px-2.5 py-1 rounded-md bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/80 transition-colors flex items-center gap-1"
-              >
-                <span>👩‍💻</span>
-                <span>Priya Patel</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill("student@codearena.dev", "Student@123!")}
-                className="px-2.5 py-1 rounded-md bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/80 transition-colors flex items-center gap-1"
-              >
-                <span>🎓</span>
-                <span>Demo Student</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Multi-Account Quick Switch Bar */}
+          {/* Multi-Account Quick Switch for previously authenticated accounts on this device */}
           {existingAccounts.length > 0 && !isAddingAccount && (
             <div className="p-3 rounded-xl bg-secondary/50 border border-border/60 space-y-2">
               <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-                <span>Student accounts on this device:</span>
+                <span>Verified accounts on this device:</span>
                 <span className="font-mono">{existingAccounts.length} account{existingAccounts.length > 1 ? "s" : ""}</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -176,11 +144,11 @@ function LoginForm() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-semibold">Student Email or Username</Label>
+              <Label htmlFor="email" className="text-xs font-semibold">Registered Email or Username</Label>
               <Input
                 id="email"
                 type="text"
-                placeholder="student@codearena.dev or username"
+                placeholder="your.email@example.com or username"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -203,15 +171,15 @@ function LoginForm() {
                     {showPassword ? "Hide" : "Show"}
                   </button>
                   <span className="text-muted-foreground text-xs">•</span>
-                  <a href="/reset-password" className="text-[11px] text-primary hover:underline">
+                  <Link href="/reset-password" className="text-[11px] text-primary hover:underline">
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
               </div>
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder="Enter your registered password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -223,23 +191,31 @@ function LoginForm() {
             </div>
 
             {error && (
-              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium flex items-center gap-2">
-                <span>⚠️</span>
-                <span>{error}</span>
+              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium space-y-1">
+                <div className="flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{error}</span>
+                </div>
+                <div className="pt-1 text-[11px] text-muted-foreground">
+                  Not registered yet?{" "}
+                  <Link href="/register" className="text-primary font-bold hover:underline">
+                    Create a new student account &rarr;
+                  </Link>
+                </div>
               </div>
             )}
 
             <Button type="submit" className="w-full h-9 text-xs font-bold" disabled={loading}>
-              {loading ? "Signing in..." : isAddingAccount ? "Add & Switch to Account" : "Sign in to Student Dashboard"}
+              {loading ? "Authenticating..." : isAddingAccount ? "Add & Switch Account" : "Sign in"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 items-center justify-center border-t py-3">
           <p className="text-xs text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <a href="/register" className="text-primary hover:underline font-semibold">
+            <Link href="/register" className="text-primary hover:underline font-semibold">
               Register here
-            </a>
+            </Link>
           </p>
         </CardFooter>
       </Card>
