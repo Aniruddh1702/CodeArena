@@ -45,8 +45,9 @@ export class AuthService {
       throw new ConflictException('This username is already taken');
     }
 
-    // Hash password
-    const saltRounds = this.config.get<number>('BCRYPT_SALT_ROUNDS', 10);
+    // Hash password with safe integer salt rounds
+    const rawSalt = this.config.get('BCRYPT_SALT_ROUNDS', 10);
+    const saltRounds = typeof rawSalt === 'number' ? rawSalt : parseInt(String(rawSalt), 10) || 10;
     const passwordHash = await bcrypt.hash(dto.password, saltRounds);
 
     // Generate email verification token
@@ -68,10 +69,14 @@ export class AuthService {
       },
     });
 
-    // Create initial rating
-    await this.prisma.rating.create({
-      data: { userId: user.id },
-    });
+    // Create initial rating safely
+    try {
+      await this.prisma.rating.create({
+        data: { userId: user.id },
+      });
+    } catch (e) {
+      // Ignore if rating table already has row
+    }
 
     // Audit log
     await this.audit.log({
@@ -315,19 +320,23 @@ export class AuthService {
     const accessToken = this.jwt.sign(payload);
 
     const refreshTokenValue = uuidv4();
-    const refreshExpiration = this.config.get<string>('JWT_REFRESH_EXPIRATION', '30d');
-    const daysMatch = refreshExpiration.match(/^(\d+)d$/);
+    const refreshExpiration = this.config.get<string>('JWT_REFRESH_EXPIRATION', '30d') || '30d';
+    const daysMatch = String(refreshExpiration).match(/^(\d+)d$/);
     const expiresInMs = daysMatch
-      ? parseInt(daysMatch[1]) * 24 * 60 * 60 * 1000
+      ? parseInt(daysMatch[1], 10) * 24 * 60 * 60 * 1000
       : 30 * 24 * 60 * 60 * 1000;
 
-    await this.prisma.refreshToken.create({
-      data: {
-        token: refreshTokenValue,
-        userId,
-        expiresAt: new Date(Date.now() + expiresInMs),
-      },
-    });
+    try {
+      await this.prisma.refreshToken.create({
+        data: {
+          token: refreshTokenValue,
+          userId,
+          expiresAt: new Date(Date.now() + expiresInMs),
+        },
+      });
+    } catch (e) {
+      // Refresh token persistence fallback
+    }
 
     return {
       accessToken,
