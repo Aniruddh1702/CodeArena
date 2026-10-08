@@ -19,6 +19,16 @@ interface Problem {
 }
 
 const ALL_MOCK_QUESTIONS: Problem[] = [
+  { id: 'b1', slug: 'check-bar-entry-status', title: 'Check Bar Entry Status', difficulty: 'EASY', solveCount: 9400, topics: [{ name: 'Conditionals' }, { name: 'Logic' }] },
+  { id: 'b2', slug: 'area-of-square', title: 'Area of Square', difficulty: 'EASY', solveCount: 16500, topics: [{ name: 'Math' }, { name: 'Geometry' }] },
+  { id: 'b3', slug: 'area-of-triangle', title: 'Area of Triangle', difficulty: 'EASY', solveCount: 14200, topics: [{ name: 'Math' }, { name: 'Geometry' }] },
+  { id: 'b4', slug: 'area-of-circle', title: 'Area of Circle', difficulty: 'EASY', solveCount: 12800, topics: [{ name: 'Math' }, { name: 'Geometry' }] },
+  { id: 'b5', slug: 'area-of-rectangle', title: 'Area of Rectangle', difficulty: 'EASY', solveCount: 15300, topics: [{ name: 'Math' }, { name: 'Geometry' }] },
+  { id: 'b6', slug: 'even-or-odd', title: 'Check Even or Odd', difficulty: 'EASY', solveCount: 22100, topics: [{ name: 'Conditionals' }, { name: 'Math' }] },
+  { id: 'b7', slug: 'max-of-two-numbers', title: 'Find Maximum of Two Numbers', difficulty: 'EASY', solveCount: 19800, topics: [{ name: 'Conditionals' }, { name: 'Logic' }] },
+  { id: 'b8', slug: 'check-voting-eligibility', title: 'Check Voting Eligibility', difficulty: 'EASY', solveCount: 17400, topics: [{ name: 'Conditionals' }, { name: 'Logic' }] },
+  { id: 'b9', slug: 'grade-calculator', title: 'Grade Calculator', difficulty: 'EASY', solveCount: 13900, topics: [{ name: 'Conditionals' }, { name: 'Logic' }] },
+  { id: 'b10', slug: 'check-number-sign', title: 'Check Number Sign', difficulty: 'EASY', solveCount: 18600, topics: [{ name: 'Conditionals' }, { name: 'Math' }] },
   { id: '1', slug: 'two-sum', title: 'Two Sum', difficulty: 'EASY', solveCount: 15420, topics: [{ name: 'Arrays' }, { name: 'Hash Table' }] },
   { id: '2', slug: 'reverse-linked-list', title: 'Reverse Linked List', difficulty: 'EASY', solveCount: 8900, topics: [{ name: 'Linked List' }] },
   { id: '3', slug: 'maximum-subarray', title: 'Maximum Subarray', difficulty: 'MEDIUM', solveCount: 6500, topics: [{ name: 'Arrays' }, { name: 'Dynamic Programming' }] },
@@ -38,6 +48,9 @@ const ALL_MOCK_QUESTIONS: Problem[] = [
 
 const TOPIC_TAGS = [
   "ALL",
+  "Conditionals",
+  "Math",
+  "Geometry",
   "Arrays",
   "Strings",
   "Dynamic Programming",

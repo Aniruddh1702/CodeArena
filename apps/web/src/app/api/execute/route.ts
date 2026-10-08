@@ -336,12 +336,12 @@ print(json.dumps({"results": results}))
 // C++ Runner (Compiles with g++ and evaluates real testcases)
 // ----------------------------------------------------
 function inferCppType(val: any): string {
-  if (typeof val === "number") return "int";
+  if (typeof val === "number") return Number.isInteger(val) ? "int" : "double";
   if (typeof val === "boolean") return "bool";
   if (typeof val === "string") return "string";
   if (Array.isArray(val)) {
     if (val.length === 0) return "vector<int>";
-    if (typeof val[0] === "number") return "vector<int>";
+    if (typeof val[0] === "number") return Number.isInteger(val[0]) ? "vector<int>" : "vector<double>";
     if (typeof val[0] === "string") return "vector<string>";
     if (Array.isArray(val[0])) {
       if (val[0].length > 0 && typeof val[0][0] === "string" && val[0][0].length === 1) {
@@ -364,6 +364,10 @@ function toCppLiteral(val: any, typeName: string): string {
     return JSON.stringify(String(val));
   }
   if (typeName === "vector<int>") {
+    if (!Array.isArray(val) || val.length === 0) return "{}";
+    return "{" + val.join(", ") + "}";
+  }
+  if (typeName === "vector<double>") {
     if (!Array.isArray(val) || val.length === 0) return "{}";
     return "{" + val.join(", ") + "}";
   }
@@ -393,6 +397,17 @@ const PROBLEM_CPP_META: Record<string, string[]> = {
   "merge-intervals": ["vector<vector<int>>"],
   "coin-change": ["vector<int>", "int"],
   "number-of-islands": ["vector<vector<char>>"],
+  "check-bar-entry-status": ["int", "bool"],
+  "check-bar-entry": ["int", "bool"],
+  "area-of-square": ["int"],
+  "area-of-triangle": ["double", "double"],
+  "area-of-circle": ["double"],
+  "area-of-rectangle": ["int", "int"],
+  "even-or-odd": ["int"],
+  "max-of-two-numbers": ["int", "int"],
+  "check-voting-eligibility": ["int"],
+  "grade-calculator": ["int"],
+  "check-number-sign": ["int"],
 };
 
 async function executeCpp(

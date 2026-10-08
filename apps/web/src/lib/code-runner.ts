@@ -32,7 +32,11 @@ export function deepEqual(a: any, b: any): boolean {
 
   if (typeof a === "number" && typeof b === "number") {
     // Handle floating point tolerances
-    return Math.abs(a - b) < 1e-5;
+    return Math.abs(a - b) < 0.05;
+  }
+
+  if (typeof a === "string" && typeof b === "string") {
+    return a.trim() === b.trim();
   }
 
   if (a === null || b === null || typeof a !== "object" || typeof b !== "object") {

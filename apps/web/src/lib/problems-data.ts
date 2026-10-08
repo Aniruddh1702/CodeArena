@@ -1,4 +1,5 @@
 import { DSA_150_PROBLEMS } from "./dsa-150-database";
+import { BASIC_PRACTICE_PROBLEMS } from "./basic-problems-database";
 
 export interface TestCase {
   input: string; // raw display string
@@ -28,6 +29,7 @@ export interface ProblemDefinition {
 }
 
 export const PROBLEMS_DATABASE: Record<string, ProblemDefinition> = {
+  ...BASIC_PRACTICE_PROBLEMS,
   ...DSA_150_PROBLEMS,
 };
 
@@ -115,9 +117,25 @@ export function resetQuestionOrder(): void {
 }
 
 export function getProblem(slug: string): ProblemDefinition | null {
+  if (!slug) return null;
+  const normSlug = slug.toLowerCase().trim().replace(/_/g, "-");
+  
+  // Check custom problems first
   const custom = getCustomProblems();
-  if (custom[slug]) return custom[slug];
-  return PROBLEMS_DATABASE[slug] || null;
+  if (custom[normSlug]) {
+    const custProb = custom[normSlug];
+    // If the custom problem has valid testcases, return it
+    if (Array.isArray(custProb.publicTestCases) && custProb.publicTestCases.length > 0) {
+      return custProb;
+    }
+  }
+
+  // Check alias for bar entry
+  if (normSlug === "check-bar-entry-status" || normSlug === "check-bar-entry" || normSlug === "bar-entry") {
+    return BASIC_PRACTICE_PROBLEMS["check-bar-entry-status"];
+  }
+
+  return PROBLEMS_DATABASE[normSlug] || PROBLEMS_DATABASE[slug] || null;
 }
 
 export function getAllProblems(): ProblemDefinition[] {
@@ -126,9 +144,12 @@ export function getAllProblems(): ProblemDefinition[] {
   const map = new Map<string, ProblemDefinition>();
 
   for (const p of builtIn) {
+    // Skip duplicate alias from listing
+    if (p.slug === "check-bar-entry") continue;
     map.set(p.slug, p);
   }
   for (const p of custom) {
+    if (p.slug === "check-bar-entry") continue;
     map.set(p.slug, p);
   }
 
@@ -150,6 +171,7 @@ export function getAllProblems(): ProblemDefinition[] {
     });
   }
 
-  // Default clean order: 50 Easy -> 50 Medium -> 50 Hard
+  // Default clean order
   return allList;
 }
+
