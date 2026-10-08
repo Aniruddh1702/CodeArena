@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Card, Button, Input } from "@codearena/ui";
 import { getActiveAccount, getUserStats } from "@/lib/auth-session";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { getAllProblems } from "@/lib/problems-data";
 
 interface Problem {
@@ -169,13 +170,16 @@ function ProblemsContent() {
           </Link>
           <nav className="hidden md:flex gap-8 text-sm font-medium">
             <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">Dashboard</Link>
-            <Link href="/problems" className="text-primary font-semibold">Practice</Link>
-            <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">Assessments</Link>
+            <Link href="/problems" className="text-primary font-semibold">Practice (150 DSA)</Link>
+            <Link href="/contests" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 font-semibold text-amber-400">
+              <span>🏆</span> Contests
+            </Link>
             <Link href="/battles" className="text-muted-foreground hover:text-foreground transition-colors">Battles</Link>
             <Link href="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">Leaderboard</Link>
             <Link href="/profile" className="text-muted-foreground hover:text-foreground transition-colors">Profile</Link>
           </nav>
           <div className="flex items-center gap-3">
+            <NotificationCenter />
             <Link href="/profile">
               <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
                 <span>👤</span> Profile

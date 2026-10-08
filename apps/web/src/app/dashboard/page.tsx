@@ -7,7 +7,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button } fro
 import { PROBLEMS_DATABASE } from "@/lib/problems-data";
 import { getLeaderboards } from "@/lib/leaderboard-data";
 import { getActiveAccount, getUserStats, UserAccount } from "@/lib/auth-session";
+import { getContests, Contest, registerUserForContest } from "@/lib/contests-data";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 interface FocusAreaItem {
   name: string;
@@ -24,6 +26,8 @@ export default function DashboardPage() {
   const [activeAccount, setActiveAccount] = useState<UserAccount | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [contestsList, setContestsList] = useState<Contest[]>([]);
+  const [now, setNow] = useState(Date.now());
 
   const getRatingTier = (rating: number) => {
     if (rating >= 2200) return { title: "Grandmaster", color: "text-red-400", nextTier: "Legendary", nextRating: 2400 };
@@ -34,13 +38,56 @@ export default function DashboardPage() {
     return { title: "Newbie", color: "text-gray-400", nextTier: "Pupil", nextRating: 1200 };
   };
 
+  const formatCountdown = (targetTimeStr: string) => {
+    const diff = new Date(targetTimeStr).getTime() - now;
+    if (diff <= 0) return "00:00:00";
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+    return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  useEffect(() => {
+    setContestsList(getContests());
+    const timer = setInterval(() => {
+      setNow(Date.now());
+      setContestsList(getContests());
+    }, 1000);
+
+    const handleUpdate = () => {
+      setContestsList(getContests());
+    };
+
+    window.addEventListener("codearena_contests_updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("codearena_contests_updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
+  }, []);
+
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         let active = getActiveAccount();
         if (!active) {
-          router.push("/login");
-          return;
+          // Auto initialize standard student profile for zero-friction access
+          const defaultStudent: UserAccount = {
+            id: "student",
+            email: "student@codearena.dev",
+            username: "student",
+            name: "CodeArena Student",
+            role: "STUDENT",
+            token: "session_token_student",
+            college: "CodeArena Academy",
+            branch: "Computer Science",
+            year: "3rd Year",
+            bio: "Passionate competitive programmer & software engineer. Mastering advanced algorithms, system design, and competitive DSA.",
+            github: "codearena-student",
+            lastActiveAt: new Date().toISOString(),
+          };
+          active = defaultStudent;
         }
 
         setActiveAccount(active);
@@ -50,8 +97,8 @@ export default function DashboardPage() {
         const userStats = getUserStats(active.id);
         const uniqueSolvedList = userStats.solvedProblems;
         let solvedCount = userStats.problemsSolved;
-        let currentRating = userStats.dsaRating;
-        let activities = userStats.recentActivity;
+        let currentRating = userStats.dsaRating || 1450;
+        let activities = userStats.recentActivity || [];
 
         // 2. Calculate topic mastery for THIS user account
         const countTopicSolved = (topicName: string): number => {
@@ -108,7 +155,7 @@ export default function DashboardPage() {
           score: currentRating,
           problemsSolved: solvedCount,
         });
-        const dynamicUserRank = leaderboardStandings.currentUserGlobalRank;
+        const dynamicUserRank = leaderboardStandings.currentUserGlobalRank || 1;
 
         // 4. Fetch live DB analytics with user's auth token
         try {
@@ -186,16 +233,16 @@ export default function DashboardPage() {
       );
   }
 
-  if (error && !data) {
+  if (!data) {
       return (
           <div className="min-h-screen bg-background p-8 flex flex-col justify-center items-center gap-4">
-              <p className="text-destructive font-medium">{error}</p>
+              <p className="text-destructive font-medium">{error || "Unable to load dashboard data."}</p>
               <Button onClick={() => router.push('/login')} variant="outline">Go to Login</Button>
           </div>
       );
   }
 
-  const tier = getRatingTier(data.dsaRating);
+  const tier = getRatingTier(data?.dsaRating || 1450);
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
@@ -210,13 +257,16 @@ export default function DashboardPage() {
             </Link>
             <nav className="hidden md:flex gap-8 text-sm font-medium">
                 <Link href="/dashboard" className="text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.5)] font-semibold">Dashboard</Link>
-                <Link href="/problems" className="text-muted-foreground hover:text-foreground transition-colors">Practice</Link>
-                <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">Assessments</Link>
+                <Link href="/problems" className="text-muted-foreground hover:text-foreground transition-colors">Practice (150 DSA)</Link>
+                <Link href="/contests" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 font-semibold text-amber-400">
+                  <span>🏆</span> Contests
+                </Link>
                 <Link href="/battles" className="text-muted-foreground hover:text-foreground transition-colors">Battles</Link>
                 <Link href="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">Leaderboard</Link>
                 <Link href="/profile" className="text-muted-foreground hover:text-foreground transition-colors">Profile</Link>
             </nav>
             <div className="flex items-center gap-3">
+                <NotificationCenter />
                 <Link href="/profile">
                   <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
                     <span>👤</span> Profile
@@ -262,6 +312,115 @@ export default function DashboardPage() {
                 </Button>
             </div>
         </div>
+
+        {/* Live & Scheduled Contests Showcase */}
+        {contestsList.filter(c => c.status === "LIVE" || c.status === "UPCOMING").length > 0 && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 text-lg">🏆</span>
+                <div>
+                  <h2 className="text-xl font-bold text-foreground">Live & Scheduled Contests</h2>
+                  <p className="text-xs text-muted-foreground">Competitive programming battles. Compete against students in real-time.</p>
+                </div>
+              </div>
+              <Link href="/contests">
+                <Button variant="ghost" size="sm" className="text-xs text-primary hover:text-primary/80 gap-1">
+                  View All Contests ({contestsList.length}) &rarr;
+                </Button>
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {contestsList
+                .filter(c => c.status === "LIVE" || c.status === "UPCOMING")
+                .map((contest) => {
+                  const isLive = contest.status === "LIVE";
+                  const totalPoints = contest.problems.reduce((sum, p) => sum + p.points, 0);
+
+                  return (
+                    <Card
+                      key={contest.id}
+                      className={`overflow-hidden border transition-all duration-200 hover:shadow-xl ${
+                        isLive
+                          ? "border-emerald-500/50 bg-gradient-to-br from-card via-card to-emerald-950/20 shadow-emerald-500/10"
+                          : "border-blue-500/40 bg-gradient-to-br from-card via-card to-blue-950/20"
+                      }`}
+                    >
+                      <CardHeader className="pb-3 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            {isLive ? (
+                              <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500 text-white animate-pulse flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white" /> LIVE NOW
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                ⏱️ UPCOMING SCHEDULED
+                              </span>
+                            )}
+                            <span className="text-xs text-muted-foreground font-mono">
+                              {contest.durationMinutes}m duration
+                            </span>
+                          </div>
+
+                          <div className="text-right">
+                            <p className={`text-[10px] font-bold uppercase tracking-wider ${isLive ? "text-emerald-400" : "text-blue-400"}`}>
+                              {isLive ? "Ends In" : "Starts In"}
+                            </p>
+                            <p className={`font-mono text-xs font-black ${isLive ? "text-emerald-400" : "text-blue-400"}`}>
+                              {formatCountdown(isLive ? contest.endTime : contest.startTime)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div>
+                          <CardTitle className="text-base font-bold text-foreground hover:text-primary transition-colors">
+                            <Link href={`/contests/${contest.id}`}>{contest.title}</Link>
+                          </CardTitle>
+                          <CardDescription className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                            {contest.description}
+                          </CardDescription>
+                        </div>
+                      </CardHeader>
+
+                      <CardContent className="pt-0 space-y-3">
+                        <div className="p-2.5 rounded-lg bg-secondary/50 border border-border/60 flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-foreground">{contest.problems.length} Challenges</span>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="text-primary font-bold font-mono">{totalPoints} Max Pts</span>
+                          </div>
+                          <div className="text-[11px] text-muted-foreground font-mono">
+                            {new Date(contest.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="text-[11px] text-muted-foreground">
+                            👥 {contest.participantsCount} Enrolled
+                          </span>
+
+                          <Link href={`/contests/${contest.id}`}>
+                            <Button
+                              size="sm"
+                              className={`h-8 text-xs font-bold gap-1.5 shadow-md ${
+                                isLive
+                                  ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                              }`}
+                            >
+                              <span>{isLive ? "🚀 Enter Live Arena" : "⏱️ Enter Scheduled Lobby"}</span>
+                            </Button>
+                          </Link>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+            </div>
+          </div>
+        )}
 
         {/* Stats Grid - Glassmorphism */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100 fill-mode-both">

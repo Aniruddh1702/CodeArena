@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Tabs
 import { getLeaderboards, LeaderboardUser, setCachedDbUsers, getCachedDbUsers } from "@/lib/leaderboard-data";
 import { getActiveAccount, getUserStats } from "@/lib/auth-session";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 export default function LeaderboardPage() {
   const router = useRouter();
@@ -129,13 +130,16 @@ export default function LeaderboardPage() {
           </Link>
           <nav className="hidden md:flex gap-8 text-sm font-medium">
             <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">Dashboard</Link>
-            <Link href="/problems" className="text-muted-foreground hover:text-foreground transition-colors">Practice</Link>
-            <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">Assessments</Link>
+            <Link href="/problems" className="text-muted-foreground hover:text-foreground transition-colors">Practice (150 DSA)</Link>
+            <Link href="/contests" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 font-semibold text-amber-400">
+              <span>🏆</span> Contests
+            </Link>
             <Link href="/battles" className="text-muted-foreground hover:text-foreground transition-colors">Battles</Link>
             <Link href="/leaderboard" className="text-primary font-semibold drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]">Leaderboard</Link>
             <Link href="/profile" className="text-muted-foreground hover:text-foreground transition-colors">Profile</Link>
           </nav>
           <div className="flex items-center gap-3">
+            <NotificationCenter />
             <Link href="/profile">
               <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
                 <span>👤</span> Profile

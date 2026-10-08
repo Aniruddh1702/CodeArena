@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Editor from "@monaco-editor/react";
 import { Button, Card, CardHeader, CardTitle, CardContent, Tabs, TabsList, TabsTrigger, TabsContent } from "@codearena/ui";
-import { getProblem, ProblemDefinition, TestCase } from "@/lib/problems-data";
+import { getProblem, PROBLEMS_DATABASE, ProblemDefinition, TestCase } from "@/lib/problems-data";
 import { evaluateJavaScript, ExecutionSummary, TestResult } from "@/lib/code-runner";
 import { getActiveAccount, getUserStats, getUserProblemSubmissions, saveUserProblemSubmission, recordUserSolve } from "@/lib/auth-session";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
@@ -26,7 +26,8 @@ interface SavedSubmission {
 
 export default function ProblemWorkspace({ params }: { params: { slug: string } }) {
   const router = useRouter();
-  const [question, setQuestion] = useState<ProblemDefinition>(getProblem(params.slug));
+  const initialProb = getProblem(params.slug) || (PROBLEMS_DATABASE as any)[params.slug] || Object.values(PROBLEMS_DATABASE)[0];
+  const [question, setQuestion] = useState<ProblemDefinition>(initialProb);
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState<"javascript" | "python" | "cpp" | "java">("javascript");
   const [code, setCode] = useState<string>("");
@@ -114,9 +115,11 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
 
   // Load problem details & past submissions
   useEffect(() => {
-    const prob = getProblem(params.slug);
-    setQuestion(prob);
-    setCode(prob.starterCode[language] || prob.starterCode.javascript);
+    const prob = getProblem(params.slug) || (PROBLEMS_DATABASE as any)[params.slug] || Object.values(PROBLEMS_DATABASE)[0];
+    if (prob) {
+      setQuestion(prob);
+      setCode(prob.starterCode[language] || prob.starterCode.javascript);
+    }
     setRunResult(null);
     setSubmitFeedback(null);
     setHasRun(false);
@@ -142,8 +145,10 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         setSubmissions(subs);
         const s = getUserStats(currentId);
         setIsProblemSolved(s.solvedProblems.some((p: any) => p.slug === params.slug));
-        const p = getProblem(params.slug);
-        setCode(p.starterCode[language] || p.starterCode.javascript);
+        const p = getProblem(params.slug) || (PROBLEMS_DATABASE as any)[params.slug] || Object.values(PROBLEMS_DATABASE)[0];
+        if (p) {
+          setCode(p.starterCode[language] || p.starterCode.javascript);
+        }
         clearEditorMarkers();
         setRunResult(null);
         setSubmitFeedback(null);

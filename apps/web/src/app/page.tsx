@@ -10,17 +10,30 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <span className="font-bold text-xl tracking-tight text-primary">Code<span className="text-destructive">Arena</span></span>
           </div>
-          <nav className="hidden md:flex gap-6 text-sm font-medium">
-            <Link href="/about" className="transition-colors hover:text-primary">About</Link>
-            <Link href="/features" className="transition-colors hover:text-primary">Features</Link>
-            <Link href="/pricing" className="transition-colors hover:text-primary">Pricing</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="ghost" size="sm">Sign In</Button>
+          <nav className="hidden md:flex gap-6 text-sm font-medium items-center">
+            <Link href="/dashboard" className="text-primary font-semibold hover:text-primary/80 transition-colors flex items-center gap-1">
+              <span>📊</span> Student Dashboard
             </Link>
-            <Link href="/register">
-              <Button size="sm">Get Started</Button>
+            <Link href="/problems" className="transition-colors hover:text-primary font-medium">
+              Practice (150 DSA)
+            </Link>
+            <Link href="/contests" className="transition-colors hover:text-amber-400 font-medium flex items-center gap-1 text-amber-400/90">
+              <span>🏆</span> Contests
+            </Link>
+            <Link href="/leaderboard" className="transition-colors hover:text-primary">
+              Leaderboard
+            </Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
+                Student Panel &rarr;
+              </Button>
+            </Link>
+            <Link href="/admin">
+              <Button variant="outline" size="sm" className="border-border/80 text-xs font-semibold">
+                🛡️ Admin
+              </Button>
             </Link>
           </div>
         </div>
@@ -42,14 +55,14 @@ export default function Home() {
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-destructive">Aces Interviews.</span>
                     </h1>
                     <p className="max-w-[700px] text-lg md:text-xl text-muted-foreground">
-                        The definitive platform for learning Data Structures, practicing algorithms, and getting assessed by top tech companies.
+                        The definitive platform for learning Data Structures, practicing algorithms, and competing in live contests.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                        <Link href="/register" className="w-full sm:w-auto">
-                            <Button size="lg" className="w-full text-base h-12 px-8">Start Practicing Now</Button>
+                        <Link href="/dashboard" className="w-full sm:w-auto">
+                            <Button size="lg" className="w-full text-base h-12 px-8 font-bold">Open Student Panel 🚀</Button>
                         </Link>
-                        <Link href="/features" className="w-full sm:w-auto">
-                            <Button variant="outline" size="lg" className="w-full text-base h-12 px-8">Explore Features</Button>
+                        <Link href="/problems" className="w-full sm:w-auto">
+                            <Button variant="outline" size="lg" className="w-full text-base h-12 px-8">Practice 150 DSA</Button>
                         </Link>
                     </div>
                 </div>
