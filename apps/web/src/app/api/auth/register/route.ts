@@ -31,6 +31,20 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Record registration in global user registry for admin visibility
+    try {
+      const userPayload = data?.data?.user || data?.user;
+      const { recordUserLoginEvent } = await import("@/lib/userActivity");
+      recordUserLoginEvent({
+        id: userPayload?.id,
+        username: userPayload?.username || body.username || body.email?.split("@")[0],
+        email: userPayload?.email || body.email,
+        name: `${userPayload?.firstName || body.firstName || ""} ${userPayload?.lastName || body.lastName || ""}`.trim() || body.username,
+        role: userPayload?.role || "STUDENT",
+        college: body.college,
+      });
+    } catch (e) {}
+
     return response;
   } catch (err: any) {
     return NextResponse.json(

@@ -56,6 +56,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Record login in global user registry for admin visibility
+    try {
+      const userPayload = data?.data?.user || data?.user;
+      if (userPayload) {
+        const { recordUserLoginEvent } = await import("@/lib/userActivity");
+        recordUserLoginEvent({
+          id: userPayload.id,
+          username: userPayload.username || emailLower.split("@")[0],
+          email: userPayload.email || emailLower,
+          name: `${userPayload.firstName || ""} ${userPayload.lastName || ""}`.trim() || userPayload.username,
+          role: userPayload.role || "STUDENT",
+        });
+      }
+    } catch (e) {}
+
     return response;
   } catch (err: any) {
     return NextResponse.json(

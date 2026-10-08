@@ -157,37 +157,44 @@ export default function AdminPortalPage() {
   const loadUsers = async () => {
     setLoadingUsers(true);
     try {
-      const res = await fetch("/api/leaderboard");
+      const res = await fetch("/api/admin/users", { cache: "no-store" });
       const json = await res.json().catch(() => null);
-      const dbItems = json?.items || [];
+      const serverUsers = json?.users || [];
       const sessionAccounts = getAllAccounts();
 
       const map = new Map<string, any>();
-      for (const u of dbItems) {
+      for (const u of serverUsers) {
         map.set(u.username.toLowerCase(), {
-          userId: u.userId || u.id,
+          userId: u.id || u.userId,
           username: u.username,
           name: u.name || u.username,
-          email: `${u.username}@codearena.dev`,
-          role: "STUDENT",
+          email: u.email || `${u.username}@codearena.dev`,
+          role: u.role || "STUDENT",
           score: u.score || 1450,
           problemsSolved: u.problemsSolved || 0,
-          org: u.org || "CodeArena Academy",
+          org: u.college || u.org || "CodeArena Academy",
+          lastLoginAt: u.lastLoginAt,
+          status: u.status || "ACTIVE",
         });
       }
+
       for (const s of sessionAccounts) {
         const stats = getUserStats(s.id);
+        const existing = map.get(s.username.toLowerCase());
         map.set(s.username.toLowerCase(), {
           userId: s.id,
           username: s.username,
           name: s.name,
           email: s.email,
-          role: s.role || "STUDENT",
-          score: stats.dsaRating,
-          problemsSolved: stats.problemsSolved,
-          org: s.college || "CodeArena Academy",
+          role: s.role || existing?.role || "STUDENT",
+          score: stats.dsaRating || existing?.score || 1450,
+          problemsSolved: stats.problemsSolved || existing?.problemsSolved || 0,
+          org: s.college || existing?.org || "CodeArena Academy",
+          lastLoginAt: existing?.lastLoginAt || new Date().toISOString(),
+          status: "ONLINE",
         });
       }
+
       setAllUsersList(Array.from(map.values()));
     } catch (e) {
       console.error("Error loading users:", e);
@@ -196,8 +203,16 @@ export default function AdminPortalPage() {
     }
   };
 
-  const handleToggleUserRole = (username: string, currentRole: string) => {
+  const handleToggleUserRole = async (username: string, currentRole: string) => {
     const nextRole = currentRole === "SUPER_ADMIN" ? "STUDENT" : "SUPER_ADMIN";
+    try {
+      await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, role: nextRole }),
+      });
+    } catch (e) {}
+
     const accounts = getAllAccounts();
     const updated = accounts.map((a) => {
       if (a.username.toLowerCase() === username.toLowerCase()) {
@@ -2523,8 +2538,9 @@ export default function AdminPortalPage() {
                   <table className="w-full text-sm text-left">
                     <thead className="bg-muted/40 border-b border-border/60 text-xs uppercase tracking-wider text-muted-foreground">
                       <tr>
-                        <th className="px-5 py-3.5 font-bold">User</th>
-                        <th className="px-5 py-3.5 font-bold hidden sm:table-cell">Organization</th>
+                        <th className="px-5 py-3.5 font-bold">Student / User</th>
+                        <th className="px-5 py-3.5 font-bold">Login Status & Activity</th>
+                        <th className="px-5 py-3.5 font-bold hidden sm:table-cell">College / Org</th>
                         <th className="px-5 py-3.5 font-bold">Role</th>
                         <th className="px-5 py-3.5 font-bold text-right">Solved</th>
                         <th className="px-5 py-3.5 font-bold text-right text-primary">DSA Rating</th>
@@ -2534,13 +2550,13 @@ export default function AdminPortalPage() {
                     <tbody className="divide-y divide-border/40">
                       {loadingUsers ? (
                         <tr>
-                          <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground animate-pulse">
+                          <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground animate-pulse">
                             Loading platform users...
                           </td>
                         </tr>
                       ) : allUsersList.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                          <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                             No users registered yet.
                           </td>
                         </tr>
@@ -2552,11 +2568,13 @@ export default function AdminPortalPage() {
                             return (
                               u.username.toLowerCase().includes(q) ||
                               u.name.toLowerCase().includes(q) ||
+                              (u.email && u.email.toLowerCase().includes(q)) ||
                               (u.org && u.org.toLowerCase().includes(q))
                             );
                           })
                           .map((u) => {
                             const isSuper = u.role === "SUPER_ADMIN";
+                            const isOnline = u.status === "ONLINE" || (u.lastLoginAt && (Date.now() - new Date(u.lastLoginAt).getTime()) < 30 * 60 * 1000);
                             return (
                               <tr key={u.userId || u.username} className="hover:bg-muted/20 transition-colors">
                                 <td className="px-5 py-3.5">
@@ -2566,8 +2584,23 @@ export default function AdminPortalPage() {
                                     </div>
                                     <div>
                                       <p className="font-semibold text-foreground text-xs">{u.name}</p>
-                                      <p className="text-[11px] text-muted-foreground font-mono">@{u.username}</p>
+                                      <p className="text-[11px] text-muted-foreground font-mono">@{u.username} • {u.email}</p>
                                     </div>
+                                  </div>
+                                </td>
+                                <td className="px-5 py-3.5">
+                                  <div className="space-y-0.5">
+                                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                      isOnline ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-secondary text-muted-foreground"
+                                    }`}>
+                                      <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-400 animate-pulse" : "bg-muted-foreground"}`} />
+                                      {isOnline ? "ONLINE NOW" : "LOGGED IN"}
+                                    </span>
+                                    {u.lastLoginAt && (
+                                      <p className="text-[10px] text-muted-foreground font-mono">
+                                        {new Date(u.lastLoginAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(u.lastLoginAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                                      </p>
+                                    )}
                                   </div>
                                 </td>
                                 <td className="px-5 py-3.5 hidden sm:table-cell text-xs text-muted-foreground">
