@@ -14,9 +14,9 @@ import { AuditModule } from '../audit/audit.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
+        secret: config.get<string>('JWT_SECRET') || 'codearena_jwt_super_secret_key_2026',
         signOptions: {
-          expiresIn: config.get<string>('JWT_EXPIRATION', '7d'),
+          expiresIn: config.get<string>('JWT_EXPIRATION', '7d') || '7d',
         },
       }),
     }),
