@@ -97,7 +97,7 @@ export class UsersService {
     pageSize?: number;
   }) {
     const validPage = Math.max(1, Number(options.page) || 1);
-    const validPageSize = Math.max(1, Math.min(100, Number(options.pageSize) || 20));
+    const validPageSize = Math.max(1, Math.min(1000, Number(options.pageSize) || 100));
     const skip = (validPage - 1) * validPageSize;
     const { role, search } = options;
     const where: any = {};
@@ -127,6 +127,16 @@ export class UsersService {
             emailVerified: true,
             createdAt: true,
             lastLoginAt: true,
+            ratings: { select: { dsaRating: true, problemsSolved: true }, take: 1 },
+            organizationMemberships: {
+              select: {
+                organization: {
+                  select: { name: true },
+                },
+              },
+              take: 1,
+            },
+            _count: { select: { submissions: true } },
           },
           orderBy: { createdAt: 'desc' },
           skip,
@@ -135,8 +145,27 @@ export class UsersService {
         this.prisma.user.count({ where }),
       ]);
 
+      const formatted = items.map((u: any) => ({
+        id: u.id,
+        userId: u.id,
+        email: u.email,
+        username: u.username,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.username,
+        role: u.role,
+        status: u.status,
+        emailVerified: u.emailVerified,
+        createdAt: u.createdAt,
+        registeredAt: u.createdAt,
+        lastLoginAt: u.lastLoginAt || u.createdAt,
+        score: u.ratings?.[0]?.dsaRating || 1450,
+        problemsSolved: u.ratings?.[0]?.problemsSolved || u._count?.submissions || 0,
+        college: u.organizationMemberships?.[0]?.organization?.name || 'CodeArena Academy',
+      }));
+
       return {
-        items,
+        items: formatted,
         total,
         page: validPage,
         pageSize: validPageSize,

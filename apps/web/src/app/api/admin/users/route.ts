@@ -8,14 +8,60 @@ export async function GET(req: NextRequest) {
     const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
     const map = getUserRegistry();
 
-    // Try merging with backend database leaderboard/users if available
+    // 1. Fetch real registered users from PostgreSQL Database via NestJS API
+    try {
+      const endpoints = [
+        `${apiUrl}/api/users/admin/all?pageSize=1000`,
+        `${apiUrl}/api/users?pageSize=1000`,
+      ];
+
+      for (const endpoint of endpoints) {
+        try {
+          const res = await fetch(endpoint, {
+            headers: { "Content-Type": "application/json" },
+            cache: "no-store",
+          });
+
+          if (res.ok) {
+            const json = await res.json().catch(() => null);
+            const dbUsers = json?.data?.items || json?.items || [];
+            if (Array.isArray(dbUsers) && dbUsers.length > 0) {
+              for (const u of dbUsers) {
+                const uKey = (u.username || "").toLowerCase().trim();
+                if (uKey) {
+                  const existing = map.get(uKey);
+                  map.set(uKey, {
+                    id: u.id || u.userId || `usr_${uKey}`,
+                    username: u.username,
+                    email: u.email || `${u.username}@codearena.dev`,
+                    name: u.name || `${u.firstName || ""} ${u.lastName || ""}`.trim() || u.username,
+                    role: (u.role as any) || existing?.role || "STUDENT",
+                    college: u.college || existing?.college || "CodeArena Academy",
+                    score: u.score !== undefined ? u.score : (existing?.score || 1450),
+                    problemsSolved: u.problemsSolved !== undefined ? u.problemsSolved : (existing?.problemsSolved || 0),
+                    lastLoginAt: u.lastLoginAt || existing?.lastLoginAt || u.createdAt || new Date().toISOString(),
+                    registeredAt: u.createdAt || u.registeredAt || existing?.registeredAt || new Date().toISOString(),
+                    status: existing?.status || (u.status === "SUSPENDED" ? "SUSPENDED" : "ACTIVE"),
+                  });
+                }
+              }
+              break;
+            }
+          }
+        } catch (e) {}
+      }
+    } catch (e) {
+      console.error("Failed to query users from backend API:", e);
+    }
+
+    // 2. Try merging with global leaderboard entries if any extra users exist
     try {
       const res = await fetch(`${apiUrl}/api/leaderboard/global`, { cache: "no-store" });
       if (res.ok) {
         const json = await res.json().catch(() => null);
         const dbItems = json?.items || json?.data?.items || [];
         for (const item of dbItems) {
-          const uKey = (item.username || "").toLowerCase();
+          const uKey = (item.username || "").toLowerCase().trim();
           if (uKey && !map.has(uKey)) {
             map.set(uKey, {
               id: item.userId || item.id || `usr_${uKey}`,
@@ -33,12 +79,10 @@ export async function GET(req: NextRequest) {
           }
         }
       }
-    } catch (e) {
-      // Continue with in-memory global registry
-    }
+    } catch (e) {}
 
     const allUsers = Array.from(map.values()).sort(
-      (a, b) => new Date(b.lastLoginAt).getTime() - new Date(a.lastLoginAt).getTime()
+      (a, b) => new Date(b.lastLoginAt || b.registeredAt).getTime() - new Date(a.lastLoginAt || a.registeredAt).getTime()
     );
 
     return NextResponse.json({
@@ -85,20 +129,27 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { username, role, status } = body;
+    const { username, role, status, userId } = body;
     const map = getUserRegistry();
-    const key = (username || "").toLowerCase();
+    const key = (username || "").toLowerCase().trim();
 
-    if (!key || !map.has(key)) {
-      return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
+    if (key && map.has(key)) {
+      const user = map.get(key)!;
+      if (role) user.role = role;
+      if (status) user.status = status;
+      map.set(key, user);
     }
 
-    const user = map.get(key)!;
-    if (role) user.role = role;
-    if (status) user.status = status;
-    map.set(key, user);
+    // Also forward suspend/activate to backend if status changed
+    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    if (userId && status) {
+      try {
+        const endpoint = status === "SUSPENDED" ? `${apiUrl}/api/users/${userId}/suspend` : `${apiUrl}/api/users/${userId}/activate`;
+        await fetch(endpoint, { method: "PATCH" });
+      } catch (e) {}
+    }
 
-    return NextResponse.json({ success: true, user });
+    return NextResponse.json({ success: true, user: key ? map.get(key) : null });
   } catch (err: any) {
     return NextResponse.json(
       { success: false, message: err.message || "Failed to update user" },
