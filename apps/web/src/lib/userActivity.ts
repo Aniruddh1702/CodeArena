@@ -19,59 +19,23 @@ declare global {
 
 if (!global.__codearena_global_users) {
   global.__codearena_global_users = new Map<string, PlatformUserRecord>();
-
-  // Default seed accounts
-  const seedUsers: PlatformUserRecord[] = [
-    {
-      id: "usr_alex_chen",
-      username: "alex.chen",
-      email: "alex.chen@gmail.com",
-      name: "Alex Chen",
-      role: "STUDENT",
-      college: "Stanford University",
-      score: 1850,
-      problemsSolved: 42,
-      lastLoginAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-      registeredAt: "2026-09-01T00:00:00.000Z",
-      status: "ONLINE",
-    },
-    {
-      id: "usr_priya_patel",
-      username: "priya.patel",
-      email: "priya.patel@gmail.com",
-      name: "Priya Patel",
-      role: "STUDENT",
-      college: "IIT Bombay",
-      score: 1720,
-      problemsSolved: 38,
-      lastLoginAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
-      registeredAt: "2026-09-05T00:00:00.000Z",
-      status: "ONLINE",
-    },
-    {
-      id: "usr_rahul_sharma",
-      username: "rahul.sharma",
-      email: "rahul.sharma@gmail.com",
-      name: "Rahul Sharma",
-      role: "STUDENT",
-      college: "BITS Pilani",
-      score: 1640,
-      problemsSolved: 29,
-      lastLoginAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      registeredAt: "2026-09-10T00:00:00.000Z",
-      status: "ACTIVE",
-    },
-  ];
-
-  seedUsers.forEach((u) => global.__codearena_global_users!.set(u.username.toLowerCase(), u));
 }
 
 export function getUserRegistry(): Map<string, PlatformUserRecord> {
-  return global.__codearena_global_users!;
+  if (!global.__codearena_global_users) {
+    global.__codearena_global_users = new Map<string, PlatformUserRecord>();
+  }
+  return global.__codearena_global_users;
+}
+
+export function clearUserRegistry(): void {
+  if (global.__codearena_global_users) {
+    global.__codearena_global_users.clear();
+  }
 }
 
 export function recordUserLoginEvent(user: Partial<PlatformUserRecord> & { username: string; email?: string }): PlatformUserRecord {
-  const map = global.__codearena_global_users!;
+  const map = getUserRegistry();
   const key = user.username.toLowerCase();
   const existing = map.get(key);
 

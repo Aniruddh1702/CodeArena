@@ -234,6 +234,23 @@ export default function AdminPortalPage() {
     setTimeout(() => setUserRoleFeedback(null), 3500);
   };
 
+  const handleClearAllUsers = async () => {
+    if (!confirm("Are you sure you want to clear ALL users from the server and database? This provides a completely fresh start.")) {
+      return;
+    }
+    try {
+      await fetch("/api/admin/users", { method: "DELETE" });
+      setAllUsersList([]);
+      localStorage.removeItem("codearena_accounts");
+      localStorage.removeItem("codearena_active_account_id");
+      setUserRoleFeedback("All users cleared from the server and database for a fresh start.");
+      setTimeout(() => setUserRoleFeedback(null), 4000);
+      loadUsers();
+    } catch (e) {
+      console.error("Error clearing users:", e);
+    }
+  };
+
   // Contest Manager State & Scheduling Logic
   const getFutureDateTimeLocalString = (minutesAhead: number = 60): string => {
     const d = new Date(Date.now() + minutesAhead * 60 * 1000);
@@ -2523,6 +2540,14 @@ export default function AdminPortalPage() {
                       className="h-8 text-xs font-semibold gap-1"
                     >
                       <span>🔄</span> Refresh
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleClearAllUsers}
+                      className="h-8 text-xs font-semibold gap-1"
+                    >
+                      <span>🗑️</span> Clear All Users (Fresh Start)
                     </Button>
                   </div>
                 </div>

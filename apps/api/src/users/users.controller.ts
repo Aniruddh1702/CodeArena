@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, Query, Body, UseGuards, Headers, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Patch, Param, Query, Body, UseGuards, Headers, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -81,5 +81,19 @@ export class UsersController {
   async activateUser(@Param('id') id: string) {
     await this.usersService.activateUser(id);
     return { success: true, message: 'User activated' };
+  }
+
+  @Delete('clear-all')
+  @ApiOperation({ summary: 'Clear all users from database for a fresh start' })
+  async clearAllUsers() {
+    const result = await this.usersService.clearAllUsers();
+    return { success: true, message: 'All users cleared successfully', result };
+  }
+
+  @Post('clear-all')
+  @ApiOperation({ summary: 'Clear all users from database for a fresh start' })
+  async clearAllUsersPost() {
+    const result = await this.usersService.clearAllUsers();
+    return { success: true, message: 'All users cleared successfully', result };
   }
 }

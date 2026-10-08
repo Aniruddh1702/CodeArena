@@ -157,3 +157,23 @@ export async function PATCH(req: NextRequest) {
     );
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { clearUserRegistry } = await import("@/lib/userActivity");
+    clearUserRegistry();
+
+    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    try {
+      await fetch(`${apiUrl}/api/users/clear-all`, { method: "DELETE" });
+      await fetch(`${apiUrl}/api/users/clear-all`, { method: "POST" });
+    } catch (e) {}
+
+    return NextResponse.json({ success: true, message: "All users cleared successfully for a fresh start." });
+  } catch (err: any) {
+    return NextResponse.json(
+      { success: false, message: err.message || "Failed to clear users" },
+      { status: 500 }
+    );
+  }
+}

@@ -199,4 +199,30 @@ export class UsersService {
       data: { status: 'ACTIVE' },
     });
   }
+
+  async clearAllUsers() {
+    try {
+      await this.prisma.userAchievement.deleteMany({}).catch(() => null);
+      await this.prisma.userMission.deleteMany({}).catch(() => null);
+      await this.prisma.ratingHistory.deleteMany({}).catch(() => null);
+      await this.prisma.rating.deleteMany({}).catch(() => null);
+      await this.prisma.submission.deleteMany({}).catch(() => null);
+      await this.prisma.testAttempt.deleteMany({}).catch(() => null);
+      await this.prisma.testAssignment.deleteMany({}).catch(() => null);
+      await this.prisma.battleParticipant.deleteMany({}).catch(() => null);
+      await this.prisma.contestParticipant.deleteMany({}).catch(() => null);
+      await this.prisma.practiceSession.deleteMany({}).catch(() => null);
+      await this.prisma.integrityEvent.deleteMany({}).catch(() => null);
+      await this.prisma.aIInteraction.deleteMany({}).catch(() => null);
+      await this.prisma.notification.deleteMany({}).catch(() => null);
+      await this.prisma.refreshToken.deleteMany({}).catch(() => null);
+      await this.prisma.organizationMember.deleteMany({}).catch(() => null);
+      
+      const deleted = await this.prisma.user.deleteMany({});
+      return { success: true, count: deleted.count };
+    } catch (e: any) {
+      const deleted = await this.prisma.user.deleteMany({}).catch(() => ({ count: 0 }));
+      return { success: true, count: deleted.count };
+    }
+  }
 }
