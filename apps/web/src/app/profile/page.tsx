@@ -42,7 +42,10 @@ export default function ProfilePage() {
   const loadProfile = () => {
     if (typeof window === "undefined") return;
     const active = getActiveAccount();
-    if (!active) return;
+    if (!active) {
+      router.push("/login?redirect=/profile");
+      return;
+    }
 
     const activeProfile: UserProfile = {
       name: active.name || active.username,

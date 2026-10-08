@@ -29,12 +29,16 @@ export default function LeaderboardPage() {
   const loadLeaderboard = useCallback((extraDbUsers?: LeaderboardUser[]) => {
     if (typeof window === "undefined") return;
     const active = getActiveAccount();
-    const activeId = active?.id || "default";
+    if (!active) {
+      router.push("/login?redirect=/leaderboard");
+      return;
+    }
+    const activeId = active.id || "default";
     const stats = getUserStats(activeId);
 
-    const pName = active?.name || "CodeArena Student";
-    const pUsername = active?.username || "student";
-    const pOrg = active?.college || "CodeArena Academy";
+    const pName = active.name || "CodeArena Student";
+    const pUsername = active.username || "student";
+    const pOrg = active.college || "CodeArena Academy";
 
     setCurrentSolved(stats.problemsSolved);
     setCurrentRating(stats.dsaRating);

@@ -16,11 +16,15 @@ export default function BattlesLobbyPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const active = getActiveAccount();
-      const activeId = active?.id || "default";
+      if (!active) {
+        router.push("/login?redirect=/battles");
+        return;
+      }
+      const activeId = active.id || "default";
       const stats = getUserStats(activeId);
       setRating(stats.dsaRating);
     }
-  }, []);
+  }, [router]);
 
   const findMatch = () => {
       setSearching(true);

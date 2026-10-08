@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Editor from "@monaco-editor/react";
 import { Button, Card, CardHeader, CardTitle, CardContent, Tabs, TabsList, TabsTrigger, TabsContent } from "@codearena/ui";
+import { getActiveAccount } from "@/lib/auth-session";
 
 export default function ActiveBattlePage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -14,8 +15,13 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
   const [myProgress, setMyProgress] = useState(0);
 
   useEffect(() => {
-      setTimeout(() => setLoading(false), 800);
-  }, []);
+    const active = getActiveAccount();
+    if (!active) {
+      router.push(`/login?redirect=/battles/${params.id}`);
+      return;
+    }
+    setTimeout(() => setLoading(false), 800);
+  }, [params.id, router]);
 
   useEffect(() => {
       if (!loading && timeLeft > 0) {

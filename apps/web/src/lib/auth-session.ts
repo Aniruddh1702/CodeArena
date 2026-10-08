@@ -106,17 +106,14 @@ export function updateActiveAccount(updates: Partial<UserAccount>): UserAccount 
  */
 export function getActiveAccount(): UserAccount | null {
   if (typeof window === "undefined") return null;
+  const activeId = localStorage.getItem(ACTIVE_ACCOUNT_ID_KEY);
+  if (!activeId) return null;
+
   const accounts = getAllAccounts();
   if (accounts.length === 0) return null;
 
-  const activeId = localStorage.getItem(ACTIVE_ACCOUNT_ID_KEY);
-  if (activeId) {
-    const found = accounts.find((a) => a.id === activeId || a.username === activeId || a.email === activeId);
-    if (found) return found;
-  }
-
-  // Fallback to the first account
-  return accounts[0] || null;
+  const found = accounts.find((a) => a.id === activeId || a.username === activeId || a.email === activeId);
+  return found || null;
 }
 
 /**

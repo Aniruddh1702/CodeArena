@@ -18,7 +18,12 @@ export default function ContestsPage() {
   const [reminderNoticedId, setReminderNoticedId] = useState<string | null>(null);
 
   useEffect(() => {
-    setCurrentUser(getActiveAccount());
+    const user = getActiveAccount();
+    if (!user) {
+      router.push("/login?redirect=/contests");
+      return;
+    }
+    setCurrentUser(user);
     setContests(getContests());
 
     const timer = setInterval(() => {

@@ -109,6 +109,10 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
 
   useEffect(() => {
     const user = getActiveAccount();
+    if (!user) {
+      router.push(`/login?redirect=/contests/${contestId}`);
+      return;
+    }
     setCurrentUser(user);
 
     const c = getContestById(contestId);

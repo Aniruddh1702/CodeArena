@@ -126,7 +126,11 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
 
     if (typeof window !== "undefined") {
       const activeAcc = getActiveAccount();
-      const activeId = activeAcc?.id || "default";
+      if (!activeAcc) {
+        router.push(`/login?redirect=/problems/${params.slug}`);
+        return;
+      }
+      const activeId = activeAcc.id || "default";
 
       // 1. Load submissions strictly scoped to active account (never leak other users)
       const userSubs = getUserProblemSubmissions(activeId, params.slug);
@@ -140,7 +144,11 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
       // 3. React to account changes so new user starts completely from new
       const handleAccountChange = () => {
         const currentAcc = getActiveAccount();
-        const currentId = currentAcc?.id || "default";
+        if (!currentAcc) {
+          router.push(`/login?redirect=/problems/${params.slug}`);
+          return;
+        }
+        const currentId = currentAcc.id || "default";
         const subs = getUserProblemSubmissions(currentId, params.slug);
         setSubmissions(subs);
         const s = getUserStats(currentId);
@@ -160,7 +168,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         window.removeEventListener("codearena_account_changed", handleAccountChange);
       };
     }
-  }, [params.slug, language]);
+  }, [params.slug, language, router]);
 
   // Handle language switch
   const handleLanguageChange = (val: "javascript" | "python" | "cpp" | "java") => {

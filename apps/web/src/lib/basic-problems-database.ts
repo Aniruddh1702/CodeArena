@@ -23,34 +23,24 @@ Given an integer \`age\` and a boolean \`hasId\`, return \`"Allowed"\` if they m
  * @return {string}
  */
 var checkBarEntry = function(age, hasId) {
-    if (age >= 21 && hasId) {
-        return "Allowed";
-    }
-    return "Denied";
+    // Write your code here
 };`,
       python: `class Solution:
     def checkBarEntry(self, age: int, hasId: bool) -> str:
-        if age >= 21 and hasId:
-            return "Allowed"
-        return "Denied"`,
+        # Write your code here
+        pass`,
       cpp: `#include <string>
 using namespace std;
 
 class Solution {
 public:
     string checkBarEntry(int age, bool hasId) {
-        if (age >= 21 && hasId) {
-            return "Allowed";
-        }
-        return "Denied";
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public String checkBarEntry(int age, boolean hasId) {
-        if (age >= 21 && hasId) {
-            return "Allowed";
-        }
-        return "Denied";
+        // Write your code here
     }
 }`
     },
@@ -124,34 +114,24 @@ Given an integer \`age\` and a boolean \`hasId\`, return \`"Allowed"\` if they m
  * @return {string}
  */
 var checkBarEntry = function(age, hasId) {
-    if (age >= 21 && hasId) {
-        return "Allowed";
-    }
-    return "Denied";
+    // Write your code here
 };`,
       python: `class Solution:
     def checkBarEntry(self, age: int, hasId: bool) -> str:
-        if age >= 21 and hasId:
-            return "Allowed"
-        return "Denied"`,
+        # Write your code here
+        pass`,
       cpp: `#include <string>
 using namespace std;
 
 class Solution {
 public:
     string checkBarEntry(int age, bool hasId) {
-        if (age >= 21 && hasId) {
-            return "Allowed";
-        }
-        return "Denied";
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public String checkBarEntry(int age, boolean hasId) {
-        if (age >= 21 && hasId) {
-            return "Allowed";
-        }
-        return "Denied";
+        // Write your code here
     }
 }`
     },
@@ -223,20 +203,21 @@ $$\\text{Area} = \\text{side} \\times \\text{side}$$`,
  * @return {number}
  */
 var areaOfSquare = function(side) {
-    return side * side;
+    // Write your code here
 };`,
       python: `class Solution:
     def areaOfSquare(self, side: int) -> int:
-        return side * side`,
+        # Write your code here
+        pass`,
       cpp: `class Solution {
 public:
     int areaOfSquare(int side) {
-        return side * side;
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public int areaOfSquare(int side) {
-        return side * side;
+        // Write your code here
     }
 }`
     },
@@ -303,20 +284,21 @@ $$\\text{Area} = \\frac{1}{2} \\times \\text{base} \\times \\text{height}$$`,
  * @return {number}
  */
 var areaOfTriangle = function(base, height) {
-    return (base * height) / 2;
+    // Write your code here
 };`,
       python: `class Solution:
     def areaOfTriangle(self, base: float, height: float) -> float:
-        return (base * height) / 2.0`,
+        # Write your code here
+        pass`,
       cpp: `class Solution {
 public:
     double areaOfTriangle(double base, double height) {
-        return (base * height) / 2.0;
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public double areaOfTriangle(double base, double height) {
-        return (base * height) / 2.0;
+        // Write your code here
     }
 }`
     },
@@ -384,29 +366,26 @@ Return the computed area as a number rounded to 2 decimal places (using $\\pi \\
  * @return {number}
  */
 var areaOfCircle = function(radius) {
-    const area = Math.PI * radius * radius;
-    return Math.round(area * 100) / 100;
+    // Write your code here
 };`,
       python: `import math
 
 class Solution:
     def areaOfCircle(self, radius: float) -> float:
-        area = math.pi * radius * radius
-        return round(area, 2)`,
+        # Write your code here
+        pass`,
       cpp: `#include <cmath>
 using namespace std;
 
 class Solution {
 public:
     double areaOfCircle(double radius) {
-        double area = M_PI * radius * radius;
-        return round(area * 100.0) / 100.0;
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public double areaOfCircle(double radius) {
-        double area = Math.PI * radius * radius;
-        return Math.round(area * 100.0) / 100.0;
+        // Write your code here
     }
 }`
     },
@@ -473,20 +452,21 @@ $$\\text{Area} = \\text{length} \\times \\text{width}$$`,
  * @return {number}
  */
 var areaOfRectangle = function(length, width) {
-    return length * width;
+    // Write your code here
 };`,
       python: `class Solution:
     def areaOfRectangle(self, length: int, width: int) -> int:
-        return length * width`,
+        # Write your code here
+        pass`,
       cpp: `class Solution {
 public:
     int areaOfRectangle(int length, int width) {
-        return length * width;
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public int areaOfRectangle(int length, int width) {
-        return length * width;
+        // Write your code here
     }
 }`
     },
@@ -544,23 +524,24 @@ public:
  * @return {string}
  */
 var evenOrOdd = function(n) {
-    return n % 2 === 0 ? "Even" : "Odd";
+    // Write your code here
 };`,
       python: `class Solution:
     def evenOrOdd(self, n: int) -> str:
-        return "Even" if n % 2 == 0 else "Odd"`,
+        # Write your code here
+        pass`,
       cpp: `#include <string>
 using namespace std;
 
 class Solution {
 public:
     string evenOrOdd(int n) {
-        return (n % 2 == 0) ? "Even" : "Odd";
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public String evenOrOdd(int n) {
-        return (n % 2 == 0) ? "Even" : "Odd";
+        // Write your code here
     }
 }`
     },
@@ -619,20 +600,21 @@ public:
  * @return {number}
  */
 var findMax = function(a, b) {
-    return a > b ? a : b;
+    // Write your code here
 };`,
       python: `class Solution:
     def findMax(self, a: int, b: int) -> int:
-        return a if a > b else b`,
+        # Write your code here
+        pass`,
       cpp: `class Solution {
 public:
     int findMax(int a, int b) {
-        return (a > b) ? a : b;
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public int findMax(int a, int b) {
-        return (a > b) ? a : b;
+        // Write your code here
     }
 }`
     },
@@ -690,23 +672,24 @@ public:
  * @return {string}
  */
 var checkVotingEligibility = function(age) {
-    return age >= 18 ? "Eligible" : "Not Eligible";
+    // Write your code here
 };`,
       python: `class Solution:
     def checkVotingEligibility(self, age: int) -> str:
-        return "Eligible" if age >= 18 else "Not Eligible"`,
+        # Write your code here
+        pass`,
       cpp: `#include <string>
 using namespace std;
 
 class Solution {
 public:
     string checkVotingEligibility(int age) {
-        return (age >= 18) ? "Eligible" : "Not Eligible";
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public String checkVotingEligibility(int age) {
-        return (age >= 18) ? "Eligible" : "Not Eligible";
+        // Write your code here
     }
 }`
     },
@@ -769,39 +752,24 @@ public:
  * @return {string}
  */
 var calculateGrade = function(marks) {
-    if (marks >= 90) return "A";
-    if (marks >= 80) return "B";
-    if (marks >= 70) return "C";
-    if (marks >= 60) return "D";
-    return "F";
+    // Write your code here
 };`,
       python: `class Solution:
     def calculateGrade(self, marks: int) -> str:
-        if marks >= 90: return "A"
-        if marks >= 80: return "B"
-        if marks >= 70: return "C"
-        if marks >= 60: return "D"
-        return "F"`,
+        # Write your code here
+        pass`,
       cpp: `#include <string>
 using namespace std;
 
 class Solution {
 public:
     string calculateGrade(int marks) {
-        if (marks >= 90) return "A";
-        if (marks >= 80) return "B";
-        if (marks >= 70) return "C";
-        if (marks >= 60) return "D";
-        return "F";
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public String calculateGrade(int marks) {
-        if (marks >= 90) return "A";
-        if (marks >= 80) return "B";
-        if (marks >= 70) return "C";
-        if (marks >= 60) return "D";
-        return "F";
+        // Write your code here
     }
 }`
     },
@@ -865,31 +833,24 @@ public:
  * @return {string}
  */
 var checkNumberSign = function(n) {
-    if (n > 0) return "Positive";
-    if (n < 0) return "Negative";
-    return "Zero";
+    // Write your code here
 };`,
       python: `class Solution:
     def checkNumberSign(self, n: int) -> str:
-        if n > 0: return "Positive"
-        if n < 0: return "Negative"
-        return "Zero"`,
+        # Write your code here
+        pass`,
       cpp: `#include <string>
 using namespace std;
 
 class Solution {
 public:
     string checkNumberSign(int n) {
-        if (n > 0) return "Positive";
-        if (n < 0) return "Negative";
-        return "Zero";
+        // Write your code here
     }
 };`,
       java: `class Solution {
     public String checkNumberSign(int n) {
-        if (n > 0) return "Positive";
-        if (n < 0) return "Negative";
-        return "Zero";
+        // Write your code here
     }
 }`
     },

@@ -116,14 +116,22 @@ function ProblemsContent() {
 
     if (typeof window !== "undefined") {
       const active = getActiveAccount();
-      const activeId = active?.id || "default";
+      if (!active) {
+        router.push("/login?redirect=/problems");
+        return;
+      }
+      const activeId = active.id || "default";
       const stats = getUserStats(activeId);
       const uniqueSlugs = stats.solvedProblems.map((item: any) => item.slug).filter(Boolean);
       setSolvedSlugs(uniqueSlugs);
 
       const handleAccountChange = () => {
         const acc = getActiveAccount();
-        const accId = acc?.id || "default";
+        if (!acc) {
+          router.push("/login?redirect=/problems");
+          return;
+        }
+        const accId = acc.id || "default";
         const s = getUserStats(accId);
         const slugs = s.solvedProblems.map((item: any) => item.slug).filter(Boolean);
         setSolvedSlugs(slugs);
@@ -134,7 +142,7 @@ function ProblemsContent() {
         window.removeEventListener("codearena_account_changed", handleAccountChange);
       };
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   // Filter questions based on search, difficulty, and topic
   useEffect(() => {

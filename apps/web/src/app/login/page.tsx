@@ -84,9 +84,12 @@ function LoginForm() {
 
       saveAccount(sessionAccount, true);
 
+      const redirectUrl = searchParams.get("redirect");
       if (userRole === "SUPER_ADMIN" || userRole === "ADMIN") {
         localStorage.setItem("codearena_admin_authorized", "true");
         router.push("/admin");
+      } else if (redirectUrl && redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
+        router.push(redirectUrl);
       } else {
         router.push("/dashboard");
       }
