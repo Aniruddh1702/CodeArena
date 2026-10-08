@@ -48,6 +48,9 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
   const [loadedIntoEditorNotice, setLoadedIntoEditorNotice] = useState(false);
   const [isProblemSolved, setIsProblemSolved] = useState(false);
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [authChecked, setAuthChecked] = useState<boolean>(false);
+
   const [submitFeedback, setSubmitFeedback] = useState<{
     status: string;
     message: string;
@@ -127,9 +130,13 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     if (typeof window !== "undefined") {
       const activeAcc = getActiveAccount();
       if (!activeAcc) {
+        setCurrentUser(null);
+        setAuthChecked(true);
         router.push(`/login?redirect=/problems/${params.slug}`);
         return;
       }
+      setCurrentUser(activeAcc);
+      setAuthChecked(true);
       const activeId = activeAcc.id || "default";
 
       // 1. Load submissions strictly scoped to active account (never leak other users)
@@ -183,6 +190,12 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
 
   // Run Code (Public Testcases)
   const handleRunCode = async () => {
+    const activeAcc = getActiveAccount();
+    if (!activeAcc) {
+      router.push(`/login?redirect=/problems/${params.slug}`);
+      return;
+    }
+
     setIsRunning(true);
     setHasRun(true);
     setConsoleTab("test-result");
@@ -279,6 +292,12 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
 
   // Submit Code (All Testcases: Public + Hidden)
   const handleSubmit = async () => {
+    const activeAcc = getActiveAccount();
+    if (!activeAcc) {
+      router.push(`/login?redirect=/problems/${params.slug}`);
+      return;
+    }
+
     setIsRunning(true);
     setHasRun(true);
     setConsoleTab("test-result");
@@ -428,6 +447,32 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
 
   const currentResultCase: TestResult | undefined = runResult?.testResults[activeTestCase];
   const activePublicCase: TestCase | undefined = question.publicTestCases[activeTestCase];
+
+  if (authChecked && !currentUser) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
+        <div className="max-w-md p-8 rounded-3xl border border-border/80 bg-card/90 backdrop-blur-xl shadow-2xl space-y-6 animate-in fade-in zoom-in-95">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mx-auto shadow-inner">
+            🔒
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black tracking-tight">Student Login Required</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              You must be registered and signed in to view questions, write solutions in the Monaco IDE, and submit code to the leaderboard.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Button onClick={() => router.push(`/login?redirect=/problems/${params.slug}`)} className="flex-1 font-bold h-11">
+              Sign In &rarr;
+            </Button>
+            <Button onClick={() => router.push(`/register?redirect=/problems/${params.slug}`)} variant="outline" className="flex-1 font-bold h-11">
+              Register
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">

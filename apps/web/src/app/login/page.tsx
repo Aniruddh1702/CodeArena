@@ -47,6 +47,26 @@ function LoginForm() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
+        // Fallback: check if account was registered on this browser session
+        const localAccounts = getAllAccounts();
+        const localMatch = localAccounts.find(
+          (a) => a.email.toLowerCase() === cleanEmail.toLowerCase() || a.username.toLowerCase() === cleanEmail.toLowerCase()
+        );
+
+        if (localMatch) {
+          saveAccount(localMatch, true);
+          const redirectUrl = searchParams.get("redirect");
+          if (localMatch.role === "SUPER_ADMIN" || localMatch.role === "ADMIN") {
+            localStorage.setItem("codearena_admin_authorized", "true");
+            router.push("/admin");
+          } else if (redirectUrl && redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
+            router.push(redirectUrl);
+          } else {
+            router.push("/dashboard");
+          }
+          return;
+        }
+
         let errorMsg = data?.message || "Invalid credentials. If you haven't registered, please create an account first.";
         if (Array.isArray(errorMsg)) {
           errorMsg = errorMsg.join(", ");
@@ -60,6 +80,20 @@ function LoginForm() {
       const token = data?.data?.accessToken || data?.accessToken;
 
       if (!userPayload) {
+        const localAccounts = getAllAccounts();
+        const localMatch = localAccounts.find(
+          (a) => a.email.toLowerCase() === cleanEmail.toLowerCase() || a.username.toLowerCase() === cleanEmail.toLowerCase()
+        );
+        if (localMatch) {
+          saveAccount(localMatch, true);
+          const redirectUrl = searchParams.get("redirect");
+          if (redirectUrl && redirectUrl.startsWith("/")) {
+            router.push(redirectUrl);
+          } else {
+            router.push("/dashboard");
+          }
+          return;
+        }
         setError("Account not found. Please register to create a new student account.");
         setLoading(false);
         return;

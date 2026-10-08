@@ -71,6 +71,8 @@ function ProblemsContent() {
   const [search, setSearch] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("ALL");
   const [selectedTopic, setSelectedTopic] = useState("ALL");
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [authChecked, setAuthChecked] = useState<boolean>(false);
   const [solvedSlugs, setSolvedSlugs] = useState<string[]>([]);
 
   const loadAllProblems = () => {
@@ -117,9 +119,13 @@ function ProblemsContent() {
     if (typeof window !== "undefined") {
       const active = getActiveAccount();
       if (!active) {
+        setCurrentUser(null);
+        setAuthChecked(true);
         router.push("/login?redirect=/problems");
         return;
       }
+      setCurrentUser(active);
+      setAuthChecked(true);
       const activeId = active.id || "default";
       const stats = getUserStats(activeId);
       const uniqueSlugs = stats.solvedProblems.map((item: any) => item.slug).filter(Boolean);
@@ -128,9 +134,11 @@ function ProblemsContent() {
       const handleAccountChange = () => {
         const acc = getActiveAccount();
         if (!acc) {
+          setCurrentUser(null);
           router.push("/login?redirect=/problems");
           return;
         }
+        setCurrentUser(acc);
         const accId = acc.id || "default";
         const s = getUserStats(accId);
         const slugs = s.solvedProblems.map((item: any) => item.slug).filter(Boolean);
@@ -177,6 +185,32 @@ function ProblemsContent() {
     setDifficultyFilter("ALL");
     router.replace("/problems");
   };
+
+  if (authChecked && !currentUser) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
+        <div className="max-w-md p-8 rounded-3xl border border-border/80 bg-card/90 backdrop-blur-xl shadow-2xl space-y-6 animate-in fade-in zoom-in-95">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mx-auto shadow-inner">
+            🔒
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black tracking-tight">Student Login Required</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              You must be registered and signed in to access the practice problem bank, view solutions, and track your coding progress.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Button onClick={() => router.push('/login?redirect=/problems')} className="flex-1 font-bold h-11">
+              Sign In &rarr;
+            </Button>
+            <Button onClick={() => router.push('/register?redirect=/problems')} variant="outline" className="flex-1 font-bold h-11">
+              Register
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
