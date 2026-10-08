@@ -26,13 +26,8 @@ export default function Home() {
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/dashboard">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-md">
                 Student Panel &rarr;
-              </Button>
-            </Link>
-            <Link href="/admin">
-              <Button variant="outline" size="sm" className="border-border/80 text-xs font-semibold">
-                🛡️ Admin
               </Button>
             </Link>
           </div>

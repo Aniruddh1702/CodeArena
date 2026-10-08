@@ -96,8 +96,8 @@ const DEFAULT_SAMPLE_JSON = [
 export default function AdminPortalPage() {
   const router = useRouter();
 
-  // Authentication & Gate State (Direct access enabled for Admin)
-  const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
+  // Authentication & Gate State (Locked by default - requires Admin password)
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [passcode, setPasscode] = useState("");
   const [passcodeError, setPasscodeError] = useState("");
   const [verifying, setVerifying] = useState(false);
@@ -589,14 +589,11 @@ export default function AdminPortalPage() {
 
     const trimmed = passcode.trim();
     const VALID_ADMIN_PASSCODES = [
-      "Aniruddh#1702",
-      "codearena-admin-2026",
-      "admin123",
-      "codearena2026"
+      "Aniruddh#1702"
     ];
 
     const isDirectMatch = VALID_ADMIN_PASSCODES.some(
-      (valid) => valid.toLowerCase() === trimmed.toLowerCase() || valid === trimmed
+      (valid) => valid === trimmed
     );
 
     try {
@@ -619,7 +616,7 @@ export default function AdminPortalPage() {
       }
 
       if (!apiSuccess && !isDirectMatch) {
-        throw new Error("Invalid Admin Passcode. Please enter Aniruddh#1702 or authorized admin credentials.");
+        throw new Error("Invalid Admin Password. Access denied.");
       }
 
       // Elevate active session and accounts to SUPER_ADMIN
@@ -1239,19 +1236,19 @@ export default function AdminPortalPage() {
 
           <Card className="border-border/80 shadow-2xl bg-card/80 backdrop-blur-md">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base font-bold">Admin Security Verification</CardTitle>
+              <CardTitle className="text-base font-bold">Admin Authentication</CardTitle>
               <CardDescription className="text-xs">
-                Enter your authorized admin passcode to unlock the management studio.
+                Enter your authorized administrator password to access the platform control studio.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleVerifyPasscode} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="passcode" className="text-xs font-bold">Admin Passcode</Label>
+                  <Label htmlFor="passcode" className="text-xs font-bold">Admin Password</Label>
                   <Input
                     id="passcode"
                     type="password"
-                    placeholder="Enter admin passcode (e.g. Aniruddh#1702)"
+                    placeholder="Enter Admin Password"
                     value={passcode}
                     onChange={(e) => {
                       setPasscode(e.target.value);
@@ -1274,21 +1271,8 @@ export default function AdminPortalPage() {
                   disabled={verifying || !passcode.trim()}
                   className="w-full h-10 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
                 >
-                  {verifying ? "Verifying Credentials..." : "Unlock Admin Portal →"}
+                  {verifying ? "Verifying Credentials..." : "Sign In to Admin Studio →"}
                 </Button>
-
-                <div className="pt-2 border-t border-border/50 text-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPasscode("Aniruddh#1702");
-                      setPasscodeError("");
-                    }}
-                    className="text-[11px] text-muted-foreground hover:text-primary transition-colors underline decoration-dotted"
-                  >
-                    Quick Fill Default Admin Passcode (Aniruddh#1702)
-                  </button>
-                </div>
               </form>
             </CardContent>
           </Card>
