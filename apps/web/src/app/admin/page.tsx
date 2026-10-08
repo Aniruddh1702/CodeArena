@@ -1277,14 +1277,8 @@ export default function AdminPortalPage() {
             </CardContent>
           </Card>
 
-          <div className="text-center flex justify-center items-center gap-4 text-xs text-muted-foreground">
-            <Link href="/dashboard" className="hover:text-foreground transition-colors">
-              &larr; Student Dashboard
-            </Link>
-            <span>•</span>
-            <Link href="/problems" className="hover:text-foreground transition-colors">
-              Practice Bank
-            </Link>
+          <div className="text-center text-[11px] text-muted-foreground/70 font-mono">
+            🔒 CodeArena Security • Authorized Administrators Only
           </div>
         </div>
       </div>
@@ -1352,29 +1346,18 @@ export default function AdminPortalPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link href="/problems">
-              <Button variant="outline" size="sm" className="h-8 text-xs font-semibold">
-                Practice Bank &rarr;
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold text-muted-foreground hover:text-foreground">
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/profile">
-              <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold text-muted-foreground hover:text-primary">
-                👤 Profile
-              </Button>
-            </Link>
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10 border border-destructive/20 text-[11px] font-mono font-bold text-destructive">
+              <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+              SUPER-ADMIN
+            </div>
             <Button
               variant="destructive"
               size="sm"
               onClick={handleLockAdmin}
-              className="h-8 text-xs font-bold shadow-sm"
-              title="Lock Admin and require passcode again"
+              className="h-8 text-xs font-bold shadow-sm gap-1.5"
+              title="Lock Admin and require password again"
             >
-              🔒 Lock
+              <span>🔒</span> Lock & Exit
             </Button>
           </div>
         </div>
