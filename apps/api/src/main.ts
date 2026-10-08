@@ -13,8 +13,12 @@ async function bootstrap() {
   app.use(cookieParser(process.env.COOKIE_SECRET));
 
   // CORS
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
+    : true; // In production/cloud, allow configured origins or reflect request origin
+
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -36,22 +40,20 @@ async function bootstrap() {
   );
 
   // Swagger documentation
-  if (process.env.NODE_ENV !== 'production') {
-    const config = new DocumentBuilder()
-      .setTitle('CodeArena API')
-      .setDescription('CodeArena DSA Platform API Documentation')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .addCookieAuth('access_token')
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document);
-  }
+  const config = new DocumentBuilder()
+    .setTitle('CodeArena API')
+    .setDescription('CodeArena DSA Platform API Documentation')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .addCookieAuth('access_token')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.API_PORT || 4000;
-  await app.listen(port);
-  console.log(`\n🚀 CodeArena API running on http://localhost:${port}`);
-  console.log(`📚 API Docs: http://localhost:${port}/api/docs\n`);
+  const port = Number(process.env.PORT) || Number(process.env.API_PORT) || 4000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`\n🚀 CodeArena API successfully running on port ${port} (0.0.0.0)`);
+  console.log(`📚 API Docs: /api/docs\n`);
 }
 
 bootstrap();
