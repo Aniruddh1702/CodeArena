@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { getActiveAccount, getUserStats, UserAccount } from "@/lib/auth-session";
 import { getLeaderboards } from "@/lib/leaderboard-data";
 import { getContests, Contest } from "@/lib/contests-data";
-import { getAllProblems, ProblemDefinition } from "@/lib/problems-data";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
 import { NotificationCenter } from "@/components/NotificationCenter";
 
@@ -312,11 +311,8 @@ export default function HomePage() {
   const [userStats, setUserStats] = useState({ rating: 1450, solved: 24, rank: 1, streak: 2 });
   const [matchmakingActive, setMatchmakingActive] = useState(false);
   const [matchmakingTime, setMatchmakingTime] = useState(0);
-  const [selectedTopic, setSelectedTopic] = useState("ALL");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [problems, setProblems] = useState<ProblemDefinition[]>([]);
   const [contests, setContests] = useState<Contest[]>([]);
-  const [activeSectionTab, setActiveSectionTab] = useState<"ALL" | "DASHBOARD" | "BATTLES" | "PRACTICE" | "CONTESTS">("ALL");
+  const [activeSectionTab, setActiveSectionTab] = useState<"ALL" | "DASHBOARD" | "BATTLES" | "CONTESTS">("ALL");
 
   // Load account & dynamic data
   useEffect(() => {
@@ -338,7 +334,6 @@ export default function HomePage() {
       streak: stats.problemsSolved > 0 ? 2 : 0,
     });
 
-    setProblems(getAllProblems());
     setContests(getContests());
 
     const handleAccountChange = () => {
@@ -379,13 +374,6 @@ export default function HomePage() {
     }
     return () => clearInterval(interval);
   }, [matchmakingActive, router]);
-
-  const filteredProblems = problems.filter((p) => {
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.slug.toLowerCase().includes(searchQuery.toLowerCase());
-    if (selectedTopic === "ALL") return matchesSearch;
-    const matchesTopic = p.topics?.some((t) => t.name.toLowerCase().includes(selectedTopic.toLowerCase()));
-    return matchesSearch && matchesTopic;
-  });
 
   const getRatingTier = (rating: number) => {
     if (rating >= 2200) return { title: "Grandmaster", color: "text-rose-400", bg: "from-rose-500 to-red-700", glow: "rose" as const };
@@ -428,46 +416,42 @@ export default function HomePage() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1 p-1 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md">
-            <button
-              onClick={() => setActiveSectionTab("ALL")}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                activeSectionTab === "ALL" ? "bg-white/15 text-white shadow-sm" : "text-slate-400 hover:text-white"
-              }`}
+            <Link
+              href="/dashboard"
+              className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all"
             >
-              All Hubs
-            </button>
-            <button
-              onClick={() => setActiveSectionTab("DASHBOARD")}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                activeSectionTab === "DASHBOARD" ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30" : "text-slate-400 hover:text-white"
-              }`}
+              Dashboard
+            </Link>
+            <Link
+              href="/problems"
+              className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all"
             >
-              ⚡ Dashboard
-            </button>
-            <button
-              onClick={() => setActiveSectionTab("BATTLES")}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                activeSectionTab === "BATTLES" ? "bg-rose-500/20 text-rose-300 border border-rose-500/30" : "text-slate-400 hover:text-white"
-              }`}
+              Practice (150 DSA)
+            </Link>
+            <Link
+              href="/contests"
+              className="px-4 py-1.5 rounded-full text-xs font-semibold text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 flex items-center gap-1 transition-all"
             >
-              ⚔️ 1v1 Battles
-            </button>
-            <button
-              onClick={() => setActiveSectionTab("PRACTICE")}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                activeSectionTab === "PRACTICE" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "text-slate-400 hover:text-white"
-              }`}
+              <span>🏆</span> Contests
+            </Link>
+            <Link
+              href="/battles"
+              className="px-4 py-1.5 rounded-full text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 flex items-center gap-1 transition-all"
             >
-              💻 Practice (150 DSA)
-            </button>
-            <button
-              onClick={() => setActiveSectionTab("CONTESTS")}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                activeSectionTab === "CONTESTS" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "text-slate-400 hover:text-white"
-              }`}
+              <span>⚔️</span> 1v1 Battles
+            </Link>
+            <Link
+              href="/leaderboard"
+              className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all"
             >
-              🏆 Contests
-            </button>
+              Leaderboard
+            </Link>
+            <Link
+              href="/profile"
+              className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all"
+            >
+              Profile
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -756,313 +740,43 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* ── 4. 3D SKILL RADAR MATRIX & DSA 150 ROADMAP SECTION ── */}
-        {(activeSectionTab === "ALL" || activeSectionTab === "DASHBOARD") && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-5">
-              <Tilt3DCard glowColor="purple" className="p-6 bg-[#0c1024]/85 flex flex-col items-center justify-between h-full">
-                <div className="w-full flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-                    3D Holographic Skill Radar Matrix
-                  </span>
-                  <span className="text-[10px] font-mono text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20 font-bold">
-                    Live Telemetry
-                  </span>
-                </div>
-
-                <div className="my-auto py-2">
-                  <HolographicRadar
-                    stats={{
-                      algorithms: Math.min(95, 50 + userStats.solved * 4),
-                      dataStructures: Math.min(92, 55 + userStats.solved * 3),
-                      speed: 85,
-                      problemSolving: Math.min(96, 60 + userStats.solved * 3),
-                      dpOptimization: Math.min(88, 40 + userStats.solved * 4),
-                      mathLogic: Math.min(90, 50 + userStats.solved * 3),
-                    }}
-                  />
-                </div>
-
-                <div className="w-full pt-3 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Real-time algorithm competency index</span>
-                  <Link href="/profile" className="text-indigo-400 hover:underline font-bold">
-                    Full Profile &rarr;
-                  </Link>
-                </div>
-              </Tilt3DCard>
-            </div>
-
-            <div className="lg:col-span-7 space-y-3.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <span>🗺️</span> 150 Core DSA Conquest Path
-                  </h3>
-                  <p className="text-xs text-slate-400">Progress through 4 algorithmic mastery tiers</p>
-                </div>
-                <button
-                  onClick={() => router.push("/problems")}
-                  className="text-xs text-indigo-400 hover:underline font-bold"
-                >
-                  View All 150 &rarr;
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {[
-                  { id: "1", name: "Arrays & Two Pointers", desc: "Sliding Window & Hash Maps", prob: "18 Problems", prog: Math.min(100, Math.max(20, userStats.solved * 25)), color: "from-blue-500 to-indigo-600", icon: "🛡️", badge: "FOUNDATION", tag: "Arrays" },
-                  { id: "2", name: "Trees & Binary Search", desc: "Binary Search Trees, DFS & BFS", prob: "24 Problems", prog: Math.min(100, Math.max(10, userStats.solved * 18)), color: "from-emerald-500 to-teal-600", icon: "🌳", badge: "CORE", tag: "Trees" },
-                  { id: "3", name: "Graphs & Shortest Path", desc: "Dijkstra, Topo Sort & DSU", prob: "20 Problems", prog: Math.min(100, Math.max(5, userStats.solved * 12)), color: "from-purple-500 to-pink-600", icon: "🕸️", badge: "ADVANCED", tag: "Graphs" },
-                  { id: "4", name: "Dynamic Programming", desc: "1D/2D DP & Knapsack", prob: "28 Problems", prog: Math.min(100, Math.max(0, userStats.solved * 8)), color: "from-amber-500 to-red-600", icon: "🧠", badge: "GRANDMASTER", tag: "Dynamic Programming" },
-                ].map((lvl) => (
-                  <Tilt3DCard
-                    key={lvl.id}
-                    glowColor="indigo"
-                    onClick={() => router.push(`/problems?topic=${encodeURIComponent(lvl.tag)}`)}
-                    className="p-4 cursor-pointer flex flex-col justify-between bg-[#0c1024]/85 hover:bg-[#101530]"
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{lvl.icon}</span>
-                          <span className="text-xs font-bold text-white">{lvl.name}</span>
-                        </div>
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-white/5 border border-white/10 text-indigo-300">
-                          {lvl.badge}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug">{lvl.desc}</p>
-                    </div>
-
-                    <div className="space-y-1.5 pt-2.5 border-t border-white/10 mt-2.5">
-                      <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
-                        <span>{lvl.prob}</span>
-                        <span className="text-indigo-400 font-bold">{lvl.prog}%</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full bg-gradient-to-r ${lvl.color} rounded-full transition-all duration-700`}
-                          style={{ width: `${Math.max(6, lvl.prog)}%` }}
-                        />
-                      </div>
-                    </div>
-                  </Tilt3DCard>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── 5. INTERACTIVE 150 DSA PRACTICE ENGINE (DIRECT ON HOME PAGE) ── */}
-        {(activeSectionTab === "ALL" || activeSectionTab === "PRACTICE") && (
-          <section className="space-y-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest">
-                  ✦ Instant Practice Engine ✦
+        {/* ── 3D HOLOGRAPHIC SKILL RADAR MATRIX (PROMINENT CENTERPIECE) ── */}
+        <div className="max-w-3xl mx-auto w-full">
+          <Tilt3DCard glowColor="purple" className="p-7 md:p-8 bg-gradient-to-b from-[#120a22]/90 via-[#0c1024]/95 to-[#0c1024]/90 border-purple-500/30 flex flex-col items-center justify-between">
+            <div className="w-full flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.9)] animate-pulse" />
+                <span className="text-sm font-black tracking-tight text-white">
+                  3D Holographic Skill Radar Matrix
                 </span>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                  150 Curated DSA Problem Matrix
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-400">
-                  Select a topic, search problems, and jump straight into the Monaco code sandbox.
-                </p>
               </div>
-
-              {/* Search Bar */}
-              <div className="w-full md:w-72">
-                <input
-                  type="text"
-                  placeholder="Search 150 problems..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
-                />
-              </div>
+              <span className="text-[11px] font-mono text-purple-300 bg-purple-500/15 px-3 py-0.5 rounded-full border border-purple-500/30 font-bold">
+                Live Telemetry
+              </span>
             </div>
 
-            {/* Topic Filter Chips */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-              {["ALL", "Arrays", "Two Pointers", "Trees", "Graphs", "Dynamic Programming", "Greedy", "Binary Search"].map((topic) => (
-                <button
-                  key={topic}
-                  onClick={() => setSelectedTopic(topic)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-mono whitespace-nowrap transition-all ${
-                    selectedTopic === topic
-                      ? "bg-indigo-600 text-white font-bold shadow-[0_0_15px_rgba(99,102,241,0.5)]"
-                      : "bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white border border-white/5"
-                  }`}
-                >
-                  #{topic}
-                </button>
-              ))}
+            <div className="my-4 py-3 scale-110">
+              <HolographicRadar
+                stats={{
+                  algorithms: Math.min(95, 50 + userStats.solved * 4),
+                  dataStructures: Math.min(92, 55 + userStats.solved * 3),
+                  speed: 85,
+                  problemSolving: Math.min(96, 60 + userStats.solved * 3),
+                  dpOptimization: Math.min(88, 40 + userStats.solved * 4),
+                  mathLogic: Math.min(90, 50 + userStats.solved * 3),
+                }}
+              />
             </div>
 
-            {/* Problem Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredProblems.slice(0, 6).map((prob) => {
-                const diffColor =
-                  prob.difficulty === "EASY"
-                    ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/30"
-                    : prob.difficulty === "MEDIUM"
-                    ? "text-amber-400 bg-amber-500/10 border-amber-500/30"
-                    : "text-rose-400 bg-rose-500/10 border-rose-500/30";
-
-                return (
-                  <Tilt3DCard
-                    key={prob.slug}
-                    glowColor="indigo"
-                    onClick={() => router.push(`/problems/${prob.slug}`)}
-                    className="p-5 cursor-pointer flex flex-col justify-between bg-[#0c1024]/90 hover:bg-[#101633] group"
-                  >
-                    <div className="space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <span className={`px-2.5 py-0.5 rounded text-[10px] font-black border uppercase font-mono ${diffColor}`}>
-                          {prob.difficulty}
-                        </span>
-                        <span className="text-[11px] font-mono text-slate-400">
-                          +15 pts
-                        </span>
-                      </div>
-
-                      <h4 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">
-                        {prob.title}
-                      </h4>
-
-                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-                        {prob.description?.slice(0, 110)}...
-                      </p>
-
-                      <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                        {prob.topics?.slice(0, 2).map((t, idx) => (
-                          <span key={idx} className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/5">
-                            #{t.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition-transform">
-                      <span>Solve in Monaco IDE</span>
-                      <span>&rarr;</span>
-                    </div>
-                  </Tilt3DCard>
-                );
-              })}
-            </div>
-
-            <div className="text-center pt-2">
-              <button
-                onClick={() => router.push("/problems")}
-                className="px-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 hover:text-white font-bold text-xs shadow-lg transition-all"
-              >
-                Browse All {problems.length} Problems &rarr;
-              </button>
-            </div>
-          </section>
-        )}
-
-        {/* ── 6. HALL OF FAME PODIUM & ENTERPRISE PROCTORING DECK ── */}
-        {(activeSectionTab === "ALL" || activeSectionTab === "DASHBOARD") && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Podium Block */}
-            <Tilt3DCard
-              glowColor="purple"
-              onClick={() => router.push("/leaderboard")}
-              className="p-6 cursor-pointer bg-[#0c1024]/85 border-purple-500/30 flex flex-col justify-between group"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-                    Global Hall of Fame & Rankings
-                  </span>
-                  <span className="text-[10px] font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-                    Live Elo
-                  </span>
-                </div>
-
-                {/* 3D Podium Preview */}
-                <div className="h-32 rounded-xl bg-black/40 border border-purple-500/20 p-2.5 flex items-end justify-center gap-3 relative overflow-hidden">
-                  <div className="w-14 bg-slate-400/20 border border-slate-300/30 rounded-t-lg h-16 flex flex-col items-center justify-end pb-1">
-                    <span className="text-sm">🥈</span>
-                    <span className="text-[9px] font-black text-slate-300">#2 Alex</span>
-                  </div>
-                  <div className="w-16 bg-amber-500/25 border border-amber-400/50 rounded-t-lg h-22 flex flex-col items-center justify-end pb-1 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                    <span className="text-base animate-bounce">👑</span>
-                    <span className="text-[10px] font-black text-amber-300">#1 Master</span>
-                  </div>
-                  <div className="w-14 bg-amber-700/20 border border-amber-700/30 rounded-t-lg h-12 flex flex-col items-center justify-end pb-1">
-                    <span className="text-sm">🥉</span>
-                    <span className="text-[9px] font-black text-amber-600">#3 Sarah</span>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
-                    Global Competitive Ladder
-                  </h4>
-                  <p className="text-xs text-slate-400 leading-relaxed mt-0.5">
-                    Live Elo ratings, solve streaks, and regional standings updated in real time.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs font-bold text-purple-400 group-hover:translate-x-1 transition-transform">
-                <span>View Full Leaderboard</span>
+            <div className="w-full pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+              <span>Real-time algorithm competency & performance index</span>
+              <Link href="/profile" className="text-indigo-400 hover:text-indigo-300 hover:underline font-bold flex items-center gap-1">
+                <span>View Full Profile</span>
                 <span>&rarr;</span>
-              </div>
-            </Tilt3DCard>
-
-            {/* Enterprise Proctoring Block */}
-            <Tilt3DCard
-              glowColor="cyan"
-              onClick={() => router.push("/admin")}
-              className="p-6 cursor-pointer bg-[#0c1024]/85 border-cyan-500/30 flex flex-col justify-between group"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                    Assessments & Enterprise Proctoring
-                  </span>
-                  <span className="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-                    Proctored
-                  </span>
-                </div>
-
-                {/* 3D Anti-Cheat Shield */}
-                <div className="h-32 rounded-xl bg-black/40 border border-cyan-500/20 p-2.5 flex flex-col items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-hologram-scan" />
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-xl shadow-[0_0_20px_rgba(6,182,212,0.4)] mb-1">
-                    🛡️
-                  </div>
-                  <div className="text-[10px] font-black text-cyan-300 font-mono uppercase">
-                    ANTI-CHEAT ACTIVE
-                  </div>
-                  <div className="text-[8px] text-slate-400 font-mono mt-0.5">
-                    Tab Switch & AI Plagiarism Detection
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
-                    Admin Command & College Batches
-                  </h4>
-                  <p className="text-xs text-slate-400 leading-relaxed mt-0.5">
-                    Create custom hiring tests, manage student cohorts, and export automated grade reports.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs font-bold text-cyan-400 group-hover:translate-x-1 transition-transform">
-                <span>Enter Admin Console</span>
-                <span>&rarr;</span>
-              </div>
-            </Tilt3DCard>
-          </div>
-        )}
+              </Link>
+            </div>
+          </Tilt3DCard>
+        </div>
       </main>
 
       {/* ── 2026 Glassmorphism Footer ── */}
