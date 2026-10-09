@@ -14,7 +14,7 @@ import {
   ContestStanding,
   registerUserForContest
 } from "@/lib/contests-data";
-import { getAllProblems, ProblemDefinition } from "@/lib/problems-data";
+import { getAllProblems, ProblemDefinition, PROBLEMS_DATABASE } from "@/lib/problems-data";
 import { evaluateJavaScript, ExecutionSummary, TestResult } from "@/lib/code-runner";
 import { getActiveAccount } from "@/lib/auth-session";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -115,8 +115,9 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     }
     setCurrentUser(user);
 
+    // Initial local load
     const c = getContestById(contestId);
-    setContest(c);
+    if (c) setContest(c);
 
     // Load problems map
     const probs = getAllProblems();
@@ -124,7 +125,35 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     probs.forEach((p) => {
       map[p.slug] = p;
     });
+    if (c?.problems) {
+      c.problems.forEach((p) => {
+        if (p.problemDef) {
+          map[p.problemSlug] = p.problemDef;
+        }
+      });
+    }
     setAllProblemsMap(map);
+
+    // Fetch fresh contest data directly from server API
+    fetch(`/api/contests/${contestId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && data.contest) {
+          setContest(data.contest);
+          if (data.contest.problems) {
+            setAllProblemsMap((prev) => {
+              const updated = { ...prev };
+              data.contest.problems.forEach((p: any) => {
+                if (p.problemDef) {
+                  updated[p.problemSlug] = p.problemDef;
+                }
+              });
+              return updated;
+            });
+          }
+        }
+      })
+      .catch(() => {});
 
     // Load standings
     if (c) {
@@ -146,18 +175,21 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     const interval = setInterval(() => {
       setNow(Date.now());
       const updated = getContestById(contestId);
-      setContest(updated);
       if (updated) {
+        setContest(updated);
         setStandings(getContestStandings(updated.id));
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [contestId]);
+  }, [contestId, router]);
 
   // Update starter code when problem or language changes
   const activeContestProblem: ContestProblem | undefined = contest?.problems[selectedProblemIndex];
-  const activeProblemDef: ProblemDefinition | undefined = activeContestProblem ? allProblemsMap[activeContestProblem.problemSlug] : undefined;
+  const activeProblemDef: ProblemDefinition | undefined =
+    activeContestProblem?.problemDef ||
+    (activeContestProblem ? allProblemsMap[activeContestProblem.problemSlug] : undefined) ||
+    (activeContestProblem ? PROBLEMS_DATABASE[activeContestProblem.problemSlug] : undefined);
 
   useEffect(() => {
     if (!activeContestProblem) return;
@@ -165,7 +197,7 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     if (codePerProblem[slug]?.[language]) {
       setCode(codePerProblem[slug][language]);
     } else if (activeProblemDef) {
-      const starter = activeProblemDef.starterCode[language] || `// Write your code here in ${language}`;
+      const starter = activeProblemDef.starterCode?.[language] || `// Write your code here in ${language}`;
       setCode(starter);
     }
     setRunResult(null);

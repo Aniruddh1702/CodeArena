@@ -339,8 +339,15 @@ export default function AdminPortalPage() {
   const [submissionSearchQuery, setSubmissionSearchQuery] = useState("");
   const [codeCopied, setCodeCopied] = useState(false);
 
-  const loadContests = () => {
+  const loadContests = async () => {
     setContestsList(getContests());
+    try {
+      const res = await fetch("/api/contests", { cache: "no-store" });
+      const data = await res.json();
+      if (data?.success && Array.isArray(data.contests) && data.contests.length > 0) {
+        setContestsList(data.contests);
+      }
+    } catch (e) {}
   };
 
   const handleAutoPickContestProblems = () => {

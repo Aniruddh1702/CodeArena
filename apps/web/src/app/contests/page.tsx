@@ -26,6 +26,16 @@ export default function ContestsPage() {
     setCurrentUser(user);
     setContests(getContests());
 
+    // Fetch live contests from server API
+    fetch("/api/contests")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.contests) && data.contests.length > 0) {
+          setContests(data.contests);
+        }
+      })
+      .catch(() => {});
+
     const timer = setInterval(() => {
       setNow(Date.now());
       setContests(getContests());
@@ -42,7 +52,7 @@ export default function ContestsPage() {
       window.removeEventListener("codearena_contests_updated", handleUpdate);
       window.removeEventListener("storage", handleUpdate);
     };
-  }, []);
+  }, [router]);
 
   const formatCountdown = (targetTimeStr: string) => {
     const diff = new Date(targetTimeStr).getTime() - now;

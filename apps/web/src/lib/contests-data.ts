@@ -1,10 +1,12 @@
 import { saveNotification, checkContest1HourReminders } from "./notifications";
+import { PROBLEMS_DATABASE, getCustomProblems, ProblemDefinition } from "./problems-data";
 
 export interface ContestProblem {
   problemSlug: string;
   title: string;
   difficulty: "EASY" | "MEDIUM" | "HARD";
   points: number;
+  problemDef?: ProblemDefinition;
 }
 
 export interface Contest {
@@ -71,10 +73,34 @@ const DEFAULT_CONTESTS: Contest[] = [
     endTime: new Date(Date.now() + 75 * 60 * 1000).toISOString(),
     status: "LIVE",
     problems: [
-      { problemSlug: "two-sum", title: "Two Sum", difficulty: "EASY", points: 100 },
-      { problemSlug: "container-with-most-water", title: "Container With Most Water", difficulty: "MEDIUM", points: 200 },
-      { problemSlug: "coin-change", title: "Coin Change", difficulty: "MEDIUM", points: 300 },
-      { problemSlug: "trapping-rain-water", title: "Trapping Rain Water", difficulty: "HARD", points: 500 }
+      {
+        problemSlug: "two-sum",
+        title: "Two Sum",
+        difficulty: "EASY",
+        points: 100,
+        problemDef: PROBLEMS_DATABASE["two-sum"]
+      },
+      {
+        problemSlug: "container-with-most-water",
+        title: "Container With Most Water",
+        difficulty: "MEDIUM",
+        points: 200,
+        problemDef: PROBLEMS_DATABASE["container-with-most-water"]
+      },
+      {
+        problemSlug: "coin-change",
+        title: "Coin Change",
+        difficulty: "MEDIUM",
+        points: 300,
+        problemDef: PROBLEMS_DATABASE["coin-change"]
+      },
+      {
+        problemSlug: "trapping-rain-water",
+        title: "Trapping Rain Water",
+        difficulty: "HARD",
+        points: 500,
+        problemDef: PROBLEMS_DATABASE["trapping-rain-water"]
+      }
     ],
     participantsCount: 42,
     registeredUsers: ["admin@codearena.io", "alex.dev@gmail.com", "sarah.coder@outlook.com", "vikram.singh@iit.ac.in"],
@@ -88,7 +114,6 @@ const DEFAULT_CONTESTS: Contest[] = [
   }
 ];
 
-// Seed default submissions for contest-weekly-clash-1 so admin immediately sees student solutions
 const DEFAULT_SUBMISSIONS: Record<string, ContestSubmission[]> = {
   "contest-weekly-clash-1": [
     {
@@ -99,12 +124,7 @@ const DEFAULT_SUBMISSIONS: Record<string, ContestSubmission[]> = {
       problemSlug: "two-sum",
       problemTitle: "Two Sum",
       language: "javascript",
-      code: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-var twoSum = function(nums, target) {
+      code: `var twoSum = function(nums, target) {
     const map = new Map();
     for (let i = 0; i < nums.length; i++) {
         const complement = target - nums[i];
@@ -132,15 +152,10 @@ var twoSum = function(nums, target) {
       problemSlug: "container-with-most-water",
       problemTitle: "Container With Most Water",
       language: "javascript",
-      code: `/**
- * @param {number[]} height
- * @return {number}
- */
-var maxArea = function(height) {
+      code: `var maxArea = function(height) {
     let left = 0;
     let right = height.length - 1;
     let maxWater = 0;
-    
     while (left < right) {
         const currentWater = Math.min(height[left], height[right]) * (right - left);
         maxWater = Math.max(maxWater, currentWater);
@@ -173,11 +188,9 @@ var maxArea = function(height) {
     def coinChange(self, coins: List[int], amount: int) -> int:
         dp = [float('inf')] * (amount + 1)
         dp[0] = 0
-        
         for coin in coins:
             for x in range(coin, amount + 1):
                 dp[x] = min(dp[x], dp[x - coin] + 1)
-                
         return dp[amount] if dp[amount] != float('inf') else -1`,
       runtime: "115 ms",
       memory: "16.8 MB",
@@ -199,16 +212,13 @@ var maxArea = function(height) {
       code: `#include <vector>
 #include <unordered_map>
 using namespace std;
-
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
         unordered_map<int, int> seen;
         for (int i = 0; i < nums.size(); ++i) {
             int complement = target - nums[i];
-            if (seen.find(complement) != seen.end()) {
-                return {seen[complement], i};
-            }
+            if (seen.find(complement) != seen.end()) return {seen[complement], i};
             seen[nums[i]] = i;
         }
         return {};
@@ -222,53 +232,79 @@ public:
       score: 100,
       penaltyMinutes: 14,
       submittedAt: new Date(Date.now() - 20 * 60 * 1000).toISOString()
-    },
-    {
-      id: "sub_demo_5",
-      contestId: "contest-weekly-clash-1",
-      userEmail: "priya.patel@gmail.com",
-      userName: "Priya Patel",
-      problemSlug: "container-with-most-water",
-      problemTitle: "Container With Most Water",
-      language: "javascript",
-      code: `var maxArea = function(height) {
-    let max = 0;
-    // Brute force attempt
-    for(let i=0; i<height.length; i++) {
-        for(let j=i+1; j<height.length; j++) {
-            max = Math.max(max, Math.min(height[i], height[j]) * (j - i));
-        }
-    }
-    return max;
-};`,
-      runtime: "950 ms",
-      memory: "44.0 MB",
-      passedTestCases: 5,
-      totalTestCases: 12,
-      status: "WRONG_ANSWER",
-      score: 0,
-      penaltyMinutes: 0,
-      submittedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString()
     }
   ]
 };
 
+// Helper: Ensure every problem has its full ProblemDefinition attached
+function enrichContestProblems(contest: Contest): Contest {
+  const custom = typeof window !== "undefined" ? getCustomProblems() : {};
+  const enrichedProblems = (contest.problems || []).map((p) => {
+    if (p.problemDef && p.problemDef.description) {
+      return p;
+    }
+    const def = PROBLEMS_DATABASE[p.problemSlug] || custom[p.problemSlug];
+    return {
+      ...p,
+      problemDef: def || p.problemDef,
+    };
+  });
+  return {
+    ...contest,
+    problems: enrichedProblems,
+  };
+}
+
+let isSyncingContests = false;
+
+// Trigger non-blocking sync with server
+export async function syncContestsWithServer(): Promise<Contest[]> {
+  if (typeof window === "undefined" || isSyncingContests) return getContests();
+  isSyncingContests = true;
+  try {
+    const res = await fetch("/api/contests", { cache: "no-store" });
+    const json = await res.json().catch(() => null);
+    if (json?.success && Array.isArray(json.contests) && json.contests.length > 0) {
+      const serverContests: Contest[] = json.contests.map(enrichContestProblems);
+      const localContests = getContests();
+      
+      // Merge unique contests
+      const map = new Map<string, Contest>();
+      serverContests.forEach((c) => map.set(c.id, c));
+      localContests.forEach((c) => {
+        if (!map.has(c.id)) map.set(c.id, c);
+      });
+
+      const merged = Array.from(map.values());
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: merged }));
+      return merged;
+    }
+  } catch (err) {
+    console.warn("Server contests background sync:", err);
+  } finally {
+    isSyncingContests = false;
+  }
+  return getContests();
+}
+
 export function getContests(): Contest[] {
-  if (typeof window === "undefined") return DEFAULT_CONTESTS;
+  if (typeof window === "undefined") return DEFAULT_CONTESTS.map(enrichContestProblems);
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     let contests: Contest[];
     if (raw === null) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CONTESTS));
-      contests = DEFAULT_CONTESTS;
+      const enriched = DEFAULT_CONTESTS.map(enrichContestProblems);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched));
+      contests = enriched;
     } else {
-      contests = JSON.parse(raw);
+      contests = JSON.parse(raw).map(enrichContestProblems);
     }
 
     // Auto update status based on current time
     const now = Date.now();
     let updated = false;
-    contests.forEach(c => {
+    contests.forEach((c) => {
       const start = new Date(c.startTime).getTime();
       const end = new Date(c.endTime).getTime();
       let newStatus: Contest["status"] = c.status;
@@ -294,137 +330,155 @@ export function getContests(): Contest[] {
     // Check for 1-hour contest reminders
     checkContest1HourReminders(contests);
 
+    // Asynchronously trigger server sync
+    syncContestsWithServer().catch(() => {});
+
     return contests;
   } catch (e) {
     console.error("Failed to load contests:", e);
-    return DEFAULT_CONTESTS;
+    return DEFAULT_CONTESTS.map(enrichContestProblems);
   }
 }
 
 export function getContestById(id: string): Contest | null {
   const contests = getContests();
-  return contests.find(c => c.id === id) || null;
+  const c = contests.find((x) => x.id === id);
+  return c ? enrichContestProblems(c) : null;
 }
 
 export function saveContest(contest: Contest): void {
-  if (typeof window === "undefined") return;
-  try {
-    const contests = getContests();
-    const idx = contests.findIndex(c => c.id === contest.id);
-    const isNew = idx < 0;
+  const enriched = enrichContestProblems(contest);
+  if (typeof window !== "undefined") {
+    try {
+      const contests = getContests();
+      const idx = contests.findIndex((c) => c.id === enriched.id);
+      const isNew = idx < 0;
 
-    if (idx >= 0) {
-      contests[idx] = contest;
-    } else {
-      contests.unshift(contest);
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(contests));
-    window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: contest }));
-
-    // Send notifications if scheduled
-    if (isNew) {
-      const now = Date.now();
-      const startTime = new Date(contest.startTime).getTime();
-      const diffMins = (startTime - now) / (1000 * 60);
-
-      if (contest.status === "LIVE" || diffMins <= 0) {
-        saveNotification({
-          title: "🟢 Contest is LIVE Now!",
-          message: `'${contest.title}' is now live! Enter the arena and start solving challenges.`,
-          type: "CONTEST_LIVE",
-          contestId: contest.id,
-          contestTitle: contest.title,
-          actionUrl: `/contests/${contest.id}`
-        });
-      } else if (diffMins <= 60) {
-        saveNotification({
-          title: "⏰ Upcoming Contest: 1 Hour Alert!",
-          message: `'${contest.title}' is scheduled to start in ${Math.round(diffMins)} minutes! Prepare your workspace.`,
-          type: "CONTEST_1HOUR_ALERT",
-          contestId: contest.id,
-          contestTitle: contest.title,
-          actionUrl: `/contests/${contest.id}`
-        });
+      if (idx >= 0) {
+        contests[idx] = enriched;
       } else {
-        const startFormatted = new Date(contest.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        saveNotification({
-          title: "📅 New Contest Scheduled",
-          message: `'${contest.title}' scheduled for ${new Date(contest.startTime).toLocaleDateString()} at ${startFormatted}. You'll be notified 1 hour before it begins! Check your Gmail for confirmation.`,
-          type: "CONTEST_SCHEDULED",
-          contestId: contest.id,
-          contestTitle: contest.title,
-          actionUrl: `/contests`
-        });
+        contests.unshift(enriched);
       }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(contests));
+      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: enriched }));
 
-      // Dispatch Scheduled Gmail/Email to all participants
-      try {
-        import("./email-service").then(({ dispatchContestEmail }) => {
-          import("./auth-session").then(({ getAllAccounts }) => {
-            const accounts = getAllAccounts();
-            const recipientMap = new Map<string, string>();
+      // Send notifications if scheduled
+      if (isNew) {
+        const now = Date.now();
+        const startTime = new Date(enriched.startTime).getTime();
+        const diffMins = (startTime - now) / (1000 * 60);
 
-            const defaultStudents = [
-              { email: "alex.chen@gmail.com", name: "Alex Chen" },
-              { email: "priya.patel@gmail.com", name: "Priya Patel" },
-              { email: "rahul.sharma@gmail.com", name: "Rahul Sharma" },
-              { email: "student@codearena.dev", name: "Student Participant" },
-            ];
-            defaultStudents.forEach((s) => recipientMap.set(s.email, s.name));
+        if (enriched.status === "LIVE" || diffMins <= 0) {
+          saveNotification({
+            title: "🟢 Contest is LIVE Now!",
+            message: `'${enriched.title}' is now live! Enter the arena and start solving challenges.`,
+            type: "CONTEST_LIVE",
+            contestId: enriched.id,
+            contestTitle: enriched.title,
+            actionUrl: `/contests/${enriched.id}`,
+          });
+        } else if (diffMins <= 60) {
+          saveNotification({
+            title: "⏰ Upcoming Contest: 1 Hour Alert!",
+            message: `'${enriched.title}' is scheduled to start in ${Math.round(diffMins)} minutes! Prepare your workspace.`,
+            type: "CONTEST_1HOUR_ALERT",
+            contestId: enriched.id,
+            contestTitle: enriched.title,
+            actionUrl: `/contests/${enriched.id}`,
+          });
+        } else {
+          const startFormatted = new Date(enriched.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+          saveNotification({
+            title: "📅 New Contest Scheduled",
+            message: `'${enriched.title}' scheduled for ${new Date(enriched.startTime).toLocaleDateString()} at ${startFormatted}. You'll be notified 1 hour before it begins! Check your Gmail for confirmation.`,
+            type: "CONTEST_SCHEDULED",
+            contestId: enriched.id,
+            contestTitle: enriched.title,
+            actionUrl: `/contests`,
+          });
+        }
 
-            accounts.forEach((a) => {
-              if (a.email && a.email.includes("@")) {
-                recipientMap.set(a.email, a.name || a.username);
-              }
-            });
+        // Dispatch Scheduled Gmail/Email to all participants
+        try {
+          import("./email-service").then(({ dispatchContestEmail }) => {
+            import("./auth-session").then(({ getAllAccounts }) => {
+              const accounts = getAllAccounts();
+              const recipientMap = new Map<string, string>();
 
-            if (Array.isArray(contest.registeredUsers)) {
-              contest.registeredUsers.forEach((email: string) => {
-                if (email && email.includes("@") && !recipientMap.has(email)) {
-                  recipientMap.set(email, email.split("@")[0]);
+              const defaultStudents = [
+                { email: "alex.chen@gmail.com", name: "Alex Chen" },
+                { email: "priya.patel@gmail.com", name: "Priya Patel" },
+                { email: "rahul.sharma@gmail.com", name: "Rahul Sharma" },
+                { email: "student@codearena.dev", name: "Student Participant" },
+              ];
+              defaultStudents.forEach((s) => recipientMap.set(s.email, s.name));
+
+              accounts.forEach((a) => {
+                if (a.email && a.email.includes("@")) {
+                  recipientMap.set(a.email, a.name || a.username);
                 }
               });
-            }
 
-            const recipients = Array.from(recipientMap.entries()).map(([email, name]) => ({ email, name }));
-            const mailType = diffMins <= 60 && diffMins > 0 ? "CONTEST_1HOUR_REMINDER" : "CONTEST_SCHEDULED";
-            dispatchContestEmail(mailType, contest, recipients);
+              if (Array.isArray(enriched.registeredUsers)) {
+                enriched.registeredUsers.forEach((email: string) => {
+                  if (email && email.includes("@") && !recipientMap.has(email)) {
+                    recipientMap.set(email, email.split("@")[0]);
+                  }
+                });
+              }
+
+              const recipients = Array.from(recipientMap.entries()).map(([email, name]) => ({ email, name }));
+              const mailType = diffMins <= 60 && diffMins > 0 ? "CONTEST_1HOUR_REMINDER" : "CONTEST_SCHEDULED";
+              dispatchContestEmail(mailType, enriched, recipients);
+            });
           });
-        });
-      } catch (mailErr) {
-        console.error("Failed to dispatch scheduled contest emails:", mailErr);
+        } catch (mailErr) {
+          console.error("Failed to dispatch scheduled contest emails:", mailErr);
+        }
       }
+    } catch (e) {
+      console.error("Failed to save contest locally:", e);
     }
-  } catch (e) {
-    console.error("Failed to save contest:", e);
   }
+
+  // Sync to Backend Server API
+  fetch("/api/contests", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(enriched),
+  }).catch((err) => console.warn("Failed to sync contest to server:", err));
 }
 
 export function clearAllContests(): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-    window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: { cleared: true } }));
-  } catch (e) {
-    console.error("Failed to clear contests:", e);
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: { cleared: true } }));
+    } catch (e) {
+      console.error("Failed to clear contests locally:", e);
+    }
   }
+
+  fetch("/api/contests", { method: "DELETE" }).catch(() => {});
 }
 
 export function deleteContest(id: string): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    let contests = getContests();
-    const initialLen = contests.length;
-    contests = contests.filter(c => c.id !== id);
-    if (contests.length !== initialLen) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(contests));
-      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: { id, deleted: true } }));
-      return true;
+  if (typeof window !== "undefined") {
+    try {
+      let contests = getContests();
+      const initialLen = contests.length;
+      contests = contests.filter((c) => c.id !== id);
+      if (contests.length !== initialLen) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(contests));
+        window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: { id, deleted: true } }));
+      }
+    } catch (e) {
+      console.error("Failed to delete contest locally:", e);
     }
-  } catch (e) {
-    console.error("Failed to delete contest:", e);
   }
-  return false;
+
+  fetch(`/api/contests/${id}`, { method: "DELETE" }).catch(() => {});
+  return true;
 }
 
 export function startContestNow(id: string): Contest | null {
@@ -457,10 +511,18 @@ export function registerUserForContest(contestId: string, email: string): boolea
   const contest = getContestById(contestId);
   if (!contest) return false;
 
-  if (!contest.registeredUsers.includes(email)) {
-    contest.registeredUsers.push(email);
+  const cleanEmail = email.toLowerCase();
+  if (!contest.registeredUsers.includes(cleanEmail)) {
+    contest.registeredUsers.push(cleanEmail);
     contest.participantsCount = Math.max(contest.participantsCount + 1, contest.registeredUsers.length);
     saveContest(contest);
+
+    fetch(`/api/contests/${contestId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ registerUserEmail: cleanEmail }),
+    }).catch(() => {});
+
     return true;
   }
   return false;
@@ -471,7 +533,23 @@ export function getContestSubmissions(contestId: string): ContestSubmission[] {
   try {
     const raw = localStorage.getItem(`${SUBMISSIONS_PREFIX}${contestId}`);
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      // Trigger background sync with server submissions
+      fetch(`/api/contests/${contestId}/submissions`)
+        .then((res) => res.json())
+        .then((json) => {
+          if (json?.success && Array.isArray(json.submissions) && json.submissions.length > 0) {
+            const map = new Map<string, ContestSubmission>();
+            json.submissions.forEach((s: ContestSubmission) => map.set(s.id, s));
+            parsed.forEach((s: ContestSubmission) => {
+              if (!map.has(s.id)) map.set(s.id, s);
+            });
+            const merged = Array.from(map.values());
+            localStorage.setItem(`${SUBMISSIONS_PREFIX}${contestId}`, JSON.stringify(merged));
+          }
+        })
+        .catch(() => {});
+      return parsed;
     }
     if (DEFAULT_SUBMISSIONS[contestId]) {
       localStorage.setItem(`${SUBMISSIONS_PREFIX}${contestId}`, JSON.stringify(DEFAULT_SUBMISSIONS[contestId]));
@@ -492,7 +570,7 @@ export function getAllContestSubmissions(contestId?: string): ContestSubmission[
     }
     const contests = getContests();
     const allSubs: ContestSubmission[] = [];
-    contests.forEach(c => {
+    contests.forEach((c) => {
       const subs = getContestSubmissions(c.id);
       allSubs.push(...subs);
     });
@@ -504,16 +582,24 @@ export function getAllContestSubmissions(contestId?: string): ContestSubmission[
 }
 
 export function recordContestSubmission(submission: ContestSubmission): void {
-  if (typeof window === "undefined") return;
-  try {
-    const key = `${SUBMISSIONS_PREFIX}${submission.contestId}`;
-    const subs = getContestSubmissions(submission.contestId);
-    subs.push(submission);
-    localStorage.setItem(key, JSON.stringify(subs));
-    window.dispatchEvent(new CustomEvent("codearena_contest_submission", { detail: submission }));
-  } catch (e) {
-    console.error("Failed to record contest submission:", e);
+  if (typeof window !== "undefined") {
+    try {
+      const key = `${SUBMISSIONS_PREFIX}${submission.contestId}`;
+      const subs = getContestSubmissions(submission.contestId);
+      subs.unshift(submission);
+      localStorage.setItem(key, JSON.stringify(subs));
+      window.dispatchEvent(new CustomEvent("codearena_contest_submission", { detail: submission }));
+    } catch (e) {
+      console.error("Failed to record contest submission locally:", e);
+    }
   }
+
+  // Push submission directly to Server API
+  fetch(`/api/contests/${submission.contestId}/submissions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(submission),
+  }).catch((err) => console.warn("Failed to sync submission to server:", err));
 }
 
 export function getContestStandings(contestId: string): ContestStanding[] {
@@ -527,7 +613,7 @@ export function getContestStandings(contestId: string): ContestStanding[] {
   const userMap: Record<string, ContestStanding> = {};
 
   // Initialize with registered users if any
-  contest.registeredUsers.forEach(email => {
+  (contest.registeredUsers || []).forEach((email) => {
     userMap[email] = {
       rank: 1,
       userEmail: email,
@@ -535,7 +621,7 @@ export function getContestStandings(contestId: string): ContestStanding[] {
       score: 0,
       penaltyMinutes: 0,
       problemsSolved: 0,
-      problemResults: {}
+      problemResults: {},
     };
   });
 
@@ -547,7 +633,7 @@ export function getContestStandings(contestId: string): ContestStanding[] {
     { email: "elena.rostova@yandex.ru", name: "ElenaR", score: 300, penalty: 18, solved: 1 },
   ];
 
-  demoContestants.forEach(dc => {
+  demoContestants.forEach((dc) => {
     if (!userMap[dc.email]) {
       userMap[dc.email] = {
         rank: 1,
@@ -556,13 +642,13 @@ export function getContestStandings(contestId: string): ContestStanding[] {
         score: dc.score,
         penaltyMinutes: dc.penalty,
         problemsSolved: dc.solved,
-        problemResults: {}
+        problemResults: {},
       };
     }
   });
 
   // Process real submissions
-  submissions.forEach(sub => {
+  submissions.forEach((sub) => {
     if (!userMap[sub.userEmail]) {
       userMap[sub.userEmail] = {
         rank: 1,
@@ -571,7 +657,7 @@ export function getContestStandings(contestId: string): ContestStanding[] {
         score: 0,
         penaltyMinutes: 0,
         problemsSolved: 0,
-        problemResults: {}
+        problemResults: {},
       };
     }
 
@@ -581,7 +667,7 @@ export function getContestStandings(contestId: string): ContestStanding[] {
         solved: false,
         attempts: 0,
         points: 0,
-        timeMinutes: 0
+        timeMinutes: 0,
       };
     }
 
