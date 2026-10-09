@@ -137,6 +137,92 @@
   }
 }
 
+/* 3D Sword Combat Clash Animations */
+@keyframes sword-clash-left {
+  0%, 100% {
+    transform: rotate(-45deg) translate(-12px, 8px) scale(1);
+  }
+  40% {
+    transform: rotate(-10deg) translate(14px, -6px) scale(1.08);
+  }
+  50% {
+    transform: rotate(-8deg) translate(16px, -8px) scale(1.1);
+  }
+  65% {
+    transform: rotate(-35deg) translate(-6px, 4px) scale(1.02);
+  }
+}
+
+@keyframes sword-clash-right {
+  0%, 100% {
+    transform: rotate(45deg) translate(12px, 8px) scale(1);
+  }
+  40% {
+    transform: rotate(10deg) translate(-14px, -6px) scale(1.08);
+  }
+  50% {
+    transform: rotate(8deg) translate(-16px, -8px) scale(1.1);
+  }
+  65% {
+    transform: rotate(35deg) translate(6px, 4px) scale(1.02);
+  }
+}
+
+@keyframes clash-spark {
+  0%, 35% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.6) rotate(45deg);
+  }
+  60% {
+    opacity: 0;
+    transform: scale(2.4) rotate(90deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(180deg);
+  }
+}
+
+/* 3D Trophy Float & Rotation */
+@keyframes float-trophy-3d {
+  0%, 100% {
+    transform: translateY(0px) rotateY(-12deg) rotateX(6deg) scale(1);
+  }
+  50% {
+    transform: translateY(-14px) rotateY(15deg) rotateX(-6deg) scale(1.04);
+  }
+}
+
+/* 3D Winner Certificate Sheet Float */
+@keyframes float-winner-sheet {
+  0%, 100% {
+    transform: translateY(0px) rotateZ(-3deg) rotateX(10deg) rotateY(6deg);
+    box-shadow: 0 15px 35px rgba(245, 158, 11, 0.25);
+  }
+  50% {
+    transform: translateY(-10px) rotateZ(3deg) rotateX(-5deg) rotateY(-8deg);
+    box-shadow: 0 25px 45px rgba(245, 158, 11, 0.45);
+  }
+}
+
+@keyframes holographic-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(200%);
+    opacity: 0;
+  }
+}
+
 .animate-float-3d {
   animation: float-slow 6s ease-in-out infinite;
 }
@@ -147,5 +233,29 @@
 
 .animate-glow-pulse {
   animation: glow-pulse 4s ease-in-out infinite;
+}
+
+.animate-sword-left {
+  animation: sword-clash-left 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.animate-sword-right {
+  animation: sword-clash-right 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.animate-clash-spark {
+  animation: clash-spark 1.4s ease-out infinite;
+}
+
+.animate-trophy-3d {
+  animation: float-trophy-3d 4.5s ease-in-out infinite;
+}
+
+.animate-winner-sheet {
+  animation: float-winner-sheet 5s ease-in-out infinite;
+}
+
+.animate-hologram-scan {
+  animation: holographic-scan 3s ease-in-out infinite;
 }
 
