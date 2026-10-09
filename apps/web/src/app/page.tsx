@@ -543,88 +543,89 @@ export default function HomePage() {
           </div>
         </Tilt3DCard>
 
-        {/* ── 3D HERO MODULES: BATTLES, CONTESTS & PRACTICE (WITH 3D FLOATING CODES) ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* ── ROW 1: 3D BATTLE ARENA & CHAMPIONSHIP CONTESTS (2 BLOCKS) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* ════════════ 1. 3D REAL-TIME BATTLE ARENA BLOCK (FIGHTING SWORDS) ════════════ */}
           <Tilt3DCard
             glowColor="rose"
-            className="p-6 bg-gradient-to-br from-[#180816]/90 via-[#0c1024]/90 to-[#120a22]/90 border-rose-500/30 flex flex-col justify-between group"
+            className="p-7 md:p-8 bg-gradient-to-br from-[#180816]/90 via-[#0c1024]/90 to-[#120a22]/90 border-rose-500/30 flex flex-col justify-between group"
           >
-            <div className="space-y-3.5">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[11px] font-black uppercase tracking-wider font-mono">
+                <span className="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-black uppercase tracking-wider font-mono">
                   ⚔️ 1v1 Battle Arena
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 text-[9px] font-bold animate-pulse">
+                <span className="px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 text-[10px] font-bold animate-pulse">
                   LIVE COMBAT
                 </span>
               </div>
 
               {/* ── 3D CONTINUOUSLY FIGHTING SWORDS VISUAL ── */}
-              <div className="relative h-40 rounded-2xl bg-black/40 border border-rose-500/20 flex items-center justify-center overflow-hidden my-1 shadow-[inset_0_0_30px_rgba(244,63,94,0.15)]">
+              <div className="relative h-44 rounded-2xl bg-black/40 border border-rose-500/20 flex items-center justify-center overflow-hidden my-2 shadow-[inset_0_0_30px_rgba(244,63,94,0.15)]">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.15),transparent_70%)]" />
 
                 {/* Left Sword */}
                 <div className="absolute z-10 animate-sword-left flex flex-col items-center">
-                  <div className="w-2 h-20 rounded-full bg-gradient-to-t from-cyan-400 via-blue-300 to-white shadow-[0_0_18px_#22d3ee,0_0_30px_#38bdf8] relative">
-                    <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-5 h-2.5 rounded bg-cyan-700 border border-cyan-300" />
-                    <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-1.5 h-3 bg-slate-800 rounded" />
+                  <div className="w-2.5 h-24 rounded-full bg-gradient-to-t from-cyan-400 via-blue-300 to-white shadow-[0_0_20px_#22d3ee,0_0_35px_#38bdf8] relative">
+                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-3 rounded bg-cyan-700 border border-cyan-300" />
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-2 h-4 bg-slate-800 rounded" />
                   </div>
                 </div>
 
                 {/* Clash Spark */}
                 <div className="absolute z-20 animate-clash-spark flex items-center justify-center pointer-events-none">
-                  <div className="w-10 h-10 rounded-full bg-white blur-sm opacity-90 shadow-[0_0_25px_#fff,0_0_40px_#f43f5e]" />
-                  <span className="absolute text-xl font-black text-amber-300 drop-shadow-[0_0_10px_#f59e0b]">
+                  <div className="w-12 h-12 rounded-full bg-white blur-sm opacity-90 shadow-[0_0_30px_#fff,0_0_50px_#f43f5e]" />
+                  <span className="absolute text-2xl font-black text-amber-300 drop-shadow-[0_0_10px_#f59e0b]">
                     💥
                   </span>
                 </div>
 
                 {/* Right Sword */}
                 <div className="absolute z-10 animate-sword-right flex flex-col items-center">
-                  <div className="w-2 h-20 rounded-full bg-gradient-to-t from-rose-500 via-pink-400 to-white shadow-[0_0_18px_#f43f5e,0_0_30px_#ec4899] relative">
-                    <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-5 h-2.5 rounded bg-rose-700 border border-rose-300" />
-                    <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-1.5 h-3 bg-slate-800 rounded" />
+                  <div className="w-2.5 h-24 rounded-full bg-gradient-to-t from-rose-500 via-pink-400 to-white shadow-[0_0_20px_#f43f5e,0_0_35px_#ec4899] relative">
+                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-3 rounded bg-rose-700 border border-rose-300" />
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-2 h-4 bg-slate-800 rounded" />
                   </div>
                 </div>
 
                 {/* Fighter Overlay */}
-                <div className="absolute top-2 inset-x-3 flex items-center justify-between text-[10px] font-mono">
+                <div className="absolute top-2.5 inset-x-4 flex items-center justify-between text-[11px] font-mono">
                   <span className="bg-black/60 px-2 py-0.5 rounded border border-cyan-500/30 text-cyan-300">
-                    {activeAccount?.username || "P1"} ({userStats.rating})
+                    {activeAccount?.username || "Player_1"} ({userStats.rating})
                   </span>
-                  <span className="font-black text-rose-400">VS</span>
+                  <span className="font-black text-rose-400 text-xs">VS</span>
                   <span className="bg-black/60 px-2 py-0.5 rounded border border-rose-500/30 text-rose-300">
                     AI_Bot (1480)
                   </span>
                 </div>
 
-                <div className="absolute bottom-1.5 inset-x-3 text-center text-[9px] font-mono text-slate-400 bg-black/50 py-0.5 rounded border border-white/5">
-                  10m Speed Duel • ±35 Elo Stakes
+                <div className="absolute bottom-2 inset-x-4 flex items-center justify-between text-[10px] font-mono text-slate-400 bg-black/50 px-2.5 py-1 rounded-md border border-white/5">
+                  <span>Format: 1v1 Real-Time Speed Duel</span>
+                  <span className="text-emerald-400 font-bold">48 In Queue</span>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-extrabold text-white tracking-tight group-hover:text-rose-300 transition-colors">
+                <h3 className="text-xl font-extrabold text-white tracking-tight group-hover:text-rose-300 transition-colors">
                   1v1 Real-Time Speed Duels
                 </h3>
-                <p className="text-xs text-slate-300 leading-relaxed mt-1">
-                  Real-time algorithmic clash. First coder to pass all test cases wins rating points.
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-1">
+                  Direct live matchmaker. Two coders enter the same problem lobby; the first to submit a 100% passing solution wins rating points.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between">
+            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
               <button
                 onClick={() => router.push("/battles")}
                 className="text-xs text-slate-400 hover:text-white font-mono"
               >
-                Lobbies &rarr;
+                Custom Lobbies &rarr;
               </button>
 
               <button
                 onClick={() => setMatchmakingActive(!matchmakingActive)}
-                className={`px-4 py-2 rounded-xl text-white font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 ${
+                className={`px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2 ${
                   matchmakingActive
                     ? "bg-rose-500 shadow-rose-500/40 animate-pulse"
                     : "bg-gradient-to-r from-rose-500 to-red-600 shadow-[0_0_20px_rgba(244,63,94,0.4)] hover:scale-105"
@@ -633,11 +634,11 @@ export default function HomePage() {
                 {matchmakingActive ? (
                   <>
                     <span className="w-2 h-2 rounded-full bg-white animate-spin" />
-                    Searching ({matchmakingTime}s)...
+                    Searching ({matchmakingTime}s)... Cancel
                   </>
                 ) : (
                   <>
-                    <span>⚔️</span> Find Match
+                    <span>⚔️</span> Find 1v1 Match
                   </>
                 )}
               </button>
@@ -647,126 +648,131 @@ export default function HomePage() {
           {/* ════════════ 2. 3D CHAMPIONSHIP CONTESTS BLOCK (FLOATING TROPHY & WINNER SHEET) ════════════ */}
           <Tilt3DCard
             glowColor="amber"
-            className="p-6 bg-gradient-to-br from-[#191307]/90 via-[#0c1024]/90 to-[#1c1208]/90 border-amber-500/30 flex flex-col justify-between group"
+            className="p-7 md:p-8 bg-gradient-to-br from-[#191307]/90 via-[#0c1024]/90 to-[#1c1208]/90 border-amber-500/30 flex flex-col justify-between group"
           >
-            <div className="space-y-3.5">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-black uppercase tracking-wider font-mono">
-                  🏆 Contests
+                <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-black uppercase tracking-wider font-mono">
+                  🏆 Championship Contests
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[9px] font-bold">
-                  $5,000 PRIZE
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold">
+                  $5,000 PRIZE POOL
                 </span>
               </div>
 
               {/* ── 3D FLOATING TROPHY & WINNER SHEET VISUAL ── */}
-              <div className="relative h-40 rounded-2xl bg-black/40 border border-amber-500/20 flex items-center justify-around px-2 overflow-hidden my-1 shadow-[inset_0_0_30px_rgba(245,158,11,0.15)]">
+              <div className="relative h-44 rounded-2xl bg-black/40 border border-amber-500/20 flex items-center justify-around px-4 overflow-hidden my-2 shadow-[inset_0_0_30px_rgba(245,158,11,0.15)]">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.15),transparent_70%)]" />
 
                 {/* Floating Trophy */}
                 <div className="relative z-10 animate-trophy-3d flex flex-col items-center">
-                  <div className="text-5xl drop-shadow-[0_0_20px_rgba(245,158,11,0.8)]">
+                  <div className="text-6xl drop-shadow-[0_0_25px_rgba(245,158,11,0.8)]">
                     🏆
                   </div>
-                  <span className="mt-1 px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[8px] font-black font-mono border border-amber-500/30">
-                    CUP
+                  <div className="w-16 h-2 rounded-full bg-amber-500/30 blur-sm mt-1" />
+                  <span className="mt-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[9px] font-black font-mono border border-amber-500/30">
+                    CHAMPION CUP
                   </span>
                 </div>
 
                 {/* Floating Winner Sheet */}
                 <div className="relative z-10 animate-winner-sheet">
-                  <div className="w-36 p-2 rounded-xl bg-gradient-to-b from-[#fff7ed] via-[#ffedd5] to-[#fed7aa] text-slate-900 border border-amber-400/80 shadow-[0_10px_25px_rgba(245,158,11,0.35)] relative overflow-hidden">
-                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-[8px] shadow-sm border border-white font-black">
+                  <div className="w-44 p-3 rounded-xl bg-gradient-to-b from-[#fff7ed] via-[#ffedd5] to-[#fed7aa] text-slate-900 border-2 border-amber-400/80 shadow-[0_15px_30px_rgba(245,158,11,0.35)] relative overflow-hidden">
+                    <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-[10px] shadow-md border border-white font-black">
                       ★
                     </div>
 
-                    <div className="text-[8px] font-mono uppercase font-black text-amber-800 text-center border-b border-amber-800/20 pb-0.5">
+                    <div className="text-[9px] font-mono uppercase font-black tracking-widest text-amber-800 text-center border-b border-amber-800/20 pb-1">
                       WINNER SHEET
                     </div>
 
-                    <div className="my-1 text-center">
-                      <div className="text-[10px] font-black text-slate-950">
-                        #1 GRANDMASTER
+                    <div className="my-1.5 text-center">
+                      <div className="text-xs font-black text-slate-950 tracking-tight">
+                        RANK #1 GRANDMASTER
                       </div>
-                      <div className="text-[8px] font-bold text-amber-900 font-mono">
-                        1000/1000 pts
+                      <div className="text-[9px] font-bold text-amber-900 font-mono">
+                        Score: 1000/1000 (00:24:12)
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-[7px] font-mono text-slate-700 pt-0.5 border-t border-amber-800/15">
+                    <div className="flex items-center justify-between text-[8px] font-mono text-slate-700 pt-1 border-t border-amber-800/15">
                       <span>Prize: $1,500</span>
                       <span className="text-emerald-700 font-bold">+120 Elo</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="absolute top-2 right-4 text-xs animate-bounce text-amber-300">✨</div>
+                <div className="absolute top-3 right-6 text-sm animate-bounce text-amber-300">✨</div>
+                <div className="absolute bottom-4 left-6 text-sm animate-pulse text-amber-400">⭐</div>
               </div>
 
               <div>
-                <h3 className="text-lg font-extrabold text-white tracking-tight group-hover:text-amber-300 transition-colors">
-                  Global Championships
+                <h3 className="text-xl font-extrabold text-white tracking-tight group-hover:text-amber-300 transition-colors">
+                  Global Tournament Arena
                 </h3>
-                <p className="text-xs text-slate-300 leading-relaxed mt-1">
-                  Rated weekend tournament series with live leaderboard and prize verification.
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-1">
+                  Scheduled competitive championships. Full server-side synchronization, automatic penalty calculations, and verified winner credentials.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between">
-              <span className="text-[11px] text-amber-400 font-mono font-bold">
-                Sunday 8:00 PM
+            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+              <span className="text-xs text-amber-400 font-mono font-bold flex items-center gap-1.5">
+                <span>⏳</span> Next Live: Sunday 8:00 PM
               </span>
               <button
                 onClick={() => router.push("/contests")}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-black text-xs shadow-md hover:scale-105 transition-all flex items-center gap-1"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-black text-xs shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_30px_rgba(245,158,11,0.7)] hover:scale-105 transition-all flex items-center gap-1.5"
               >
-                <span>🏆</span> Enter &rarr;
+                <span>🏆</span> Enter Contests &rarr;
               </button>
             </div>
           </Tilt3DCard>
+        </div>
 
+        {/* ── ROW 2: 3D PRACTICE BLOCK (FLOATING CODES) & 3D HOLOGRAPHIC SKILL RADAR MATRIX (2 BLOCKS) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* ════════════ 3. 3D PRACTICE BLOCK (WITH 3D FLOATING CODE SNIPPETS) ════════════ */}
           <Tilt3DCard
             glowColor="emerald"
-            className="p-6 bg-gradient-to-br from-[#061c14]/90 via-[#0c1024]/90 to-[#081826]/90 border-emerald-500/30 flex flex-col justify-between group"
+            className="p-7 md:p-8 bg-gradient-to-br from-[#061c14]/90 via-[#0c1024]/90 to-[#081826]/90 border-emerald-500/30 flex flex-col justify-between group"
           >
-            <div className="space-y-3.5">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-black uppercase tracking-wider font-mono">
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black uppercase tracking-wider font-mono">
                   💻 Practice 150 DSA
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[9px] font-bold font-mono">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold font-mono">
                   0.18ms SPEED
                 </span>
               </div>
 
               {/* ── 3D FLOATING CODES ANIMATED TERMINAL ── */}
-              <div className="relative h-40 rounded-2xl bg-black/50 border border-emerald-500/20 p-2.5 overflow-hidden my-1 shadow-[inset_0_0_30px_rgba(16,185,129,0.15)] flex flex-col justify-between" style={{ perspective: "800px" }}>
+              <div className="relative h-44 rounded-2xl bg-black/50 border border-emerald-500/20 p-3 overflow-hidden my-2 shadow-[inset_0_0_30px_rgba(16,185,129,0.15)] flex flex-col justify-between" style={{ perspective: "800px" }}>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.12),transparent_70%)]" />
 
                 {/* Floating Code Snippet 1 (Two Sum C++) */}
                 <div className="relative z-10 animate-float-code-1 self-start">
-                  <div className="px-2.5 py-1 rounded-lg bg-[#0b1329]/90 border border-emerald-400/40 backdrop-blur-md shadow-lg flex items-center gap-1.5 font-mono text-[9px] text-emerald-300">
-                    <span className="text-purple-400">vector</span>&lt;<span className="text-blue-300">int</span>&gt; <span className="text-amber-300 font-bold">twoSum</span>(nums, target)
+                  <div className="px-3 py-1.5 rounded-lg bg-[#0b1329]/95 border border-emerald-400/50 backdrop-blur-md shadow-lg flex items-center gap-2 font-mono text-[10px] text-emerald-300">
+                    <span className="text-purple-400">vector</span>&lt;<span className="text-blue-300">int</span>&gt; <span className="text-amber-300 font-bold">twoSum</span>(vector&lt;int&gt;&amp; nums, int target)
                   </div>
                 </div>
 
                 {/* Floating Code Snippet 2 (Dynamic Programming Formula) */}
-                <div className="relative z-20 animate-float-code-2 self-end mr-1">
-                  <div className="px-2.5 py-1 rounded-lg bg-[#140f2d]/90 border border-indigo-400/40 backdrop-blur-md shadow-lg flex items-center gap-1.5 font-mono text-[9px] text-indigo-200">
-                    <span className="text-pink-400">dp[i][w]</span> = <span className="text-cyan-300">max</span>(dp[i-1][w], val + dp)
+                <div className="relative z-20 animate-float-code-2 self-end mr-2">
+                  <div className="px-3 py-1.5 rounded-lg bg-[#140f2d]/95 border border-indigo-400/50 backdrop-blur-md shadow-lg flex items-center gap-2 font-mono text-[10px] text-indigo-200">
+                    <span className="text-pink-400">dp[i][w]</span> = <span className="text-cyan-300">max</span>(dp[i-1][w], val[i-1] + dp[i-1][w-wt])
                   </div>
                 </div>
 
-                {/* Floating Code Snippet 3 (Trees & Hash Table) */}
+                {/* Floating Code Snippet 3 (Accepted Benchmark Tag) */}
                 <div className="relative z-10 animate-float-code-3 self-center">
-                  <div className="px-2.5 py-1 rounded-lg bg-[#081f18]/90 border border-teal-400/40 backdrop-blur-md shadow-lg flex items-center gap-1.5 font-mono text-[9px] text-teal-300">
-                    <span className="text-emerald-400 font-black">✓ ACCEPTED</span>
+                  <div className="px-3 py-1.5 rounded-lg bg-[#081f18]/95 border border-teal-400/50 backdrop-blur-md shadow-lg flex items-center gap-2 font-mono text-[10px] text-teal-300">
+                    <span className="text-emerald-400 font-black">✓ ALL 150 TEST CASES PASSED</span>
                     <span className="text-slate-400">|</span>
                     <span className="text-amber-300">0.18ms</span>
                     <span className="text-slate-400">|</span>
-                    <span className="text-purple-300">Top 99%</span>
+                    <span className="text-purple-300">Top 99.4%</span>
                   </div>
                 </div>
 
@@ -775,62 +781,82 @@ export default function HomePage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-extrabold text-white tracking-tight group-hover:text-emerald-300 transition-colors">
+                <h3 className="text-xl font-extrabold text-white tracking-tight group-hover:text-emerald-300 transition-colors">
                   150 Curated DSA Problem Matrix
                 </h3>
-                <p className="text-xs text-slate-300 leading-relaxed mt-1">
-                  Arrays, Binary Trees, Dynamic Programming, Graphs with Monaco IDE sandbox and instant tests.
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-1">
+                  Arrays, Binary Trees, Dynamic Programming, Graphs with Monaco IDE sandbox and instant compile tests.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between">
-              <span className="text-[11px] text-emerald-400 font-mono font-bold">
-                150 Challenges
+            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+              <span className="text-xs text-emerald-400 font-mono font-bold">
+                150 Interview-Ready Challenges
               </span>
               <button
                 onClick={() => router.push("/problems")}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-105 transition-all flex items-center gap-1"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] hover:scale-105 transition-all flex items-center gap-2"
               >
-                <span>⚡</span> Practice &rarr;
+                <span>⚡</span> Practice 150 DSA &rarr;
               </button>
             </div>
           </Tilt3DCard>
-        </div>
 
-        {/* ── 3D HOLOGRAPHIC SKILL RADAR MATRIX (PROMINENT CENTERPIECE) ── */}
-        <div className="max-w-3xl mx-auto w-full">
-          <Tilt3DCard glowColor="purple" className="p-7 md:p-8 bg-gradient-to-b from-[#120a22]/90 via-[#0c1024]/95 to-[#0c1024]/90 border-purple-500/30 flex flex-col items-center justify-between">
-            <div className="w-full flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.9)] animate-pulse" />
-                <span className="text-sm font-black tracking-tight text-white">
-                  3D Holographic Skill Radar Matrix
+          {/* ════════════ 4. 3D HOLOGRAPHIC SKILL RADAR MATRIX ════════════ */}
+          <Tilt3DCard
+            glowColor="purple"
+            className="p-7 md:p-8 bg-gradient-to-b from-[#120a22]/90 via-[#0c1024]/95 to-[#0c1024]/90 border-purple-500/30 flex flex-col justify-between group"
+          >
+            <div className="w-full space-y-4">
+              <div className="w-full flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.9)] animate-pulse" />
+                  <span className="text-xs font-black uppercase tracking-wider text-purple-300 font-mono">
+                    3D Holographic Skill Radar
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-purple-300 bg-purple-500/15 px-3 py-0.5 rounded-full border border-purple-500/30 font-bold">
+                  Live Matrix
                 </span>
               </div>
-              <span className="text-[11px] font-mono text-purple-300 bg-purple-500/15 px-3 py-0.5 rounded-full border border-purple-500/30 font-bold">
-                Live Telemetry
+
+              {/* Radar Visual */}
+              <div className="relative h-44 rounded-2xl bg-black/40 border border-purple-500/20 p-2 overflow-hidden my-2 flex items-center justify-center shadow-[inset_0_0_30px_rgba(168,85,247,0.15)]">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.15),transparent_70%)]" />
+                <div className="scale-90 sm:scale-100">
+                  <HolographicRadar
+                    stats={{
+                      algorithms: Math.min(95, 50 + userStats.solved * 4),
+                      dataStructures: Math.min(92, 55 + userStats.solved * 3),
+                      speed: 85,
+                      problemSolving: Math.min(96, 60 + userStats.solved * 3),
+                      dpOptimization: Math.min(88, 40 + userStats.solved * 4),
+                      mathLogic: Math.min(90, 50 + userStats.solved * 3),
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-extrabold text-white tracking-tight group-hover:text-purple-300 transition-colors">
+                  Algorithm Competency Index
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-1">
+                  6-axis real-time matrix evaluating algorithm mastery, data structures, speed, and optimization.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+              <span className="text-xs text-purple-400 font-mono font-bold">
+                Live Rating Telemetry
               </span>
-            </div>
-
-            <div className="my-4 py-3 scale-110">
-              <HolographicRadar
-                stats={{
-                  algorithms: Math.min(95, 50 + userStats.solved * 4),
-                  dataStructures: Math.min(92, 55 + userStats.solved * 3),
-                  speed: 85,
-                  problemSolving: Math.min(96, 60 + userStats.solved * 3),
-                  dpOptimization: Math.min(88, 40 + userStats.solved * 4),
-                  mathLogic: Math.min(90, 50 + userStats.solved * 3),
-                }}
-              />
-            </div>
-
-            <div className="w-full pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-              <span>Real-time algorithm competency & performance index</span>
-              <Link href="/profile" className="text-indigo-400 hover:text-indigo-300 hover:underline font-bold flex items-center gap-1">
-                <span>View Full Profile</span>
-                <span>&rarr;</span>
+              <Link
+                href="/profile"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xs shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] hover:scale-105 transition-all flex items-center gap-2"
+              >
+                <span>👤</span> Full Profile &rarr;
               </Link>
             </div>
           </Tilt3DCard>
