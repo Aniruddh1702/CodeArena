@@ -45,6 +45,7 @@ export interface ContestSubmission {
 
 // Global in-memory server state preserved across Next.js API requests
 declare global {
+  var __codearena_server_contests_initialized: boolean | undefined;
   var __codearena_server_contests: Contest[] | undefined;
   var __codearena_server_submissions: Record<string, ContestSubmission[]> | undefined;
 }
@@ -166,21 +167,25 @@ const DEFAULT_SERVER_SUBMISSIONS: Record<string, ContestSubmission[]> = {
 };
 
 export function getServerContests(): Contest[] {
-  if (!global.__codearena_server_contests || global.__codearena_server_contests.length === 0) {
+  if (!global.__codearena_server_contests_initialized) {
     global.__codearena_server_contests = [...DEFAULT_SERVER_CONTESTS];
+    global.__codearena_server_contests_initialized = true;
   }
   
-  // Re-evaluate statuses dynamically
+  // Re-evaluate statuses dynamically while respecting forced "ENDED"
   const now = Date.now();
-  global.__codearena_server_contests = global.__codearena_server_contests.map((c) => {
+  global.__codearena_server_contests = (global.__codearena_server_contests || []).map((c) => {
+    if (c.status === "ENDED") {
+      return c;
+    }
     const start = new Date(c.startTime).getTime();
     const end = new Date(c.endTime).getTime();
     let status: "UPCOMING" | "LIVE" | "ENDED" = c.status;
     if (now >= end) {
       status = "ENDED";
-    } else if (now >= start && status !== "ENDED") {
+    } else if (now >= start) {
       status = "LIVE";
-    } else if (now < start && status !== "LIVE") {
+    } else {
       status = "UPCOMING";
     }
     return { ...c, status };
@@ -190,7 +195,11 @@ export function getServerContests(): Contest[] {
 }
 
 export function saveServerContest(contest: Contest): Contest {
-  const current = getServerContests();
+  if (!global.__codearena_server_contests_initialized) {
+    global.__codearena_server_contests = [...DEFAULT_SERVER_CONTESTS];
+    global.__codearena_server_contests_initialized = true;
+  }
+  const current = global.__codearena_server_contests || [];
   const existingIdx = current.findIndex((c) => c.id === contest.id);
   if (existingIdx >= 0) {
     current[existingIdx] = { ...current[existingIdx], ...contest };
@@ -202,14 +211,20 @@ export function saveServerContest(contest: Contest): Contest {
 }
 
 export function deleteServerContest(id: string): boolean {
+  global.__codearena_server_contests_initialized = true;
   const current = getServerContests();
   const filtered = current.filter((c) => c.id !== id);
   global.__codearena_server_contests = filtered;
+  if (global.__codearena_server_submissions) {
+    delete global.__codearena_server_submissions[id];
+  }
   return true;
 }
 
 export function clearAllServerContests(): void {
   global.__codearena_server_contests = [];
+  global.__codearena_server_contests_initialized = true;
+  global.__codearena_server_submissions = {};
 }
 
 export function getServerSubmissions(contestId: string): ContestSubmission[] {

@@ -175,63 +175,6 @@ const DEFAULT_SUBMISSIONS: Record<string, ContestSubmission[]> = {
       score: 200,
       penaltyMinutes: 22,
       submittedAt: new Date(Date.now() - 32 * 60 * 1000).toISOString()
-    },
-    {
-      id: "sub_demo_3",
-      contestId: "contest-weekly-clash-1",
-      userEmail: "sarah.coder@outlook.com",
-      userName: "Sarah Khan",
-      problemSlug: "coin-change",
-      problemTitle: "Coin Change",
-      language: "python",
-      code: `class Solution:
-    def coinChange(self, coins: List[int], amount: int) -> int:
-        dp = [float('inf')] * (amount + 1)
-        dp[0] = 0
-        for coin in coins:
-            for x in range(coin, amount + 1):
-                dp[x] = min(dp[x], dp[x - coin] + 1)
-        return dp[amount] if dp[amount] != float('inf') else -1`,
-      runtime: "115 ms",
-      memory: "16.8 MB",
-      passedTestCases: 15,
-      totalTestCases: 15,
-      status: "ACCEPTED",
-      score: 300,
-      penaltyMinutes: 35,
-      submittedAt: new Date(Date.now() - 25 * 60 * 1000).toISOString()
-    },
-    {
-      id: "sub_demo_4",
-      contestId: "contest-weekly-clash-1",
-      userEmail: "vikram.singh@iit.ac.in",
-      userName: "Vikram Singh",
-      problemSlug: "two-sum",
-      problemTitle: "Two Sum",
-      language: "cpp",
-      code: `#include <vector>
-#include <unordered_map>
-using namespace std;
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        unordered_map<int, int> seen;
-        for (int i = 0; i < nums.size(); ++i) {
-            int complement = target - nums[i];
-            if (seen.find(complement) != seen.end()) return {seen[complement], i};
-            seen[nums[i]] = i;
-        }
-        return {};
-    }
-};`,
-      runtime: "8 ms",
-      memory: "10.4 MB",
-      passedTestCases: 8,
-      totalTestCases: 8,
-      status: "ACCEPTED",
-      score: 100,
-      penaltyMinutes: 14,
-      submittedAt: new Date(Date.now() - 20 * 60 * 1000).toISOString()
     }
   ]
 };
@@ -264,21 +207,11 @@ export async function syncContestsWithServer(): Promise<Contest[]> {
   try {
     const res = await fetch("/api/contests", { cache: "no-store" });
     const json = await res.json().catch(() => null);
-    if (json?.success && Array.isArray(json.contests) && json.contests.length > 0) {
+    if (json?.success && Array.isArray(json.contests)) {
       const serverContests: Contest[] = json.contests.map(enrichContestProblems);
-      const localContests = getContests();
-      
-      // Merge unique contests
-      const map = new Map<string, Contest>();
-      serverContests.forEach((c) => map.set(c.id, c));
-      localContests.forEach((c) => {
-        if (!map.has(c.id)) map.set(c.id, c);
-      });
-
-      const merged = Array.from(map.values());
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: merged }));
-      return merged;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serverContests));
+      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: serverContests }));
+      return serverContests;
     }
   } catch (err) {
     console.warn("Server contests background sync:", err);
@@ -305,6 +238,7 @@ export function getContests(): Contest[] {
     const now = Date.now();
     let updated = false;
     contests.forEach((c) => {
+      if (c.status === "ENDED") return;
       const start = new Date(c.startTime).getTime();
       const end = new Date(c.endTime).getTime();
       let newStatus: Contest["status"] = c.status;
@@ -317,7 +251,7 @@ export function getContests(): Contest[] {
         newStatus = "ENDED";
       }
 
-      if (c.status !== newStatus && c.status !== "ENDED") {
+      if (c.status !== newStatus) {
         c.status = newStatus;
         updated = true;
       }
@@ -329,9 +263,6 @@ export function getContests(): Contest[] {
 
     // Check for 1-hour contest reminders
     checkContest1HourReminders(contests);
-
-    // Asynchronously trigger server sync
-    syncContestsWithServer().catch(() => {});
 
     return contests;
   } catch (e) {
@@ -493,6 +424,17 @@ export function startContestNow(id: string): Contest | null {
   contest.status = "LIVE";
 
   saveContest(contest);
+
+  fetch(`/api/contests/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      status: "LIVE",
+      startTime: contest.startTime,
+      endTime: contest.endTime,
+    }),
+  }).catch(() => {});
+
   return contest;
 }
 
@@ -504,6 +446,16 @@ export function endContestNow(id: string): Contest | null {
   contest.status = "ENDED";
 
   saveContest(contest);
+
+  fetch(`/api/contests/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      status: "ENDED",
+      endTime: contest.endTime,
+    }),
+  }).catch(() => {});
+
   return contest;
 }
 
