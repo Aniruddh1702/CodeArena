@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, MouseEvent } from "react";
+import { useEffect, useState, useRef, MouseEvent, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getLeaderboards } from "@/lib/leaderboard-data";
@@ -9,12 +9,12 @@ import { getContests, Contest } from "@/lib/contests-data";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
 import { NotificationCenter } from "@/components/NotificationCenter";
 
-// ── 3D Interactive Tilt Card Component (GPU Accelerated) ──
-function TiltCard3D({
+// ── 3D Interactive Tilt Card Component with Depth Parallax ──
+function TiltCard({
   children,
   className = "",
   glowColor = "indigo",
-  maxTilt = 6,
+  maxTilt = 8,
   onClick,
 }: {
   children: React.ReactNode;
@@ -52,23 +52,23 @@ function TiltCard3D({
   };
 
   const glowMap: Record<string, string> = {
-    indigo: "rgba(99, 102, 241, 0.22)",
-    emerald: "rgba(16, 185, 129, 0.22)",
-    purple: "rgba(168, 85, 247, 0.22)",
-    blue: "rgba(59, 130, 246, 0.22)",
-    amber: "rgba(245, 158, 11, 0.22)",
-    rose: "rgba(244, 63, 94, 0.22)",
-    cyan: "rgba(6, 182, 212, 0.22)",
+    indigo: "rgba(99, 102, 241, 0.28)",
+    emerald: "rgba(16, 185, 129, 0.28)",
+    purple: "rgba(168, 85, 247, 0.28)",
+    blue: "rgba(59, 130, 246, 0.28)",
+    amber: "rgba(245, 158, 11, 0.28)",
+    rose: "rgba(244, 63, 94, 0.28)",
+    cyan: "rgba(6, 182, 212, 0.28)",
   };
 
   const borderMap: Record<string, string> = {
-    indigo: "hover:border-indigo-500/50 hover:shadow-[0_20px_40px_rgba(99,102,241,0.2)]",
-    emerald: "hover:border-emerald-500/50 hover:shadow-[0_20px_40px_rgba(16,185,129,0.2)]",
-    purple: "hover:border-purple-500/50 hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]",
-    blue: "hover:border-blue-500/50 hover:shadow-[0_20px_40px_rgba(59,130,246,0.2)]",
-    amber: "hover:border-amber-500/50 hover:shadow-[0_20px_40px_rgba(245,158,11,0.2)]",
-    rose: "hover:border-rose-500/50 hover:shadow-[0_20px_40px_rgba(244,63,94,0.2)]",
-    cyan: "hover:border-cyan-500/50 hover:shadow-[0_20px_40px_rgba(6,182,212,0.2)]",
+    indigo: "hover:border-indigo-500/60 hover:shadow-[0_20px_45px_rgba(99,102,241,0.25)]",
+    emerald: "hover:border-emerald-500/60 hover:shadow-[0_20px_45px_rgba(16,185,129,0.25)]",
+    purple: "hover:border-purple-500/60 hover:shadow-[0_20px_45px_rgba(168,85,247,0.25)]",
+    blue: "hover:border-blue-500/60 hover:shadow-[0_20px_45px_rgba(59,130,246,0.25)]",
+    amber: "hover:border-amber-500/60 hover:shadow-[0_20px_45px_rgba(245,158,11,0.25)]",
+    rose: "hover:border-rose-500/60 hover:shadow-[0_20px_45px_rgba(244,63,94,0.25)]",
+    cyan: "hover:border-cyan-500/60 hover:shadow-[0_20px_45px_rgba(6,182,212,0.25)]",
   };
 
   return (
@@ -79,23 +79,22 @@ function TiltCard3D({
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{
-          transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${sheen.opacity ? "12px" : "0px"})`,
-          transition: sheen.opacity ? "transform 0.08s ease-out" : "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+          transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${sheen.opacity ? "16px" : "0px"})`,
+          transition: sheen.opacity ? "transform 0.08s ease-out" : "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)",
           transformStyle: "preserve-3d",
-          willChange: "transform",
         }}
-        className={`relative rounded-2xl border border-white/10 bg-card/80 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all duration-300 overflow-hidden ${borderMap[glowColor]} ${className}`}
+        className={`relative rounded-2xl border border-white/10 bg-card/85 backdrop-blur-2xl shadow-[0_12px_35px_rgba(0,0,0,0.4)] transition-all duration-300 overflow-hidden ${borderMap[glowColor]} ${className}`}
       >
-        {/* Dynamic 3D Specular Sheen Reflection */}
+        {/* Dynamic 3D Specular Light Reflection */}
         <div
           className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 z-10"
           style={{
             opacity: sheen.opacity,
-            background: `radial-gradient(circle 320px at ${sheen.x}% ${sheen.y}%, ${glowMap[glowColor]}, transparent 75%)`,
+            background: `radial-gradient(circle 360px at ${sheen.x}% ${sheen.y}%, ${glowMap[glowColor]}, transparent 75%)`,
           }}
         />
 
-        {/* 3D Content Container */}
+        {/* 3D Content Container with true depth */}
         <div className="relative z-20 w-full h-full" style={{ transformStyle: "preserve-3d" }}>
           {children}
         </div>
@@ -104,7 +103,7 @@ function TiltCard3D({
   );
 }
 
-// ── Lightweight 3D Ambient Particle Mesh (Optimized 60 FPS) ──
+// ── 3D Ambient Particle Grid Canvas Horizon ──
 function CyberMesh3D() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -125,17 +124,24 @@ function CyberMesh3D() {
     };
     window.addEventListener("resize", handleResize);
 
-    // Optimized particle count (25 particles)
-    const particleCount = 25;
+    const particleCount = 45;
     const particles = Array.from({ length: particleCount }, () => ({
-      x: (Math.random() - 0.5) * width * 1.2,
-      y: (Math.random() - 0.5) * height * 1.2,
+      x: (Math.random() - 0.5) * width * 1.3,
+      y: (Math.random() - 0.5) * height * 1.3,
       z: Math.random() * 800 + 100,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      size: Math.random() * 2.2 + 1,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: (Math.random() - 0.5) * 0.45,
+      size: Math.random() * 2.4 + 1,
       color: Math.random() > 0.5 ? "rgba(99, 102, 241, " : "rgba(168, 85, 247, ",
     }));
+
+    let mouseX = 0;
+    let mouseY = 0;
+    const handleMouseMove = (e: globalThis.MouseEvent) => {
+      mouseX = (e.clientX - width / 2) * 0.05;
+      mouseY = (e.clientY - height / 2) * 0.05;
+    };
+    window.addEventListener("mousemove", handleMouseMove);
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
@@ -154,15 +160,34 @@ function CyberMesh3D() {
         if (p.y > height) p.y = -height;
 
         const scale = fov / (fov + p.z);
-        const px = cx + p.x * scale;
-        const py = cy + p.y * scale;
+        const px = cx + (p.x + mouseX) * scale;
+        const py = cy + (p.y + mouseY) * scale;
         const radius = Math.max(0.6, p.size * scale);
-        const alpha = Math.min(0.7, Math.max(0.1, (1 - p.z / 900) * 0.6));
+        const alpha = Math.min(0.75, Math.max(0.1, (1 - p.z / 900) * 0.65));
 
         ctx.beginPath();
         ctx.arc(px, py, radius, 0, Math.PI * 2);
         ctx.fillStyle = `${p.color}${alpha})`;
+        ctx.shadowColor = "rgba(99, 102, 241, 0.6)";
+        ctx.shadowBlur = 8;
         ctx.fill();
+        ctx.shadowBlur = 0;
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const scale2 = fov / (fov + p2.z);
+          const px2 = cx + (p2.x + mouseX) * scale2;
+          const py2 = cy + (p2.y + mouseY) * scale2;
+          const dist = Math.hypot(px - px2, py - py2);
+
+          if (dist < 115) {
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(px2, py2);
+            ctx.strokeStyle = `rgba(129, 140, 248, ${(1 - dist / 115) * 0.14})`;
+            ctx.stroke();
+          }
+        }
       }
 
       animId = requestAnimationFrame(render);
@@ -173,14 +198,142 @@ function CyberMesh3D() {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-60"
+      className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-65"
     />
+  );
+}
+
+// ── 3D Dashboard Holographic Arena Skill Radar Matrix ──
+function DashboardRadarChart({
+  stats,
+}: {
+  stats: {
+    algorithms: number;
+    dataStructures: number;
+    speed: number;
+    problemSolving: number;
+    dpOptimization: number;
+    mathLogic: number;
+  };
+}) {
+  const size = 220;
+  const center = size / 2;
+  const radius = 76;
+
+  const skills = [
+    { label: "Algorithms", value: stats.algorithms, color: "#6366f1" },
+    { label: "Data Structs", value: stats.dataStructures, color: "#10b981" },
+    { label: "Speed & Perf", value: stats.speed, color: "#f59e0b" },
+    { label: "Problem Solving", value: stats.problemSolving, color: "#a855f7" },
+    { label: "DP & Trees", value: stats.dpOptimization, color: "#ec4899" },
+    { label: "Math & Logic", value: stats.mathLogic, color: "#06b6d4" },
+  ];
+
+  const totalPoints = skills.length;
+  const angleStep = (Math.PI * 2) / totalPoints;
+
+  const points = skills.map((skill, index) => {
+    const angle = index * angleStep - Math.PI / 2;
+    const r = (Math.min(100, Math.max(20, skill.value)) / 100) * radius;
+    const x = center + r * Math.cos(angle);
+    const y = center + r * Math.sin(angle);
+    return { x, y, angle, skill };
+  });
+
+  const polygonPath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z";
+
+  return (
+    <div className="relative flex flex-col items-center justify-center">
+      <svg width={size} height={size} className="overflow-visible select-none">
+        {[0.25, 0.5, 0.75, 1].map((lvl, idx) => (
+          <polygon
+            key={idx}
+            points={Array.from({ length: totalPoints })
+              .map((_, i) => {
+                const angle = i * angleStep - Math.PI / 2;
+                const r = radius * lvl;
+                return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
+              })
+              .join(" ")}
+            fill={idx === 3 ? "rgba(99, 102, 241, 0.05)" : "none"}
+            stroke="rgba(255, 255, 255, 0.08)"
+            strokeWidth="1"
+            strokeDasharray={idx < 3 ? "3 3" : undefined}
+          />
+        ))}
+
+        {Array.from({ length: totalPoints }).map((_, i) => {
+          const angle = i * angleStep - Math.PI / 2;
+          const x2 = center + radius * Math.cos(angle);
+          const y2 = center + radius * Math.sin(angle);
+          return (
+            <line
+              key={i}
+              x1={center}
+              y1={center}
+              x2={x2}
+              y2={y2}
+              stroke="rgba(255, 255, 255, 0.1)"
+              strokeWidth="1"
+            />
+          );
+        })}
+
+        <path
+          d={polygonPath}
+          fill="url(#dashRadarGrad)"
+          stroke="#818cf8"
+          strokeWidth="2.5"
+          className="transition-all duration-700 ease-out drop-shadow-[0_0_12px_rgba(99,102,241,0.5)]"
+        />
+
+        <defs>
+          <radialGradient id="dashRadarGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(168, 85, 247, 0.6)" />
+            <stop offset="100%" stopColor="rgba(99, 102, 241, 0.15)" />
+          </radialGradient>
+        </defs>
+
+        {points.map((p, idx) => {
+          const labelDist = radius + 18;
+          const lx = center + labelDist * Math.cos(p.angle);
+          const ly = center + labelDist * Math.sin(p.angle);
+
+          return (
+            <g key={idx}>
+              <circle
+                cx={p.x}
+                cy={p.y}
+                r="3.5"
+                fill={p.skill.color}
+                stroke="#ffffff"
+                strokeWidth="1.5"
+                className="drop-shadow-[0_0_8px_rgba(99,102,241,0.9)] transition-all duration-700"
+              />
+              <text
+                x={lx}
+                y={ly}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill="#94a3b8"
+                fontSize="8.5"
+                fontWeight="700"
+                className="font-mono tracking-tight"
+              >
+                {p.skill.label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
   );
 }
 
@@ -312,6 +465,14 @@ export default function DashboardPage() {
           accuracy: baseAccuracy,
           currentStreak: currentStreak,
           recentActivity: activities,
+          radarStats: {
+            algorithms: Math.min(95, 45 + solvedCount * 5),
+            dataStructures: Math.min(92, 50 + solvedCount * 4),
+            speed: Math.min(88, 60 + solvedCount * 3),
+            problemSolving: Math.min(96, 55 + solvedCount * 4),
+            dpOptimization: Math.min(85, 35 + solvedCount * 5),
+            mathLogic: Math.min(90, 48 + solvedCount * 4),
+          },
           dailyChallenge: {
             title: "Container With Most Water",
             slug: "container-with-most-water",
@@ -435,7 +596,7 @@ export default function DashboardPage() {
       {/* 3D Ambient Particle Mesh Horizon */}
       <CyberMesh3D />
 
-      {/* Ambient Lighting Spheres */}
+      {/* Ambient 3D Lighting Glow Spheres */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div className="absolute -top-[20%] left-[20%] w-[650px] h-[650px] rounded-full bg-indigo-600/15 blur-[140px] animate-glow-pulse" />
         <div className="absolute top-[35%] -right-[10%] w-[550px] h-[550px] rounded-full bg-purple-600/15 blur-[150px] animate-glow-pulse" />
@@ -485,15 +646,16 @@ export default function DashboardPage() {
             >
               Leaderboard
             </Link>
+            <Link
+              href="/profile"
+              className="px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-all"
+            >
+              Profile
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
             <NotificationCenter />
-            <Link href="/profile">
-              <button className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 transition-all">
-                <span>👤</span> Profile
-              </button>
-            </Link>
             <AccountSwitcher />
           </div>
         </div>
@@ -502,12 +664,12 @@ export default function DashboardPage() {
       {/* Main 3D Interactive Container */}
       <main className="relative z-10 container mx-auto px-6 py-8 space-y-8 max-w-7xl">
         {/* ── 3D HERO COMMAND BRIDGE ── */}
-        <TiltCard3D glowColor={tier.glow} className="p-6 md:p-8 bg-gradient-to-r from-indigo-950/50 via-card/85 to-purple-950/50 border-indigo-500/30">
+        <TiltCard glowColor={tier.glow} className="p-6 md:p-8 bg-gradient-to-r from-indigo-950/50 via-card/85 to-purple-950/50 border-indigo-500/30">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
               {/* 3D Tier Crystal Hologram */}
               <div className="relative shrink-0">
-                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-tr ${tier.bg} p-1 shadow-[0_0_35px_rgba(99,102,241,0.45)] animate-float-3d flex items-center justify-center`}>
+                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-tr ${tier.bg} p-1 shadow-[0_0_35px_rgba(99,102,241,0.5)] animate-float-3d flex items-center justify-center`}>
                   <div className="w-full h-full rounded-2xl bg-[#0b0e1b] flex flex-col items-center justify-center">
                     <span className="text-2xl md:text-3xl">💎</span>
                     <span className={`text-[9px] font-black uppercase tracking-wider ${tier.color}`}>
@@ -533,7 +695,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <p className="text-xs md:text-sm text-slate-300 max-w-xl">
-                  Next-generation 3D arena workspace. Compete in live 1v1 battles, conquer algorithm milestones, and climb the leaderboard.
+                  Next-generation 3D interactive arena. Enter live 1v1 duels, conquer algorithm milestones, and climb global leaderboards.
                 </p>
               </div>
             </div>
@@ -555,36 +717,92 @@ export default function DashboardPage() {
               </button>
             </div>
           </div>
+        </TiltCard>
 
-          {/* 4 3D Hologram Metric Cubes */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-6 pt-6 border-t border-white/10">
-            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-              <p className="text-[11px] text-slate-400 font-medium">DSA Rating</p>
-              <p className="text-xl font-black text-indigo-400 font-mono">{data.dsaRating}</p>
+        {/* ── 4 DISTINCT 3D HOLOGRAM METRIC CUBES (JUST LIKE PROFILE) ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <TiltCard glowColor="indigo" className="p-5">
+            <div className="flex items-center justify-between text-xs text-slate-400 font-semibold mb-2">
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                DSA Rating
+              </span>
+              <span className="font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                Rank #{data.userRank}
+              </span>
             </div>
-            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-              <p className="text-[11px] text-slate-400 font-medium">Problems Solved</p>
-              <p className="text-xl font-black text-emerald-400 font-mono">{data.problemsSolved} <span className="text-xs text-slate-500 font-normal">/ 150</span></p>
+            <div className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-indigo-200 to-indigo-400">
+              {data.dsaRating}
             </div>
-            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-              <p className="text-[11px] text-slate-400 font-medium">Acceptance Rate</p>
-              <p className="text-xl font-black text-purple-400 font-mono">{data.accuracy}%</p>
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5 text-[11px]">
+              <span className={`font-bold ${tier.color}`}>✦ {tier.title}</span>
+              <span className="text-slate-400">Target: {tier.nextRating} pts</span>
             </div>
-            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-              <p className="text-[11px] text-slate-400 font-medium">Daily Streak</p>
-              <p className="text-xl font-black text-amber-400 font-mono">{data.currentStreak} Days 🔥</p>
+          </TiltCard>
+
+          <TiltCard glowColor="emerald" className="p-5">
+            <div className="flex items-center justify-between text-xs text-slate-400 font-semibold mb-2">
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                Problems Solved
+              </span>
+              <span className="text-emerald-400 font-mono text-[11px]">+15 pts / solve</span>
             </div>
-          </div>
-        </TiltCard3D>
+            <div className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-emerald-200 to-emerald-400">
+              {data.problemsSolved}
+              <span className="text-lg font-normal text-slate-500 ml-1.5">/ 150</span>
+            </div>
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5 text-[11px]">
+              <span className="text-slate-300">Acceptance Rate</span>
+              <span className="font-mono text-emerald-400 font-bold">{data.accuracy}%</span>
+            </div>
+          </TiltCard>
+
+          <TiltCard glowColor="purple" className="p-5">
+            <div className="flex items-center justify-between text-xs text-slate-400 font-semibold mb-2">
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+                Global Standing
+              </span>
+              <span className="text-purple-400 font-mono text-[11px]">Top 5%</span>
+            </div>
+            <div className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-purple-200 to-purple-400">
+              #{data.userRank}
+            </div>
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5 text-[11px]">
+              <span className="text-slate-300">Competitive Division</span>
+              <Link href="/leaderboard" className="text-indigo-400 hover:underline font-bold">
+                Leaderboard &rarr;
+              </Link>
+            </div>
+          </TiltCard>
+
+          <TiltCard glowColor="amber" className="p-5">
+            <div className="flex items-center justify-between text-xs text-slate-400 font-semibold mb-2">
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
+                Daily Streak
+              </span>
+              <span className="text-amber-400 font-mono text-[11px]">Active</span>
+            </div>
+            <div className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-amber-200 to-amber-400 flex items-center gap-2">
+              {data.currentStreak} <span className="text-2xl">🔥</span>
+            </div>
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5 text-[11px]">
+              <span className="text-slate-300">XP Multiplier</span>
+              <span className="font-mono text-amber-400 font-bold">1.5x Boost</span>
+            </div>
+          </TiltCard>
+        </div>
 
         {/* ── SECTION 1: 3D DUAL LIVE COMBAT & CONTEST ARENA ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Card A: 3D 1v1 Matchmaking Duelist */}
-          <TiltCard3D glowColor="purple" className="p-6 bg-gradient-to-br from-purple-950/40 via-card/90 to-card/90 border-purple-500/30 flex flex-col justify-between">
+          <TiltCard glowColor="purple" className="p-6 bg-gradient-to-br from-purple-950/40 via-card/90 to-card/90 border-purple-500/30 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-2xl shadow-[0_0_25px_rgba(168,85,247,0.4)] animate-float-3d">
                     ⚔️
                   </div>
                   <div>
@@ -644,15 +862,15 @@ export default function DashboardPage() {
                 )}
               </button>
             </div>
-          </TiltCard3D>
+          </TiltCard>
 
           {/* Card B: 3D Live Contest Stage */}
           {liveContest && (
-            <TiltCard3D glowColor="amber" className="p-6 bg-gradient-to-br from-amber-950/40 via-card/90 to-card/90 border-amber-500/30 flex flex-col justify-between">
+            <TiltCard glowColor="amber" className="p-6 bg-gradient-to-br from-amber-950/40 via-card/90 to-card/90 border-amber-500/30 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shadow-[0_0_25px_rgba(245,158,11,0.4)] animate-float-3d">
                       🏆
                     </div>
                     <div>
@@ -704,51 +922,86 @@ export default function DashboardPage() {
                   <span>🏆</span> Enter Arena
                 </button>
               </div>
-            </TiltCard3D>
+            </TiltCard>
           )}
         </div>
 
-        {/* ── SECTION 2: 3D PROBLEM OF THE DAY (POTD) ── */}
-        <TiltCard3D glowColor="indigo" className="p-6 bg-gradient-to-r from-indigo-950/35 via-card/85 to-card/85 border-indigo-500/30">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-black uppercase">
-                  ⭐ Challenge of the Day
-                </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  {data.dailyChallenge.difficulty}
-                </span>
-                <span className="text-xs font-mono font-bold text-emerald-400">
-                  {data.dailyChallenge.bonus}
-                </span>
-              </div>
-
-              <h3 className="text-xl font-black text-white">
-                {data.dailyChallenge.title}
-              </h3>
-
-              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
-                {data.dailyChallenge.snippet}
-              </p>
-
-              <div className="flex items-center gap-2 pt-1">
-                {data.dailyChallenge.topics.map((t: string, i: number) => (
-                  <span key={i} className="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">
-                    #{t}
+        {/* ── SECTION 2: 3D POTD CHALLENGE & 3D HOLOGRAPHIC RADAR STAGE ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Problem of the Day (7 cols) */}
+          <div className="lg:col-span-7">
+            <TiltCard glowColor="indigo" className="p-6 bg-gradient-to-r from-indigo-950/40 via-card/90 to-card/90 border-indigo-500/30 flex flex-col justify-between h-full">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-black uppercase">
+                    ⭐ Challenge of the Day
                   </span>
-                ))}
-              </div>
-            </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    {data.dailyChallenge.difficulty}
+                  </span>
+                  <span className="text-xs font-mono font-bold text-emerald-400">
+                    {data.dailyChallenge.bonus}
+                  </span>
+                </div>
 
-            <button
-              onClick={() => router.push(`/problems/${data.dailyChallenge.slug}`)}
-              className="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white font-bold text-xs shadow-[0_0_25px_rgba(99,102,241,0.4)] hover:shadow-[0_0_35px_rgba(99,102,241,0.6)] transition-all flex items-center justify-center gap-2 shrink-0"
-            >
-              <span>🚀</span> Solve Daily Challenge
-            </button>
+                <h3 className="text-xl font-black text-white">
+                  {data.dailyChallenge.title}
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  {data.dailyChallenge.snippet}
+                </p>
+
+                <div className="flex items-center gap-2 pt-2 flex-wrap">
+                  {data.dailyChallenge.topics.map((t: string, i: number) => (
+                    <span key={i} className="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">
+                      #{t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+                <span className="text-xs text-slate-400 font-mono">
+                  +200 XP upon passing test cases
+                </span>
+
+                <button
+                  onClick={() => router.push(`/problems/${data.dailyChallenge.slug}`)}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white font-bold text-xs shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] transition-all flex items-center justify-center gap-2"
+                >
+                  <span>🚀</span> Solve Daily Challenge
+                </button>
+              </div>
+            </TiltCard>
           </div>
-        </TiltCard3D>
+
+          {/* 3D Holographic Skill Matrix Radar (5 cols) */}
+          <div className="lg:col-span-5">
+            <TiltCard glowColor="purple" className="p-6 bg-card/85 flex flex-col items-center justify-between h-full">
+              <div className="w-full flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+                  3D Holographic Skill Radar
+                </span>
+                <span className="text-[10px] font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                  Live Matrix
+                </span>
+              </div>
+
+              <div className="my-auto py-1">
+                <DashboardRadarChart stats={data.radarStats} />
+              </div>
+
+              <div className="w-full pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Calculated from solved challenges</span>
+                <Link href="/profile" className="text-indigo-400 hover:underline font-bold">
+                  View Profile &rarr;
+                </Link>
+              </div>
+            </TiltCard>
+          </div>
+        </div>
 
         {/* ── SECTION 3: 3D DSA CONQUEST ROADMAP & PRACTICE MODULES ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -768,7 +1021,7 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {data.roadmapLevels.map((lvl: any) => (
-                <TiltCard3D
+                <TiltCard
                   key={lvl.id}
                   glowColor="indigo"
                   onClick={() => router.push(`/problems?topic=${encodeURIComponent(lvl.tag)}`)}
@@ -800,7 +1053,7 @@ export default function DashboardPage() {
                       />
                     </div>
                   </div>
-                </TiltCard3D>
+                </TiltCard>
               ))}
             </div>
           </div>
@@ -816,7 +1069,7 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-2 gap-3.5">
               {data.companyTracks.map((comp: any, i: number) => (
-                <TiltCard3D
+                <TiltCard
                   key={i}
                   glowColor={comp.glow}
                   onClick={() => router.push("/problems")}
@@ -830,18 +1083,19 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <span className="text-xs text-indigo-400 font-bold">&rarr;</span>
-                </TiltCard3D>
+                </TiltCard>
               ))}
             </div>
 
             {/* Recent Solves Feed */}
-            <TiltCard3D glowColor="emerald" className="p-4 bg-card/85 space-y-2.5">
+            <TiltCard glowColor="emerald" className="p-4 bg-card/85 space-y-2.5">
               <div className="flex items-center justify-between text-xs pb-1.5 border-b border-white/10">
                 <span className="font-bold text-white flex items-center gap-1.5">
-                  <span>⚡</span> Recent Submissions
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                  Recent Submissions
                 </span>
                 <Link href="/profile" className="text-[10px] text-slate-400 hover:text-white">
-                  Full History
+                  Full History &rarr;
                 </Link>
               </div>
 
@@ -872,7 +1126,7 @@ export default function DashboardPage() {
                   </div>
                 ))
               )}
-            </TiltCard3D>
+            </TiltCard>
           </div>
         </div>
       </main>
