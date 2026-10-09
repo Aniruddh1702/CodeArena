@@ -22,8 +22,11 @@ import {
   startContestNow,
   endContestNow,
   clearAllContests,
+  getContestSubmissions,
+  getAllContestSubmissions,
   Contest,
   ContestProblem,
+  ContestSubmission,
 } from "@/lib/contests-data";
 import { getActiveAccount, getAllAccounts, getUserStats } from "@/lib/auth-session";
 
@@ -328,6 +331,13 @@ export default function AdminPortalPage() {
   const [contestProblemSearch, setContestProblemSearch] = useState("");
   const [contestProblemDiffFilter, setContestProblemDiffFilter] = useState("ALL");
   const [contestFeedback, setContestFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Contest submissions inspection state
+  const [selectedContestForSubmissions, setSelectedContestForSubmissions] = useState<Contest | null>(null);
+  const [selectedSubmissionForCode, setSelectedSubmissionForCode] = useState<ContestSubmission | null>(null);
+  const [submissionFilterStatus, setSubmissionFilterStatus] = useState<"ALL" | "ACCEPTED" | "WRONG_ANSWER">("ALL");
+  const [submissionSearchQuery, setSubmissionSearchQuery] = useState("");
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const loadContests = () => {
     setContestsList(getContests());
@@ -2688,37 +2698,59 @@ export default function AdminPortalPage() {
             )}
 
             {/* Top Metrics Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg font-bold">
-                  🟢
-                </div>
-                <div>
-                  <p className="text-[11px] text-muted-foreground font-semibold uppercase">Live Now</p>
-                  <p className="text-xl font-black">{contestsList.filter(c => c.status === "LIVE").length} Active</p>
-                </div>
-              </div>
+            {(() => {
+              const allSubs = contestsList.flatMap(c => getContestSubmissions(c.id));
+              const totalSubs = allSubs.length;
+              const totalAc = allSubs.filter(s => s.status === "ACCEPTED").length;
+              const totalEnrolled = contestsList.reduce((acc, c) => acc + Math.max(c.participantsCount, (c.registeredUsers || []).length), 0);
+              const successRate = totalSubs > 0 ? Math.round((totalAc / totalSubs) * 100) : 0;
 
-              <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg font-bold">
-                  ⏱️
-                </div>
-                <div>
-                  <p className="text-[11px] text-muted-foreground font-semibold uppercase">Upcoming Scheduled</p>
-                  <p className="text-xl font-black">{contestsList.filter(c => c.status === "UPCOMING").length} Scheduled</p>
-                </div>
-              </div>
+              return (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                  <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg font-bold">
+                      🟢
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-muted-foreground font-semibold uppercase">Live & Upcoming</p>
+                      <p className="text-xl font-black">
+                        {contestsList.filter(c => c.status === "LIVE").length} <span className="text-xs text-muted-foreground font-normal">Live</span> / {contestsList.filter(c => c.status === "UPCOMING").length} <span className="text-xs text-muted-foreground font-normal">Up</span>
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-lg font-bold">
-                  📚
+                  <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg font-bold">
+                      👥
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-muted-foreground font-semibold uppercase">Total Enrolled</p>
+                      <p className="text-xl font-black">{totalEnrolled} <span className="text-xs text-muted-foreground font-normal">Students</span></p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-lg font-bold">
+                      📝
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-muted-foreground font-semibold uppercase">Total Submissions</p>
+                      <p className="text-xl font-black">{totalSubs} <span className="text-xs text-muted-foreground font-normal">Solved/Tried</span></p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg font-bold">
+                      🏆
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-muted-foreground font-semibold uppercase">Accepted Solves</p>
+                      <p className="text-xl font-black">{totalAc} <span className="text-xs text-muted-foreground font-normal">({successRate}%)</span></p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[11px] text-muted-foreground font-semibold uppercase">DSA Questions Available</p>
-                  <p className="text-xl font-black">{allQuestions.length} Problems</p>
-                </div>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Create & Launch Contest Builder */}
             <Card className="border-border/80 shadow-sm overflow-hidden">
@@ -3086,120 +3118,516 @@ export default function AdminPortalPage() {
                     const isLive = contest.status === "LIVE";
                     const isUpcoming = contest.status === "UPCOMING";
                     const totalPoints = contest.problems.reduce((sum, p) => sum + p.points, 0);
+                    const contestSubs = getContestSubmissions(contest.id);
+                    const acceptedSubs = contestSubs.filter(s => s.status === "ACCEPTED");
+                    const uniqueStudents = new Set(contestSubs.map(s => s.userEmail)).size;
+                    const enrolledCount = Math.max(contest.participantsCount, (contest.registeredUsers || []).length);
 
                     return (
                       <Card
                         key={contest.id}
-                        className={`border transition-all overflow-hidden ${
+                        className={`border transition-all overflow-hidden flex flex-col justify-between ${
                           isLive
-                            ? "border-emerald-500/50 bg-gradient-to-br from-card to-emerald-950/10"
+                            ? "border-emerald-500/50 bg-gradient-to-br from-card to-emerald-950/10 shadow-lg shadow-emerald-500/5"
                             : isUpcoming
                             ? "border-blue-500/40"
-                            : "border-border/80 opacity-90"
+                            : "border-border/80 opacity-95"
                         }`}
                       >
-                        <CardHeader className="pb-2 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              {isLive ? (
-                                <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded font-black animate-pulse">
-                                  LIVE NOW
+                        <div>
+                          <CardHeader className="pb-2 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                {isLive ? (
+                                  <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded font-black animate-pulse flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> LIVE NOW
+                                  </span>
+                                ) : isUpcoming ? (
+                                  <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold border border-blue-500/30">
+                                    UPCOMING
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] bg-secondary text-muted-foreground px-2 py-0.5 rounded font-bold">
+                                    ENDED
+                                  </span>
+                                )}
+                                <span className="text-xs text-muted-foreground font-mono">
+                                  ⏱️ {contest.durationMinutes}m duration
                                 </span>
-                              ) : isUpcoming ? (
-                                <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold border border-blue-500/30">
-                                  UPCOMING
-                                </span>
-                              ) : (
-                                <span className="text-[10px] bg-secondary text-muted-foreground px-2 py-0.5 rounded font-bold">
-                                  ENDED
-                                </span>
-                              )}
-                              <span className="text-xs text-muted-foreground font-mono">
-                                ⏱️ {contest.durationMinutes}m duration
-                              </span>
+                              </div>
+
+                              <div className="flex items-center gap-1.5">
+                                <Link href={`/contests/${contest.id}`}>
+                                  <Button size="sm" variant="outline" className="h-7 text-[11px] font-semibold gap-1">
+                                    <span>👁️</span> Arena
+                                  </Button>
+                                </Link>
+
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDeleteContestItem(contest.id)}
+                                  className="h-7 text-[11px] font-semibold"
+                                >
+                                  Delete
+                                </Button>
+                              </div>
                             </div>
 
-                            <div className="flex items-center gap-1.5">
-                              <Link href={`/contests/${contest.id}`}>
-                                <Button size="sm" variant="outline" className="h-7 text-[11px] font-semibold gap-1">
-                                  <span>👁️</span> Arena
-                                </Button>
-                              </Link>
+                            <CardTitle className="text-base font-bold">{contest.title}</CardTitle>
+                            <CardDescription className="text-xs line-clamp-1">{contest.description}</CardDescription>
+                          </CardHeader>
+
+                          <CardContent className="space-y-3 pt-1">
+                            {/* Live Submissions & Participation Banner */}
+                            <div className="p-2.5 rounded-lg bg-secondary/60 border border-border/80 space-y-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                                  <span>📊</span> Contest Activity
+                                </span>
+                                <span className="text-[11px] font-mono text-muted-foreground">
+                                  {contestSubs.length} total submissions
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                                <div className="p-1.5 rounded bg-background/80 border border-border/50">
+                                  <p className="text-[10px] text-muted-foreground font-medium">Enrolled</p>
+                                  <p className="font-black text-foreground">{enrolledCount}</p>
+                                </div>
+                                <div className="p-1.5 rounded bg-background/80 border border-border/50">
+                                  <p className="text-[10px] text-muted-foreground font-medium">Submissions</p>
+                                  <p className="font-black text-purple-400">{contestSubs.length} <span className="text-[9px] text-muted-foreground">({uniqueStudents} users)</span></p>
+                                </div>
+                                <div className="p-1.5 rounded bg-background/80 border border-border/50">
+                                  <p className="text-[10px] text-muted-foreground font-medium">Accepted</p>
+                                  <p className="font-black text-emerald-400">{acceptedSubs.length}</p>
+                                </div>
+                              </div>
 
                               <Button
                                 size="sm"
-                                variant="destructive"
-                                onClick={() => handleDeleteContestItem(contest.id)}
-                                className="h-7 text-[11px] font-semibold"
+                                onClick={() => {
+                                  setSelectedContestForSubmissions(contest);
+                                  setSubmissionFilterStatus("ALL");
+                                  setSubmissionSearchQuery("");
+                                }}
+                                className="w-full h-7 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 shadow-sm"
                               >
-                                Delete
+                                <span>🔍</span> View Student Submissions & Solutions ({contestSubs.length})
                               </Button>
                             </div>
-                          </div>
 
-                          <CardTitle className="text-base font-bold">{contest.title}</CardTitle>
-                          <CardDescription className="text-xs line-clamp-1">{contest.description}</CardDescription>
-                        </CardHeader>
-
-                        <CardContent className="space-y-3 pt-1">
-                          {/* Problem list breakdown */}
-                          <div className="space-y-1 text-xs">
-                            <div className="flex items-center justify-between text-muted-foreground text-[11px] font-semibold">
-                              <span>Questions ({contest.problems.length})</span>
-                              <span className="text-primary">{totalPoints} pts total</span>
+                            {/* Problem list breakdown */}
+                            <div className="space-y-1 text-xs">
+                              <div className="flex items-center justify-between text-muted-foreground text-[11px] font-semibold">
+                                <span>Questions ({contest.problems.length})</span>
+                                <span className="text-primary">{totalPoints} pts total</span>
+                              </div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {contest.problems.map((p, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-[10px] font-mono px-2 py-0.5 rounded bg-secondary border border-border"
+                                  >
+                                    <strong>Q{idx + 1}:</strong> {p.title} ({p.points}pts)
+                                  </span>
+                                ))}
+                              </div>
                             </div>
-                            <div className="flex flex-wrap gap-1.5">
-                              {contest.problems.map((p, idx) => (
-                                <span
-                                  key={idx}
-                                  className="text-[10px] font-mono px-2 py-0.5 rounded bg-secondary border border-border"
-                                >
-                                  <strong>Q{idx + 1}:</strong> {p.title} ({p.points}pts)
-                                </span>
-                              ))}
+
+                            <div className="text-[11px] text-muted-foreground space-y-0.5 font-mono pt-1">
+                              <p><strong className="text-foreground font-sans">Start Time:</strong> {new Date(contest.startTime).toLocaleString()}</p>
+                              <p><strong className="text-foreground font-sans">End Time:</strong> {new Date(contest.endTime).toLocaleString()}</p>
                             </div>
-                          </div>
+                          </CardContent>
+                        </div>
 
-                          <div className="text-[11px] text-muted-foreground space-y-0.5 font-mono pt-1">
-                            <p><strong className="text-foreground font-sans">Start Time:</strong> {new Date(contest.startTime).toLocaleString()}</p>
-                            <p><strong className="text-foreground font-sans">End Time:</strong> {new Date(contest.endTime).toLocaleString()}</p>
-                          </div>
+                        {/* Admin Action Bar */}
+                        <div className="p-4 pt-2 border-t border-border/60 flex items-center justify-between">
+                          <span className="text-xs font-mono text-muted-foreground">
+                            👥 {enrolledCount} participants
+                          </span>
 
-                          {/* Admin Action Bar */}
-                          <div className="flex items-center justify-between pt-2 border-t border-border/60">
-                            <span className="text-xs font-mono text-muted-foreground">
-                              👥 {contest.participantsCount} participants
-                            </span>
-
-                            <div className="flex items-center gap-2">
-                              {isUpcoming && (
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleStartContestNow(contest.id)}
-                                  className="h-7 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1 shadow-sm"
-                                >
-                                  <span>▶</span> Start Live Now
-                                </Button>
-                              )}
-                              {isLive && (
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  onClick={() => handleEndContestNow(contest.id)}
-                                  className="h-7 text-[11px] font-bold text-rose-400 gap-1 border border-rose-500/30"
-                                >
-                                  <span>⏹</span> Force End Contest
-                                </Button>
-                              )}
-                            </div>
+                          <div className="flex items-center gap-2">
+                            {isUpcoming && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleStartContestNow(contest.id)}
+                                className="h-7 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1 shadow-sm"
+                              >
+                                <span>▶</span> Start Live Now
+                              </Button>
+                            )}
+                            {isLive && (
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => handleEndContestNow(contest.id)}
+                                className="h-7 text-[11px] font-bold text-rose-400 gap-1 border border-rose-500/30"
+                              >
+                                <span>⏹</span> Force End Contest
+                              </Button>
+                            )}
                           </div>
-                        </CardContent>
+                        </div>
                       </Card>
                     );
                   })}
                 </div>
               )}
             </div>
+
+            {/* MODAL 1: CONTEST SUBMISSIONS & STUDENT SOLUTIONS INSPECTOR */}
+            {selectedContestForSubmissions && (
+              <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+                <div className="bg-card border border-border rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+                  {/* Header */}
+                  <div className="p-5 border-b border-border flex items-start justify-between bg-secondary/30 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                          {selectedContestForSubmissions.status}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-mono">
+                          ⏱️ {selectedContestForSubmissions.durationMinutes} mins
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-black text-foreground">
+                        {selectedContestForSubmissions.title} — Submissions & Solutions
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Inspect real-time student submissions, execution metrics, and full code solutions.
+                      </p>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedContestForSubmissions(null)}
+                      className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+
+                  {/* Submissions Stats & Filters */}
+                  {(() => {
+                    const subs = getContestSubmissions(selectedContestForSubmissions.id);
+                    const acceptedSubs = subs.filter(s => s.status === "ACCEPTED");
+                    const failedSubs = subs.filter(s => s.status !== "ACCEPTED");
+                    const uniqueStudents = new Set(subs.map(s => s.userEmail)).size;
+                    const passRate = subs.length > 0 ? Math.round((acceptedSubs.length / subs.length) * 100) : 0;
+
+                    const filteredSubs = subs.filter(sub => {
+                      const matchesStatus =
+                        submissionFilterStatus === "ALL" ||
+                        (submissionFilterStatus === "ACCEPTED" && sub.status === "ACCEPTED") ||
+                        (submissionFilterStatus === "WRONG_ANSWER" && sub.status !== "ACCEPTED");
+                      const q = submissionSearchQuery.toLowerCase().trim();
+                      const matchesSearch =
+                        !q ||
+                        sub.userName.toLowerCase().includes(q) ||
+                        sub.userEmail.toLowerCase().includes(q) ||
+                        (sub.problemTitle || sub.problemSlug).toLowerCase().includes(q) ||
+                        (sub.language || "").toLowerCase().includes(q);
+                      return matchesStatus && matchesSearch;
+                    });
+
+                    return (
+                      <div className="flex-1 flex flex-col overflow-hidden">
+                        {/* Summary Badges */}
+                        <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-secondary/10 border-b border-border">
+                          <div className="p-2.5 rounded-lg bg-card border border-border/70 text-center">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Enrolled Students</span>
+                            <span className="text-lg font-black text-foreground">
+                              {Math.max(selectedContestForSubmissions.participantsCount, (selectedContestForSubmissions.registeredUsers || []).length)}
+                            </span>
+                          </div>
+
+                          <div className="p-2.5 rounded-lg bg-card border border-border/70 text-center">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Total Submissions</span>
+                            <span className="text-lg font-black text-purple-400">{subs.length}</span>
+                            <span className="text-[10px] text-muted-foreground block">({uniqueStudents} active users)</span>
+                          </div>
+
+                          <div className="p-2.5 rounded-lg bg-card border border-border/70 text-center">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Accepted Solves</span>
+                            <span className="text-lg font-black text-emerald-400">{acceptedSubs.length}</span>
+                          </div>
+
+                          <div className="p-2.5 rounded-lg bg-card border border-border/70 text-center">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Pass Rate</span>
+                            <span className="text-lg font-black text-amber-400">{passRate}%</span>
+                          </div>
+                        </div>
+
+                        {/* Filter Bar */}
+                        <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-border bg-card">
+                          {/* Search Input */}
+                          <div className="w-full sm:w-80">
+                            <Input
+                              placeholder="Search by student name, email, or problem..."
+                              value={submissionSearchQuery}
+                              onChange={(e) => setSubmissionSearchQuery(e.target.value)}
+                              className="h-8 text-xs"
+                            />
+                          </div>
+
+                          {/* Filter Tabs */}
+                          <div className="flex items-center gap-1.5 self-start sm:self-auto">
+                            <Button
+                              size="sm"
+                              variant={submissionFilterStatus === "ALL" ? "default" : "outline"}
+                              onClick={() => setSubmissionFilterStatus("ALL")}
+                              className="h-8 text-xs font-semibold"
+                            >
+                              All ({subs.length})
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={submissionFilterStatus === "ACCEPTED" ? "default" : "outline"}
+                              onClick={() => setSubmissionFilterStatus("ACCEPTED")}
+                              className="h-8 text-xs font-semibold text-emerald-400 border-emerald-500/30"
+                            >
+                              Accepted ({acceptedSubs.length})
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={submissionFilterStatus === "WRONG_ANSWER" ? "default" : "outline"}
+                              onClick={() => setSubmissionFilterStatus("WRONG_ANSWER")}
+                              className="h-8 text-xs font-semibold text-rose-400 border-rose-500/30"
+                            >
+                              Failed ({failedSubs.length})
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Submissions List / Table */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                          {filteredSubs.length === 0 ? (
+                            <div className="p-12 text-center text-muted-foreground space-y-2">
+                              <span className="text-3xl block">📭</span>
+                              <p className="text-sm font-semibold">No submissions found matching criteria</p>
+                              <p className="text-xs">When students enter the arena and submit their code, their solutions will appear here in real-time.</p>
+                            </div>
+                          ) : (
+                            <div className="overflow-x-auto border border-border rounded-xl bg-card">
+                              <table className="w-full text-left text-xs border-collapse">
+                                <thead>
+                                  <tr className="border-b border-border bg-secondary/40 text-muted-foreground font-semibold">
+                                    <th className="p-3">Student</th>
+                                    <th className="p-3">Problem Solved</th>
+                                    <th className="p-3">Language</th>
+                                    <th className="p-3">Verdict</th>
+                                    <th className="p-3">Score</th>
+                                    <th className="p-3">Runtime / Memory</th>
+                                    <th className="p-3">Submitted</th>
+                                    <th className="p-3 text-right">Action</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-border">
+                                  {filteredSubs.map((sub) => {
+                                    const isAc = sub.status === "ACCEPTED";
+                                    return (
+                                      <tr key={sub.id} className="hover:bg-secondary/20 transition-colors">
+                                        <td className="p-3 font-medium">
+                                          <div className="flex items-center gap-2">
+                                            <div className="w-7 h-7 rounded-full bg-primary/20 text-primary font-black flex items-center justify-center text-xs">
+                                              {sub.userName.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div>
+                                              <p className="font-bold text-foreground">{sub.userName}</p>
+                                              <p className="text-[10px] text-muted-foreground font-mono">{sub.userEmail}</p>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td className="p-3">
+                                          <span className="font-semibold text-foreground block">
+                                            {sub.problemTitle || sub.problemSlug}
+                                          </span>
+                                          <span className="text-[10px] text-muted-foreground font-mono">
+                                            {sub.problemSlug}
+                                          </span>
+                                        </td>
+                                        <td className="p-3">
+                                          <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-secondary border border-border">
+                                            {sub.language || "javascript"}
+                                          </span>
+                                        </td>
+                                        <td className="p-3">
+                                          {isAc ? (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                              <span>✓</span> ACCEPTED
+                                            </span>
+                                          ) : (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                                              <span>✗</span> {sub.status.replace("_", " ")}
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="p-3 font-mono font-bold">
+                                          {isAc ? (
+                                            <span className="text-emerald-400">+{sub.score} pts</span>
+                                          ) : (
+                                            <span className="text-muted-foreground">0 pts</span>
+                                          )}
+                                        </td>
+                                        <td className="p-3 text-[11px] font-mono text-muted-foreground">
+                                          {sub.runtime || "—"} / {sub.memory || "—"}
+                                          {typeof sub.passedTestCases === "number" && sub.totalTestCases && (
+                                            <span className="block text-[10px] text-muted-foreground">
+                                              ({sub.passedTestCases}/{sub.totalTestCases} cases)
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="p-3 text-[11px] text-muted-foreground">
+                                          {new Date(sub.submittedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                          <span className="block text-[10px]">
+                                            {new Date(sub.submittedAt).toLocaleDateString()}
+                                          </span>
+                                        </td>
+                                        <td className="p-3 text-right">
+                                          <Button
+                                            size="sm"
+                                            onClick={() => {
+                                              setSelectedSubmissionForCode(sub);
+                                              setCodeCopied(false);
+                                            }}
+                                            className="h-7 text-[11px] font-bold bg-secondary hover:bg-secondary/80 text-foreground border border-border gap-1"
+                                          >
+                                            <span>💻</span> View Solution
+                                          </Button>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Footer */}
+                  <div className="p-4 border-t border-border bg-secondary/20 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      Contest ID: <strong className="font-mono text-foreground">{selectedContestForSubmissions.id}</strong>
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedContestForSubmissions(null)}
+                      className="h-8 text-xs font-semibold"
+                    >
+                      Close Inspector
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* MODAL 2: DETAILED SOLUTION CODE VIEWER */}
+            {selectedSubmissionForCode && (
+              <div className="fixed inset-0 z-[60] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+                <div className="bg-[#0f172a] border border-border/80 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden my-auto text-slate-100">
+                  {/* Top Bar */}
+                  <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/80">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-primary/20 text-primary flex items-center justify-center text-base font-black">
+                        💻
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-black text-sm text-white">
+                            {selectedSubmissionForCode.problemTitle || selectedSubmissionForCode.problemSlug}
+                          </h4>
+                          {selectedSubmissionForCode.status === "ACCEPTED" ? (
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">
+                              ✓ ACCEPTED (+{selectedSubmissionForCode.score} pts)
+                            </span>
+                          ) : (
+                            <span className="text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded font-bold">
+                              ✗ {selectedSubmissionForCode.status.replace("_", " ")}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Submitted by <strong className="text-slate-200">{selectedSubmissionForCode.userName}</strong> ({selectedSubmissionForCode.userEmail}) • {new Date(selectedSubmissionForCode.submittedAt).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedSubmissionForCode(null)}
+                      className="h-8 w-8 p-0 rounded-full text-slate-400 hover:text-white"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+
+                  {/* Execution Metrics Bar */}
+                  <div className="px-4 py-2 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between text-xs font-mono text-slate-400">
+                    <div className="flex items-center gap-4">
+                      <span><strong>Language:</strong> <span className="text-amber-400 uppercase">{selectedSubmissionForCode.language || "javascript"}</span></span>
+                      <span><strong>Runtime:</strong> <span className="text-emerald-400">{selectedSubmissionForCode.runtime || "N/A"}</span></span>
+                      <span><strong>Memory:</strong> <span className="text-blue-400">{selectedSubmissionForCode.memory || "N/A"}</span></span>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (selectedSubmissionForCode.code) {
+                          navigator.clipboard.writeText(selectedSubmissionForCode.code);
+                          setCodeCopied(true);
+                          setTimeout(() => setCodeCopied(false), 2000);
+                        }
+                      }}
+                      className="h-7 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 gap-1.5"
+                    >
+                      {codeCopied ? (
+                        <>
+                          <span className="text-emerald-400">✓</span> Copied!
+                        </>
+                      ) : (
+                        <>
+                          <span>📋</span> Copy Solution Code
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Code Editor Container */}
+                  <div className="flex-1 overflow-y-auto p-4 bg-[#090d16] font-mono text-xs leading-relaxed">
+                    {selectedSubmissionForCode.code ? (
+                      <pre className="text-emerald-300 font-mono whitespace-pre-wrap select-text">
+                        {selectedSubmissionForCode.code}
+                      </pre>
+                    ) : (
+                      <div className="p-8 text-center text-slate-500">
+                        <p>No source code recorded for this submission.</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="p-3 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                    <span>Submission ID: <code className="text-slate-300">{selectedSubmissionForCode.id}</code></span>
+                    <Button
+                      size="sm"
+                      onClick={() => setSelectedSubmissionForCode(null)}
+                      className="h-7 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white"
+                    >
+                      Done Viewing
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </main>

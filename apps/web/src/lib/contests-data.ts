@@ -29,10 +29,17 @@ export interface ContestSubmission {
   userEmail: string;
   userName: string;
   problemSlug: string;
+  problemTitle?: string;
   status: "ACCEPTED" | "WRONG_ANSWER" | "TIME_LIMIT_EXCEEDED" | "RUNTIME_ERROR";
   score: number;
   penaltyMinutes: number;
   submittedAt: string;
+  language?: string;
+  code?: string;
+  runtime?: string;
+  memory?: string;
+  passedTestCases?: number;
+  totalTestCases?: number;
 }
 
 export interface ContestStanding {
@@ -70,7 +77,7 @@ const DEFAULT_CONTESTS: Contest[] = [
       { problemSlug: "trapping-rain-water", title: "Trapping Rain Water", difficulty: "HARD", points: 500 }
     ],
     participantsCount: 42,
-    registeredUsers: ["admin@codearena.io", "alex.dev@gmail.com"],
+    registeredUsers: ["admin@codearena.io", "alex.dev@gmail.com", "sarah.coder@outlook.com", "vikram.singh@iit.ac.in"],
     isRated: true,
     rules: [
       "No external AI coding assistance during the live window.",
@@ -80,6 +87,171 @@ const DEFAULT_CONTESTS: Contest[] = [
     createdAt: new Date().toISOString()
   }
 ];
+
+// Seed default submissions for contest-weekly-clash-1 so admin immediately sees student solutions
+const DEFAULT_SUBMISSIONS: Record<string, ContestSubmission[]> = {
+  "contest-weekly-clash-1": [
+    {
+      id: "sub_demo_1",
+      contestId: "contest-weekly-clash-1",
+      userEmail: "alex.dev@gmail.com",
+      userName: "Alex Dev",
+      problemSlug: "two-sum",
+      problemTitle: "Two Sum",
+      language: "javascript",
+      code: `/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    const map = new Map();
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement)) {
+            return [map.get(complement), i];
+        }
+        map.set(nums[i], i);
+    }
+    return [];
+};`,
+      runtime: "48 ms",
+      memory: "42.1 MB",
+      passedTestCases: 8,
+      totalTestCases: 8,
+      status: "ACCEPTED",
+      score: 100,
+      penaltyMinutes: 8,
+      submittedAt: new Date(Date.now() - 45 * 60 * 1000).toISOString()
+    },
+    {
+      id: "sub_demo_2",
+      contestId: "contest-weekly-clash-1",
+      userEmail: "alex.dev@gmail.com",
+      userName: "Alex Dev",
+      problemSlug: "container-with-most-water",
+      problemTitle: "Container With Most Water",
+      language: "javascript",
+      code: `/**
+ * @param {number[]} height
+ * @return {number}
+ */
+var maxArea = function(height) {
+    let left = 0;
+    let right = height.length - 1;
+    let maxWater = 0;
+    
+    while (left < right) {
+        const currentWater = Math.min(height[left], height[right]) * (right - left);
+        maxWater = Math.max(maxWater, currentWater);
+        if (height[left] < height[right]) {
+            left++;
+        } else {
+            right--;
+        }
+    }
+    return maxWater;
+};`,
+      runtime: "62 ms",
+      memory: "49.3 MB",
+      passedTestCases: 12,
+      totalTestCases: 12,
+      status: "ACCEPTED",
+      score: 200,
+      penaltyMinutes: 22,
+      submittedAt: new Date(Date.now() - 32 * 60 * 1000).toISOString()
+    },
+    {
+      id: "sub_demo_3",
+      contestId: "contest-weekly-clash-1",
+      userEmail: "sarah.coder@outlook.com",
+      userName: "Sarah Khan",
+      problemSlug: "coin-change",
+      problemTitle: "Coin Change",
+      language: "python",
+      code: `class Solution:
+    def coinChange(self, coins: List[int], amount: int) -> int:
+        dp = [float('inf')] * (amount + 1)
+        dp[0] = 0
+        
+        for coin in coins:
+            for x in range(coin, amount + 1):
+                dp[x] = min(dp[x], dp[x - coin] + 1)
+                
+        return dp[amount] if dp[amount] != float('inf') else -1`,
+      runtime: "115 ms",
+      memory: "16.8 MB",
+      passedTestCases: 15,
+      totalTestCases: 15,
+      status: "ACCEPTED",
+      score: 300,
+      penaltyMinutes: 35,
+      submittedAt: new Date(Date.now() - 25 * 60 * 1000).toISOString()
+    },
+    {
+      id: "sub_demo_4",
+      contestId: "contest-weekly-clash-1",
+      userEmail: "vikram.singh@iit.ac.in",
+      userName: "Vikram Singh",
+      problemSlug: "two-sum",
+      problemTitle: "Two Sum",
+      language: "cpp",
+      code: `#include <vector>
+#include <unordered_map>
+using namespace std;
+
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> seen;
+        for (int i = 0; i < nums.size(); ++i) {
+            int complement = target - nums[i];
+            if (seen.find(complement) != seen.end()) {
+                return {seen[complement], i};
+            }
+            seen[nums[i]] = i;
+        }
+        return {};
+    }
+};`,
+      runtime: "8 ms",
+      memory: "10.4 MB",
+      passedTestCases: 8,
+      totalTestCases: 8,
+      status: "ACCEPTED",
+      score: 100,
+      penaltyMinutes: 14,
+      submittedAt: new Date(Date.now() - 20 * 60 * 1000).toISOString()
+    },
+    {
+      id: "sub_demo_5",
+      contestId: "contest-weekly-clash-1",
+      userEmail: "priya.patel@gmail.com",
+      userName: "Priya Patel",
+      problemSlug: "container-with-most-water",
+      problemTitle: "Container With Most Water",
+      language: "javascript",
+      code: `var maxArea = function(height) {
+    let max = 0;
+    // Brute force attempt
+    for(let i=0; i<height.length; i++) {
+        for(let j=i+1; j<height.length; j++) {
+            max = Math.max(max, Math.min(height[i], height[j]) * (j - i));
+        }
+    }
+    return max;
+};`,
+      runtime: "950 ms",
+      memory: "44.0 MB",
+      passedTestCases: 5,
+      totalTestCases: 12,
+      status: "WRONG_ANSWER",
+      score: 0,
+      penaltyMinutes: 0,
+      submittedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString()
+    }
+  ]
+};
 
 export function getContests(): Contest[] {
   if (typeof window === "undefined") return DEFAULT_CONTESTS;
@@ -295,12 +467,38 @@ export function registerUserForContest(contestId: string, email: string): boolea
 }
 
 export function getContestSubmissions(contestId: string): ContestSubmission[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return DEFAULT_SUBMISSIONS[contestId] || [];
   try {
     const raw = localStorage.getItem(`${SUBMISSIONS_PREFIX}${contestId}`);
-    return raw ? JSON.parse(raw) : [];
+    if (raw) {
+      return JSON.parse(raw);
+    }
+    if (DEFAULT_SUBMISSIONS[contestId]) {
+      localStorage.setItem(`${SUBMISSIONS_PREFIX}${contestId}`, JSON.stringify(DEFAULT_SUBMISSIONS[contestId]));
+      return DEFAULT_SUBMISSIONS[contestId];
+    }
+    return [];
   } catch (e) {
     console.error("Failed to get contest submissions:", e);
+    return DEFAULT_SUBMISSIONS[contestId] || [];
+  }
+}
+
+export function getAllContestSubmissions(contestId?: string): ContestSubmission[] {
+  if (typeof window === "undefined") return [];
+  try {
+    if (contestId) {
+      return getContestSubmissions(contestId);
+    }
+    const contests = getContests();
+    const allSubs: ContestSubmission[] = [];
+    contests.forEach(c => {
+      const subs = getContestSubmissions(c.id);
+      allSubs.push(...subs);
+    });
+    return allSubs;
+  } catch (e) {
+    console.error("Failed to get all contest submissions:", e);
     return [];
   }
 }
