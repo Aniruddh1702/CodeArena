@@ -450,45 +450,6 @@ export default function HomePage() {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1 p-1 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md">
-            <Link
-              href="/dashboard"
-              className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/problems"
-              className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all"
-            >
-              Practice (150 DSA)
-            </Link>
-            <Link
-              href="/contests"
-              className="px-4 py-1.5 rounded-full text-xs font-semibold text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 flex items-center gap-1 transition-all"
-            >
-              <span>🏆</span> Contests
-            </Link>
-            <Link
-              href="/battles"
-              className="px-4 py-1.5 rounded-full text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 flex items-center gap-1 transition-all"
-            >
-              <span>⚔️</span> 1v1 Battles
-            </Link>
-            <Link
-              href="/leaderboard"
-              className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all"
-            >
-              Leaderboard
-            </Link>
-            <Link
-              href="/profile"
-              className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all"
-            >
-              Profile
-            </Link>
-          </nav>
-
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -935,12 +896,19 @@ export default function HomePage() {
                   {userStats.solved}<span className="text-xs text-slate-500">/150</span>
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col">
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Global Rank</span>
+              <Link
+                href="/leaderboard"
+                className="p-3 rounded-xl bg-black/40 border border-white/5 hover:border-amber-500/40 backdrop-blur-md flex flex-col hover:scale-105 transition-all group/rank cursor-pointer"
+                title="View Full Global Leaderboard"
+              >
+                <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase">
+                  <span>Global Rank</span>
+                  <span className="text-amber-400 opacity-0 group-hover/rank:opacity-100 transition-opacity">→</span>
+                </div>
                 <span className="text-base sm:text-lg font-black text-amber-400 font-mono">
                   #{userStats.rank}
                 </span>
-              </div>
+              </Link>
               <div className="p-3 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col">
                 <span className="text-[10px] font-mono text-slate-400 uppercase">Active Streak</span>
                 <span className="text-base sm:text-lg font-black text-rose-400 font-mono">
