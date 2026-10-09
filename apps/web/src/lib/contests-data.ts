@@ -143,38 +143,6 @@ const DEFAULT_SUBMISSIONS: Record<string, ContestSubmission[]> = {
       score: 100,
       penaltyMinutes: 8,
       submittedAt: new Date(Date.now() - 45 * 60 * 1000).toISOString()
-    },
-    {
-      id: "sub_demo_2",
-      contestId: "contest-weekly-clash-1",
-      userEmail: "alex.dev@gmail.com",
-      userName: "Alex Dev",
-      problemSlug: "container-with-most-water",
-      problemTitle: "Container With Most Water",
-      language: "javascript",
-      code: `var maxArea = function(height) {
-    let left = 0;
-    let right = height.length - 1;
-    let maxWater = 0;
-    while (left < right) {
-        const currentWater = Math.min(height[left], height[right]) * (right - left);
-        maxWater = Math.max(maxWater, currentWater);
-        if (height[left] < height[right]) {
-            left++;
-        } else {
-            right--;
-        }
-    }
-    return maxWater;
-};`,
-      runtime: "62 ms",
-      memory: "49.3 MB",
-      passedTestCases: 12,
-      totalTestCases: 12,
-      status: "ACCEPTED",
-      score: 200,
-      penaltyMinutes: 22,
-      submittedAt: new Date(Date.now() - 32 * 60 * 1000).toISOString()
     }
   ]
 };
@@ -277,11 +245,12 @@ export function getContestById(id: string): Contest | null {
   return c ? enrichContestProblems(c) : null;
 }
 
-export function saveContest(contest: Contest): void {
+export async function saveContest(contest: Contest): Promise<void> {
   const enriched = enrichContestProblems(contest);
   if (typeof window !== "undefined") {
     try {
-      const contests = getContests();
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const contests: Contest[] = raw ? JSON.parse(raw) : [];
       const idx = contests.findIndex((c) => c.id === enriched.id);
       const isNew = idx < 0;
 
@@ -373,46 +342,52 @@ export function saveContest(contest: Contest): void {
   }
 
   // Sync to Backend Server API
-  fetch("/api/contests", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(enriched),
-  }).catch((err) => console.warn("Failed to sync contest to server:", err));
+  try {
+    await fetch("/api/contests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(enriched),
+    });
+  } catch (err) {
+    console.warn("Failed to sync contest to server:", err);
+  }
 }
 
-export function clearAllContests(): void {
+export async function clearAllContests(): Promise<void> {
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: { cleared: true } }));
+      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: [] }));
     } catch (e) {
       console.error("Failed to clear contests locally:", e);
     }
   }
 
-  fetch("/api/contests", { method: "DELETE" }).catch(() => {});
+  try {
+    await fetch("/api/contests", { method: "DELETE" });
+  } catch (e) {}
 }
 
-export function deleteContest(id: string): boolean {
+export async function deleteContest(id: string): Promise<boolean> {
   if (typeof window !== "undefined") {
     try {
-      let contests = getContests();
-      const initialLen = contests.length;
+      const raw = localStorage.getItem(STORAGE_KEY);
+      let contests: Contest[] = raw ? JSON.parse(raw) : [];
       contests = contests.filter((c) => c.id !== id);
-      if (contests.length !== initialLen) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(contests));
-        window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: { id, deleted: true } }));
-      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(contests));
+      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: contests }));
     } catch (e) {
       console.error("Failed to delete contest locally:", e);
     }
   }
 
-  fetch(`/api/contests/${id}`, { method: "DELETE" }).catch(() => {});
+  try {
+    await fetch(`/api/contests/${id}`, { method: "DELETE" });
+  } catch (e) {}
   return true;
 }
 
-export function startContestNow(id: string): Contest | null {
+export async function startContestNow(id: string): Promise<Contest | null> {
   const contest = getContestById(id);
   if (!contest) return null;
 
@@ -423,38 +398,42 @@ export function startContestNow(id: string): Contest | null {
   contest.endTime = endTime.toISOString();
   contest.status = "LIVE";
 
-  saveContest(contest);
+  await saveContest(contest);
 
-  fetch(`/api/contests/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      status: "LIVE",
-      startTime: contest.startTime,
-      endTime: contest.endTime,
-    }),
-  }).catch(() => {});
+  try {
+    await fetch(`/api/contests/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "LIVE",
+        startTime: contest.startTime,
+        endTime: contest.endTime,
+      }),
+    });
+  } catch (e) {}
 
   return contest;
 }
 
-export function endContestNow(id: string): Contest | null {
+export async function endContestNow(id: string): Promise<Contest | null> {
   const contest = getContestById(id);
   if (!contest) return null;
 
   contest.endTime = new Date().toISOString();
   contest.status = "ENDED";
 
-  saveContest(contest);
+  await saveContest(contest);
 
-  fetch(`/api/contests/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      status: "ENDED",
-      endTime: contest.endTime,
-    }),
-  }).catch(() => {});
+  try {
+    await fetch(`/api/contests/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "ENDED",
+        endTime: contest.endTime,
+      }),
+    });
+  } catch (e) {}
 
   return contest;
 }
@@ -490,7 +469,7 @@ export function getContestSubmissions(contestId: string): ContestSubmission[] {
       fetch(`/api/contests/${contestId}/submissions`)
         .then((res) => res.json())
         .then((json) => {
-          if (json?.success && Array.isArray(json.submissions) && json.submissions.length > 0) {
+          if (json?.success && Array.isArray(json.submissions)) {
             const map = new Map<string, ContestSubmission>();
             json.submissions.forEach((s: ContestSubmission) => map.set(s.id, s));
             parsed.forEach((s: ContestSubmission) => {

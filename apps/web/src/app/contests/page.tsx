@@ -30,8 +30,11 @@ export default function ContestsPage() {
     fetch("/api/contests")
       .then((res) => res.json())
       .then((data) => {
-        if (data?.success && Array.isArray(data.contests) && data.contests.length > 0) {
+        if (data?.success && Array.isArray(data.contests)) {
           setContests(data.contests);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("codearena_contests", JSON.stringify(data.contests));
+          }
         }
       })
       .catch(() => {});

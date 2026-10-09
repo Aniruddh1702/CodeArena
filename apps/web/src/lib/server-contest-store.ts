@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { ProblemDefinition, PROBLEMS_DATABASE } from "./problems-data";
 
 export interface ContestProblem {
@@ -130,49 +132,43 @@ const DEFAULT_SERVER_SUBMISSIONS: Record<string, ContestSubmission[]> = {
       score: 100,
       penaltyMinutes: 8,
       submittedAt: new Date(Date.now() - 45 * 60 * 1000).toISOString()
-    },
-    {
-      id: "sub_server_2",
-      contestId: "contest-weekly-clash-1",
-      userEmail: "alex.dev@gmail.com",
-      userName: "Alex Dev",
-      problemSlug: "container-with-most-water",
-      problemTitle: "Container With Most Water",
-      language: "javascript",
-      code: `var maxArea = function(height) {
-    let left = 0;
-    let right = height.length - 1;
-    let maxWater = 0;
-    while (left < right) {
-        const currentWater = Math.min(height[left], height[right]) * (right - left);
-        maxWater = Math.max(maxWater, currentWater);
-        if (height[left] < height[right]) {
-            left++;
-        } else {
-            right--;
-        }
-    }
-    return maxWater;
-};`,
-      runtime: "62 ms",
-      memory: "49.3 MB",
-      passedTestCases: 12,
-      totalTestCases: 12,
-      status: "ACCEPTED",
-      score: 200,
-      penaltyMinutes: 22,
-      submittedAt: new Date(Date.now() - 32 * 60 * 1000).toISOString()
     }
   ]
 };
 
+// File persistence helper
+const STORAGE_FILE = path.join(process.cwd(), ".data_contests.json");
+
+function readFromFile(): { contests: Contest[]; initialized: boolean } | null {
+  try {
+    if (fs.existsSync(STORAGE_FILE)) {
+      const raw = fs.readFileSync(STORAGE_FILE, "utf-8");
+      return JSON.parse(raw);
+    }
+  } catch (e) {}
+  return null;
+}
+
+function writeToFile(contests: Contest[]) {
+  try {
+    fs.writeFileSync(STORAGE_FILE, JSON.stringify({ contests, initialized: true }), "utf-8");
+  } catch (e) {}
+}
+
 export function getServerContests(): Contest[] {
   if (!global.__codearena_server_contests_initialized) {
-    global.__codearena_server_contests = [...DEFAULT_SERVER_CONTESTS];
-    global.__codearena_server_contests_initialized = true;
+    const fromFile = readFromFile();
+    if (fromFile && fromFile.initialized) {
+      global.__codearena_server_contests = fromFile.contests;
+      global.__codearena_server_contests_initialized = true;
+    } else {
+      global.__codearena_server_contests = [...DEFAULT_SERVER_CONTESTS];
+      global.__codearena_server_contests_initialized = true;
+      writeToFile(global.__codearena_server_contests);
+    }
   }
   
-  // Re-evaluate statuses dynamically while respecting forced "ENDED"
+  // Re-evaluate statuses dynamically while preserving "ENDED"
   const now = Date.now();
   global.__codearena_server_contests = (global.__codearena_server_contests || []).map((c) => {
     if (c.status === "ENDED") {
@@ -195,11 +191,7 @@ export function getServerContests(): Contest[] {
 }
 
 export function saveServerContest(contest: Contest): Contest {
-  if (!global.__codearena_server_contests_initialized) {
-    global.__codearena_server_contests = [...DEFAULT_SERVER_CONTESTS];
-    global.__codearena_server_contests_initialized = true;
-  }
-  const current = global.__codearena_server_contests || [];
+  const current = getServerContests();
   const existingIdx = current.findIndex((c) => c.id === contest.id);
   if (existingIdx >= 0) {
     current[existingIdx] = { ...current[existingIdx], ...contest };
@@ -207,14 +199,17 @@ export function saveServerContest(contest: Contest): Contest {
     current.unshift(contest);
   }
   global.__codearena_server_contests = current;
+  global.__codearena_server_contests_initialized = true;
+  writeToFile(current);
   return contest;
 }
 
 export function deleteServerContest(id: string): boolean {
-  global.__codearena_server_contests_initialized = true;
   const current = getServerContests();
   const filtered = current.filter((c) => c.id !== id);
   global.__codearena_server_contests = filtered;
+  global.__codearena_server_contests_initialized = true;
+  writeToFile(filtered);
   if (global.__codearena_server_submissions) {
     delete global.__codearena_server_submissions[id];
   }
@@ -225,6 +220,7 @@ export function clearAllServerContests(): void {
   global.__codearena_server_contests = [];
   global.__codearena_server_contests_initialized = true;
   global.__codearena_server_submissions = {};
+  writeToFile([]);
 }
 
 export function getServerSubmissions(contestId: string): ContestSubmission[] {

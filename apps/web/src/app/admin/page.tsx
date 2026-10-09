@@ -340,14 +340,18 @@ export default function AdminPortalPage() {
   const [codeCopied, setCodeCopied] = useState(false);
 
   const loadContests = async () => {
-    setContestsList(getContests());
     try {
       const res = await fetch("/api/contests", { cache: "no-store" });
       const data = await res.json();
-      if (data?.success && Array.isArray(data.contests) && data.contests.length > 0) {
+      if (data?.success && Array.isArray(data.contests)) {
         setContestsList(data.contests);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("codearena_contests", JSON.stringify(data.contests));
+        }
+        return;
       }
     } catch (e) {}
+    setContestsList(getContests());
   };
 
   const handleAutoPickContestProblems = () => {
@@ -411,7 +415,7 @@ export default function AdminPortalPage() {
     }));
   };
 
-  const handleCreateContest = (forceStartNow: boolean = false) => {
+  const handleCreateContest = async (forceStartNow: boolean = false) => {
     try {
       const now = new Date();
       const contestTitle = contestFormData.title.trim() || `CodeArena Bi-Weekly Clash #${contestsList.length + 1}`;
@@ -460,8 +464,8 @@ export default function AdminPortalPage() {
         createdAt: now.toISOString()
       };
 
-      saveContest(newContest);
-      setContestsList(getContests());
+      await saveContest(newContest);
+      await loadContests();
       setContestFeedback({
         type: "success",
         message: timing.status === "LIVE"
@@ -489,20 +493,20 @@ export default function AdminPortalPage() {
     }
   };
 
-  const handleStartContestNow = (id: string) => {
-    startContestNow(id);
-    loadContests();
+  const handleStartContestNow = async (id: string) => {
+    await startContestNow(id);
+    await loadContests();
   };
 
-  const handleEndContestNow = (id: string) => {
-    endContestNow(id);
-    loadContests();
+  const handleEndContestNow = async (id: string) => {
+    await endContestNow(id);
+    await loadContests();
   };
 
-  const handleDeleteContestItem = (id: string) => {
+  const handleDeleteContestItem = async (id: string) => {
     if (confirm("Are you sure you want to delete this contest?")) {
-      deleteContest(id);
-      loadContests();
+      await deleteContest(id);
+      await loadContests();
     }
   };
 
@@ -3098,10 +3102,10 @@ export default function AdminPortalPage() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => {
+                    onClick={async () => {
                       if (confirm("Are you sure you want to clear all contests? This will remove all scheduled and live contests.")) {
-                        clearAllContests();
-                        loadContests();
+                        await clearAllContests();
+                        await loadContests();
                       }
                     }}
                     className="h-8 text-xs font-semibold text-rose-400 border-rose-500/30 hover:bg-rose-500/10 gap-1"

@@ -368,8 +368,23 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setContestsList(getContests());
+
+    // Fetch live contests from server API
+    fetch("/api/contests")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.contests)) {
+          setContestsList(data.contests);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("codearena_contests", JSON.stringify(data.contests));
+          }
+        }
+      })
+      .catch(() => {});
+
     const timer = setInterval(() => {
       setNow(Date.now());
+      setContestsList(getContests());
     }, 1000);
 
     const handleUpdate = () => {
