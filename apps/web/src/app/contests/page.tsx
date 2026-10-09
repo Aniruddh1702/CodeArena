@@ -110,7 +110,7 @@ export default function ContestsPage() {
       <header className="border-b border-border/80 bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg tracking-tight hover:opacity-90 transition-opacity">
+            <Link href="/" className="flex items-center gap-2 font-bold text-lg tracking-tight hover:opacity-90 transition-opacity">
               <span className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-primary-foreground font-black shadow-md shadow-primary/20">
                 ⚡
               </span>
@@ -118,6 +118,12 @@ export default function ContestsPage() {
             </Link>
 
             <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+              <Link href="/" className="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors">
+                Home
+              </Link>
+              <Link href="/dashboard" className="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors">
+                Dashboard
+              </Link>
               <Link href="/problems" className="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors">
                 Practice (150 DSA)
               </Link>
@@ -127,11 +133,11 @@ export default function ContestsPage() {
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
                 )}
               </Link>
+              <Link href="/battles" className="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors">
+                Battles
+              </Link>
               <Link href="/leaderboard" className="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors">
                 Leaderboard
-              </Link>
-              <Link href="/dashboard" className="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors">
-                Dashboard
               </Link>
             </nav>
           </div>

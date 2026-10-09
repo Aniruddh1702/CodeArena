@@ -41,11 +41,12 @@ export default function BattlesLobbyPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="border-b bg-card">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-            <Link href="/dashboard" className="font-bold text-xl tracking-tight text-primary">Code<span className="text-destructive">Arena</span></Link>
+            <Link href="/" className="font-bold text-xl tracking-tight text-primary">Code<span className="text-destructive">Arena</span></Link>
             <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
+                <Link href="/" className="hover:text-primary transition-colors">Home</Link>
                 <Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
                 <Link href="/problems" className="hover:text-primary transition-colors">Practice</Link>
-                <Link href="/assessments" className="hover:text-primary transition-colors">Assessments</Link>
+                <Link href="/contests" className="hover:text-primary transition-colors text-amber-400 font-medium">Contests</Link>
                 <Link href="/battles" className="text-primary font-semibold">Battles</Link>
                 <Link href="/leaderboard" className="hover:text-primary transition-colors">Leaderboard</Link>
                 <Link href="/profile" className="hover:text-primary transition-colors">Profile</Link>

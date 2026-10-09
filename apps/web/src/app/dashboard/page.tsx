@@ -569,7 +569,7 @@ export default function DashboardPage() {
       {/* 2026 Glassmorphism Header */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#05070e]/75 backdrop-blur-2xl">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/dashboard" className="group flex items-center gap-2.5">
+          <Link href="/" className="group flex items-center gap-2.5">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
               <span className="text-white text-base font-black">C</span>
             </div>
@@ -579,6 +579,12 @@ export default function DashboardPage() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-1 p-1 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md">
+            <Link
+              href="/"
+              className="px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-all"
+            >
+              Home
+            </Link>
             <Link
               href="/dashboard"
               className="px-4 py-1.5 rounded-full text-xs font-bold text-white bg-white/10 shadow-[0_0_12px_rgba(99,102,241,0.35)] transition-all"
