@@ -466,6 +466,23 @@ ${argDecls}
 `;
   }).join("\n");
 
+  // Extract user-defined #include lines and hoist them to file scope before using namespace std
+  const userLines = code.split("\n");
+  const userIncludes: string[] = [];
+  const cleanCodeLines: string[] = [];
+
+  for (const l of userLines) {
+    if (/^\s*#\s*include\b/.test(l)) {
+      // If student writes #include <bits/stdc++.h>, the headers below cover everything
+      if (!l.includes("bits/stdc++.h")) {
+        userIncludes.push(l.trim());
+      }
+    } else {
+      cleanCodeLines.push(l);
+    }
+  }
+  const cleanCode = cleanCodeLines.join("\n");
+
   const cppHarness = `
 #include <iostream>
 #include <vector>
@@ -475,19 +492,64 @@ ${argDecls}
 #include <map>
 #include <set>
 #include <queue>
+#include <deque>
 #include <stack>
+#include <list>
 #include <algorithm>
 #include <cmath>
 #include <climits>
 #include <sstream>
+#include <numeric>
+#include <iomanip>
+#include <functional>
+#include <utility>
+#include <memory>
+#include <iterator>
+#include <cstring>
+#include <cctype>
+#include <bitset>
+#include <tuple>
+#include <cassert>
+
+${userIncludes.join("\n")}
 
 using namespace std;
 
+// Common Data Structures for LeetCode-style DSA
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
+// JSON Output Serialization Overloads
 void printJson(int val) { cout << val; }
+void printJson(long val) { cout << val; }
 void printJson(long long val) { cout << val; }
+void printJson(unsigned int val) { cout << val; }
+void printJson(unsigned long val) { cout << val; }
+void printJson(unsigned long long val) { cout << val; }
 void printJson(double val) { cout << val; }
+void printJson(float val) { cout << val; }
 void printJson(bool val) { cout << (val ? "true" : "false"); }
+void printJson(char val) { cout << "\\"" << val << "\\""; }
+void printJson(const char* val) { cout << "\\"" << val << "\\""; }
 void printJson(const string& val) { cout << "\\"" << val << "\\""; }
+
+template<typename T> void printJson(const vector<T>& vec);
+template<typename K, typename V> void printJson(const pair<K, V>& p);
+
 template<typename T>
 void printJson(const vector<T>& vec) {
     cout << "[";
@@ -498,8 +560,17 @@ void printJson(const vector<T>& vec) {
     cout << "]";
 }
 
+template<typename K, typename V>
+void printJson(const pair<K, V>& p) {
+    cout << "[";
+    printJson(p.first);
+    cout << ",";
+    printJson(p.second);
+    cout << "]";
+}
+
 // User Code
-${code}
+${cleanCode}
 
 int main() {
     Solution sol;
@@ -525,7 +596,7 @@ ${caseBlocks}
       const lineMatch = compileRes.stderr.match(/:(\d+):\d+: error:/i);
       if (lineMatch) {
         const rawLine = parseInt(lineMatch[1], 10);
-        const preambleLines = cppHarness.split(code)[0].split("\n").length;
+        const preambleLines = cppHarness.split(cleanCode)[0].split("\n").length;
         const userLine = rawLine - preambleLines + 1;
         if (userLine >= 1 && userLine <= code.split("\n").length) {
           errorLine = userLine;
