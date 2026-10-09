@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
       username: normalizedUsername,
       email: normalizedEmail,
       name: fullName,
+      password: body.password,
       role: "STUDENT",
       college: body.college || "CodeArena Academy",
       score: 1450,

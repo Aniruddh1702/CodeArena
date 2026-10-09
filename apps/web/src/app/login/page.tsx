@@ -54,17 +54,33 @@ function LoginForm() {
         );
 
         if (localMatch) {
-          saveAccount(localMatch, true);
-          const redirectUrl = searchParams.get("redirect");
-          if (localMatch.role === "SUPER_ADMIN" || localMatch.role === "ADMIN") {
-            localStorage.setItem("codearena_admin_authorized", "true");
-            router.push("/admin");
-          } else if (redirectUrl && redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
-            router.push(redirectUrl);
-          } else {
-            router.push("/dashboard");
+          // If local account has a stored password, strictly reject if it doesn't match
+          if (localMatch.password && localMatch.password !== password) {
+            setError("Invalid password. Please check your password and try again.");
+            setLoading(false);
+            return;
           }
-          return;
+
+          // If server returned 401 with password error, do not bypass
+          if (data?.message && typeof data.message === "string" && data.message.toLowerCase().includes("invalid password")) {
+            setError(data.message);
+            setLoading(false);
+            return;
+          }
+
+          if (localMatch.password === password) {
+            saveAccount(localMatch, true);
+            const redirectUrl = searchParams.get("redirect");
+            if (localMatch.role === "SUPER_ADMIN" || localMatch.role === "ADMIN") {
+              localStorage.setItem("codearena_admin_authorized", "true");
+              router.push("/admin");
+            } else if (redirectUrl && redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
+              router.push(redirectUrl);
+            } else {
+              router.push("/dashboard");
+            }
+            return;
+          }
         }
 
         let errorMsg = data?.message || "Invalid credentials. If you haven't registered, please create an account first.";
@@ -85,14 +101,21 @@ function LoginForm() {
           (a) => a.email.toLowerCase() === cleanEmail.toLowerCase() || a.username.toLowerCase() === cleanEmail.toLowerCase()
         );
         if (localMatch) {
-          saveAccount(localMatch, true);
-          const redirectUrl = searchParams.get("redirect");
-          if (redirectUrl && redirectUrl.startsWith("/")) {
-            router.push(redirectUrl);
-          } else {
-            router.push("/dashboard");
+          if (localMatch.password && localMatch.password !== password) {
+            setError("Invalid password. Please check your password and try again.");
+            setLoading(false);
+            return;
           }
-          return;
+          if (localMatch.password === password) {
+            saveAccount(localMatch, true);
+            const redirectUrl = searchParams.get("redirect");
+            if (redirectUrl && redirectUrl.startsWith("/")) {
+              router.push(redirectUrl);
+            } else {
+              router.push("/dashboard");
+            }
+            return;
+          }
         }
         setError("Account not found. Please register to create a new student account.");
         setLoading(false);
@@ -108,6 +131,7 @@ function LoginForm() {
         email: userPayload.email || cleanEmail,
         username: username,
         name: fullName,
+        password: password,
         role: userRole,
         token: token || `token_${Date.now()}`,
         college: userPayload.college || "CodeArena University",

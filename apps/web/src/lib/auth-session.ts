@@ -7,6 +7,7 @@ export interface UserAccount {
   email: string;
   username: string;
   name: string;
+  password?: string;
   role: string;
   avatarUrl?: string;
   token: string;
@@ -124,19 +125,21 @@ export function saveAccount(account: UserAccount, setAsActive: boolean = true): 
   try {
     const accounts = getAllAccounts();
     const existingIndex = accounts.findIndex(
-      (a) => a.id === account.id || a.username.toLowerCase() === account.username.toLowerCase() || a.email.toLowerCase() === account.email.toLowerCase()
+      (a) => a.id === account.id || a.username.toLowerCase() === (account.username || "").toLowerCase() || a.email.toLowerCase() === (account.email || "").toLowerCase()
     );
-
+    const existing = existingIndex >= 0 ? accounts[existingIndex] : undefined;
     const updatedAccount: UserAccount = {
+      ...existing,
       ...account,
-      id: account.id || account.username || account.email,
+      id: account.id || existing?.id || account.username || account.email,
+      password: account.password || existing?.password,
       lastActiveAt: new Date().toISOString(),
     };
 
     let updatedList: UserAccount[];
     if (existingIndex >= 0) {
       updatedList = [...accounts];
-      updatedList[existingIndex] = { ...updatedList[existingIndex], ...updatedAccount };
+      updatedList[existingIndex] = updatedAccount;
     } else {
       updatedList = [updatedAccount, ...accounts];
     }

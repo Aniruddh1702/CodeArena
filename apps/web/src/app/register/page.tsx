@@ -81,6 +81,7 @@ export default function RegisterPage() {
               email: formData.email,
               username: formData.username,
               name: `${formData.firstName} ${formData.lastName}`.trim(),
+              password: formData.password,
               role: "STUDENT",
               token: token,
               college: "CodeArena University",

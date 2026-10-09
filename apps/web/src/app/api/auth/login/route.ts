@@ -91,12 +91,21 @@ export async function POST(req: NextRequest) {
     );
 
     if (registeredUser) {
+      // Strictly enforce password matching
+      if (registeredUser.password && registeredUser.password !== body.password) {
+        return NextResponse.json(
+          { message: "Invalid password. Please check your password and try again." },
+          { status: 401 }
+        );
+      }
+
       const token = `token_jwt_${Date.now()}`;
       const recorded = recordUserLoginEvent({
         id: registeredUser.id,
         username: registeredUser.username,
         email: registeredUser.email,
         name: registeredUser.name,
+        password: registeredUser.password,
         role: registeredUser.role,
         college: registeredUser.college,
         score: registeredUser.score,

@@ -7,6 +7,7 @@ export interface PlatformUserRecord {
   username: string;
   email: string;
   name: string;
+  password?: string;
   role: "STUDENT" | "SUPER_ADMIN" | "ADMIN" | "INSTRUCTOR";
   college?: string;
   score: number;
@@ -86,6 +87,7 @@ export function recordUserLoginEvent(user: Partial<PlatformUserRecord> & { usern
     username: user.username,
     email: user.email || existing?.email || `${user.username}@codearena.dev`,
     name: user.name || (user as any).firstName ? `${(user as any).firstName || ""} ${(user as any).lastName || ""}`.trim() : existing?.name || user.username,
+    password: user.password || existing?.password,
     role: (user.role as any) || existing?.role || "STUDENT",
     college: user.college || existing?.college || "CodeArena Academy",
     score: user.score !== undefined ? user.score : (existing?.score || 1450),
