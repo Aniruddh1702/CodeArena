@@ -305,3 +305,45 @@
   animation: float-code-3 5s ease-in-out infinite 1.2s;
 }
 
+/* 2026 Creative Welcome Visual Animations */
+@keyframes wave-hand {
+  0%, 100% { transform: rotate(0deg); }
+  20%, 60% { transform: rotate(14deg) scale(1.1); }
+  40%, 80% { transform: rotate(-10deg) scale(1.1); }
+}
+
+@keyframes welcome-orb-rotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.08); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes floating-sparkle {
+  0%, 100% { transform: translateY(0px) scale(0.9); opacity: 0.6; }
+  50% { transform: translateY(-8px) scale(1.2); opacity: 1; filter: drop-shadow(0 0 12px #f43f5e); }
+}
+
+@keyframes cosmic-halo {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.25); opacity: 0.8; }
+}
+
+.animate-wave-hand {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: wave-hand 2.2s infinite ease-in-out;
+}
+
+.animate-welcome-orb {
+  animation: welcome-orb-rotate 12s linear infinite;
+}
+
+.animate-sparkle-float {
+  animation: floating-sparkle 3s ease-in-out infinite;
+}
+
+.animate-cosmic-halo {
+  animation: cosmic-halo 4s ease-in-out infinite;
+}
+
+

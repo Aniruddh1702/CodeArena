@@ -308,16 +308,50 @@ function HolographicRadar({ stats }: { stats: { algorithms: number; dataStructur
 export default function HomePage() {
   const router = useRouter();
   const [activeAccount, setActiveAccount] = useState<UserAccount | null>(null);
+  const [userName, setUserName] = useState<string>("Coder");
   const [userStats, setUserStats] = useState({ rating: 1450, solved: 24, rank: 1, streak: 2 });
   const [matchmakingActive, setMatchmakingActive] = useState(false);
   const [matchmakingTime, setMatchmakingTime] = useState(0);
   const [contests, setContests] = useState<Contest[]>([]);
-  const [activeSectionTab, setActiveSectionTab] = useState<"ALL" | "DASHBOARD" | "BATTLES" | "CONTESTS">("ALL");
+
+  // Function to resolve user's real name from login
+  const resolveRealName = (active: UserAccount | null): string => {
+    if (active) {
+      if (active.name && active.name.trim() !== "") {
+        return active.name.trim();
+      }
+      if (active.username && active.username.trim() !== "") {
+        return active.username.trim();
+      }
+    }
+    if (typeof window !== "undefined") {
+      try {
+        const rawProf = localStorage.getItem("userProfile");
+        if (rawProf) {
+          const p = JSON.parse(rawProf);
+          if (p.name && p.name.trim() !== "") return p.name.trim();
+          if (p.username && p.username.trim() !== "") return p.username.trim();
+        }
+      } catch {}
+      try {
+        const rawUser = localStorage.getItem("user");
+        if (rawUser) {
+          const u = JSON.parse(rawUser);
+          const fullName = `${u.firstName || ""} ${u.lastName || ""}`.trim();
+          if (fullName) return fullName;
+          if (u.name && u.name.trim() !== "") return u.name.trim();
+          if (u.username && u.username.trim() !== "") return u.username.trim();
+        }
+      } catch {}
+    }
+    return "Coder";
+  };
 
   // Load account & dynamic data
   useEffect(() => {
     const active = getActiveAccount();
     setActiveAccount(active);
+    setUserName(resolveRealName(active));
 
     const stats = active ? getUserStats(active.id) : { dsaRating: 1450, problemsSolved: 12 };
     const leaderboard = getLeaderboards({
@@ -339,6 +373,7 @@ export default function HomePage() {
     const handleAccountChange = () => {
       const updated = getActiveAccount();
       setActiveAccount(updated);
+      setUserName(resolveRealName(updated));
       if (updated) {
         const uStats = getUserStats(updated.id);
         setUserStats((prev) => ({
@@ -467,78 +502,63 @@ export default function HomePage() {
       </header>
 
       <main className="relative z-10 container mx-auto px-6 py-8 space-y-12 max-w-7xl">
-        {/* ── 1. 3D HERO COMMAND BRIDGE & LIVE NEXUS STATS ── */}
-        <Tilt3DCard glowColor={tier.glow} className="p-6 md:p-8 bg-gradient-to-r from-indigo-950/60 via-[#0c1024]/90 to-purple-950/60 border-indigo-500/30">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              {/* 3D Tier Crystal Hologram */}
-              <div className="relative shrink-0">
-                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-tr ${tier.bg} p-1 shadow-[0_0_35px_rgba(99,102,241,0.5)] animate-float-3d flex items-center justify-center`}>
-                  <div className="w-full h-full rounded-2xl bg-[#080b18] flex flex-col items-center justify-center">
-                    <span className="text-2xl md:text-3xl">💎</span>
-                    <span className={`text-[9px] font-black uppercase tracking-wider ${tier.color}`}>
-                      {tier.title.split(" ")[0]}
-                    </span>
-                  </div>
+        {/* ── 1. 3D CREATIVE VISUAL WELCOME HERO ── */}
+        <Tilt3DCard glowColor="indigo" className="p-6 md:p-8 bg-gradient-to-r from-[#0b0f26]/95 via-[#120c2a]/90 to-[#0b0f26]/95 border-indigo-500/30 overflow-hidden relative">
+          {/* Ambient Cosmic Background Accents */}
+          <div className="pointer-events-none absolute -top-12 -right-12 w-64 h-64 rounded-full bg-purple-500/15 blur-3xl animate-pulse" />
+          <div className="pointer-events-none absolute -bottom-12 -left-12 w-64 h-64 rounded-full bg-indigo-500/15 blur-3xl animate-pulse" />
+
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+            {/* Left / Center Greeting Content */}
+            <div className="flex items-center gap-5 sm:gap-6">
+              {/* 3D Holographic Avatar Crystal / Orb Visual */}
+              <div className="relative shrink-0 flex items-center justify-center">
+                {/* Rotating Conic Energy Ring */}
+                <div className="absolute -inset-2 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 opacity-60 blur-md animate-welcome-orb" />
+                
+                {/* 3D Glass Crystal Orb */}
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#090d1f] border-2 border-indigo-400/40 shadow-[0_0_35px_rgba(99,102,241,0.5)] flex items-center justify-center overflow-hidden">
+                  {/* Internal Cosmic Halo */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/10 animate-cosmic-halo" />
+                  
+                  {/* User Initial or 3D Avatar Symbol */}
+                  <span className="relative z-10 text-2xl sm:text-3xl font-black bg-gradient-to-tr from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">
+                    {(userName[0] || "C").toUpperCase()}
+                  </span>
+
+                  {/* Shimmer Overlay */}
+                  <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-hologram-scan pointer-events-none" />
                 </div>
-                <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-md bg-emerald-500 text-[9px] font-black text-black shadow-md">
-                  ONLINE
+
+                {/* Floating Micro Sparkles */}
+                <span className="absolute -top-1.5 -right-1.5 text-xs animate-sparkle-float text-amber-300">
+                  ✨
+                </span>
+                <span className="absolute -bottom-1 -left-1 text-[10px] animate-sparkle-float text-purple-300" style={{ animationDelay: "1.5s" }}>
+                  ⭐
                 </span>
               </div>
 
+              {/* Real Welcome Message with User's Login Name */}
               <div className="space-y-1">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
-                    {activeAccount ? `Welcome, ${activeAccount.name || activeAccount.username}!` : "CodeArena 2026 Command Nexus"}
-                  </h1>
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border border-white/10 ${tier.color} bg-white/5`}>
-                    ✦ {tier.title}
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
+                  Welcome,{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">
+                    {userName}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold font-mono">
-                    Rank #{userStats.rank}
-                  </span>
-                </div>
-                <p className="text-xs md:text-sm text-slate-300 max-w-xl leading-relaxed">
-                  All platform modules consolidated into a 3D command matrix. Engage in live 1v1 battle duels, conquer 150 DSA problems, enter high-stakes contests, and track your global standing.
-                </p>
+                  ! <span className="animate-wave-hand">👋</span>
+                </h1>
               </div>
             </div>
 
-            {/* Quick Action Triggers */}
-            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-              <button
-                onClick={() => setMatchmakingActive(!matchmakingActive)}
-                className={`flex-1 sm:flex-none px-6 py-3 rounded-xl font-bold text-xs tracking-wide shadow-lg transition-all flex items-center justify-center gap-2 ${
-                  matchmakingActive
-                    ? "bg-rose-500 text-white shadow-rose-500/40 animate-pulse"
-                    : "bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-[0_0_25px_rgba(244,63,94,0.4)] hover:shadow-[0_0_35px_rgba(244,63,94,0.7)]"
-                }`}
-              >
-                {matchmakingActive ? (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-white animate-spin" />
-                    Searching ({matchmakingTime}s)... Cancel
-                  </>
-                ) : (
-                  <>
-                    <span>⚔️</span> Quick 1v1 Duel
-                  </>
-                )}
-              </button>
-
-              <button
-                onClick={() => router.push("/problems")}
-                className="flex-1 sm:flex-none px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold text-xs shadow-[0_0_20px_rgba(99,102,241,0.35)] transition-all flex items-center justify-center gap-2"
-              >
-                <span>⚡</span> Practice 150 DSA
-              </button>
-
-              <button
-                onClick={() => router.push("/contests")}
-                className="flex-1 sm:flex-none px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-amber-500/40 text-amber-300 font-bold text-xs transition-all flex items-center justify-center gap-2"
-              >
-                <span>🏆</span> Contests
-              </button>
+            {/* Right Side 3D Creative Visual Elements (Particles & Glowing Tech Accents) */}
+            <div className="hidden lg:flex items-center gap-3 relative">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span className="text-xs font-mono font-bold text-slate-300">
+                  Arena Session Active
+                </span>
+              </div>
             </div>
           </div>
         </Tilt3DCard>
