@@ -881,6 +881,87 @@ export default function HomePage() {
             </div>
           </Tilt3DCard>
         </div>
+
+        {/* ── 3. FULL-WIDTH 3D DASHBOARD COMMAND BAR ── */}
+        <Tilt3DCard
+          glowColor="indigo"
+          className="p-6 md:p-8 bg-gradient-to-r from-[#0c102a]/95 via-[#111638]/90 to-[#0c102a]/95 border-indigo-500/30 overflow-hidden relative group"
+        >
+          {/* Subtle Ambient Radial Light */}
+          <div className="pointer-events-none absolute -right-20 -top-20 w-80 h-80 rounded-full bg-indigo-600/15 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-purple-600/15 blur-3xl" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+            {/* Left: Icon & Section Details */}
+            <div className="flex items-center gap-5 w-full lg:w-auto">
+              <div className="relative shrink-0">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 p-0.5 shadow-[0_0_30px_rgba(99,102,241,0.5)] flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <div className="w-full h-full rounded-2xl bg-[#090d20] flex items-center justify-center text-2xl sm:text-3xl">
+                    📊
+                  </div>
+                </div>
+                <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#090d20] shadow-[0_0_8px_#34d399]" />
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <span className="text-xs font-mono font-bold text-indigo-400 uppercase tracking-widest">
+                    Command Telemetry
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold font-mono">
+                    LIVE METRICS
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight group-hover:text-indigo-300 transition-colors">
+                  Personal Student Dashboard
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
+                  Inspect your real-time problem-solving timeline, submission verdicts, topic proficiency radar, and peer ranking telemetry.
+                </p>
+              </div>
+            </div>
+
+            {/* Center: Live Quick Stats Chips */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto shrink-0">
+              <div className="p-3 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">DSA Rating</span>
+                <span className="text-base sm:text-lg font-black text-indigo-400 font-mono">
+                  {userStats.rating}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">Solved</span>
+                <span className="text-base sm:text-lg font-black text-emerald-400 font-mono">
+                  {userStats.solved}<span className="text-xs text-slate-500">/150</span>
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">Global Rank</span>
+                <span className="text-base sm:text-lg font-black text-amber-400 font-mono">
+                  #{userStats.rank}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">Active Streak</span>
+                <span className="text-base sm:text-lg font-black text-rose-400 font-mono">
+                  {userStats.streak} Days 🔥
+                </span>
+              </div>
+            </div>
+
+            {/* Right: Action CTA */}
+            <div className="w-full lg:w-auto flex items-center justify-end">
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="w-full lg:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-600 hover:from-indigo-600 hover:to-pink-700 text-white font-bold text-xs tracking-wide shadow-[0_0_25px_rgba(99,102,241,0.4)] hover:shadow-[0_0_35px_rgba(99,102,241,0.7)] hover:scale-105 transition-all flex items-center justify-center gap-2"
+              >
+                <span>⚡</span>
+                <span>Open Dashboard</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
+          </div>
+        </Tilt3DCard>
       </main>
 
       {/* ── 2026 Glassmorphism Footer ── */}
