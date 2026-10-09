@@ -92,86 +92,127 @@ export function AccountSwitcher() {
         size="sm"
         variant="outline"
         onClick={() => router.push("/login")}
-        className="text-xs h-8"
+        className="text-xs h-9 px-4 rounded-xl border-indigo-500/40 bg-indigo-950/40 hover:bg-indigo-600 hover:text-white font-bold transition-all shadow-[0_0_15px_rgba(99,102,241,0.3)]"
       >
-        Sign In
+        <span>⚡</span> Sign In
       </Button>
     );
   }
 
+  // Resolve authentic login name
+  const resolveDisplayName = (acc: UserAccount): string => {
+    if (acc.name && acc.name !== "CodeArena Student" && acc.name.trim() !== "") {
+      return acc.name.trim();
+    }
+    if (acc.username && acc.username !== "student" && acc.username.trim() !== "") {
+      return acc.username.trim();
+    }
+    if (typeof window !== "undefined") {
+      try {
+        const rawProf = localStorage.getItem("userProfile");
+        if (rawProf) {
+          const p = JSON.parse(rawProf);
+          if (p.name && p.name !== "CodeArena Student" && p.name.trim() !== "") return p.name.trim();
+          if (p.username && p.username.trim() !== "") return p.username.trim();
+        }
+      } catch {}
+      try {
+        const rawUser = localStorage.getItem("user");
+        if (rawUser) {
+          const u = JSON.parse(rawUser);
+          const fullName = `${u.firstName || ""} ${u.lastName || ""}`.trim();
+          if (fullName) return fullName;
+          if (u.username) return u.username;
+        }
+      } catch {}
+    }
+    return acc.name || acc.username || "Coder";
+  };
+
+  const displayName = resolveDisplayName(activeAccount);
   const activeStats = getUserStats(activeAccount.id);
-  const initial = (activeAccount.name || activeAccount.username || "U")[0]?.toUpperCase();
+  const initial = (displayName || "U")[0]?.toUpperCase();
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Account Trigger Button */}
-      <div className="flex items-center rounded-full bg-secondary/60 hover:bg-secondary border border-border/80 transition-all hover:border-primary/40 shadow-sm group">
+      {/* 2026 3D Holographic Account Trigger Button */}
+      <div className="flex items-center rounded-2xl bg-gradient-to-r from-[#0c102a]/95 via-[#130f30]/90 to-[#0c102a]/95 border border-indigo-500/40 hover:border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:shadow-[0_0_28px_rgba(99,102,241,0.45)] transition-all group backdrop-blur-xl p-1 pr-3">
+        {/* Holographic 3D Avatar Capsule */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             router.push('/profile');
           }}
-          className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-primary-foreground font-black text-xs shadow-sm hover:scale-105 transition-transform ml-1 cursor-pointer"
+          className="relative h-8 w-8 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 p-0.5 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform cursor-pointer shrink-0"
           title="Open Full Profile (Click avatar)"
         >
-          {initial}
+          <div className="w-full h-full rounded-[10px] bg-[#090d20] flex items-center justify-center text-white font-black text-xs">
+            {initial}
+          </div>
+          <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-[#090d20] shadow-[0_0_6px_#34d399]" />
         </button>
+
+        {/* Name & Live Elo Telemetry */}
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center gap-2 px-2.5 py-1.5 text-left"
+          className="flex items-center gap-2 pl-2 text-left"
           title="Switch accounts or view profile"
         >
-          <div className="hidden sm:block text-left leading-tight">
-            <div className="text-xs font-bold text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5">
-              <span>{activeAccount.name || activeAccount.username}</span>
+          <div className="text-left leading-tight">
+            <div className="text-xs font-black text-white group-hover:text-indigo-300 transition-colors flex items-center gap-1.5">
+              <span className="truncate max-w-[130px]">{displayName}</span>
               {accounts.length > 1 && (
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/20 text-primary font-mono font-bold">
+                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-indigo-500/25 text-indigo-300 font-mono font-bold border border-indigo-500/30">
                   +{accounts.length - 1}
                 </span>
               )}
             </div>
-            <div className="text-[10px] text-muted-foreground font-mono">
-              {activeStats.dsaRating} pts • {activeStats.problemsSolved} solved
+            <div className="text-[10px] font-mono text-slate-300/80 flex items-center gap-1.5 mt-0.5">
+              <span className="text-indigo-400 font-bold">{activeStats.dsaRating} pts</span>
+              <span className="text-slate-500">•</span>
+              <span className="text-emerald-400 font-bold">{activeStats.problemsSolved} solved</span>
             </div>
           </div>
-          <span className="text-muted-foreground text-xs ml-0.5 transition-transform duration-200 group-hover:text-foreground">
-            {open ? "▲" : "▼"}
+          <span className={`text-slate-400 text-xs ml-1 transition-transform duration-200 group-hover:text-white ${open ? "rotate-180" : ""}`}>
+            ▼
           </span>
         </button>
       </div>
 
       {/* Dropdown Menu */}
       {open && (
-        <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-card/95 backdrop-blur-xl border border-border/80 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute right-0 mt-3 w-84 rounded-3xl bg-[#090d20]/95 backdrop-blur-2xl border border-indigo-500/40 shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           {/* Prominent Profile Access Card */}
-          <div className="p-3 border-b border-border/60 bg-gradient-to-r from-primary/15 via-secondary/50 to-purple-600/15">
+          <div className="p-3.5 border-b border-white/10 bg-gradient-to-r from-indigo-950/60 via-[#0d122b] to-purple-950/60">
             <button
               onClick={() => {
                 setOpen(false);
                 router.push("/profile");
               }}
-              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-card border border-primary/40 hover:border-primary hover:shadow-lg transition-all group text-left shadow-sm"
+              className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/[0.04] border border-indigo-500/30 hover:border-indigo-400 hover:bg-white/[0.08] transition-all group text-left shadow-lg"
               title="Open full profile, heatmap, badges, and submissions"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-primary-foreground font-black text-sm shadow-md shrink-0 group-hover:scale-105 transition-transform">
-                  {initial}
+                <div className="h-11 w-11 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 p-0.5 shadow-md shrink-0 group-hover:scale-105 transition-transform flex items-center justify-center">
+                  <div className="w-full h-full rounded-[10px] bg-[#090d20] flex items-center justify-center text-white font-black text-sm">
+                    {initial}
+                  </div>
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                      {activeAccount.name || activeAccount.username}
+                    <span className="text-xs font-black text-white group-hover:text-indigo-300 transition-colors truncate">
+                      {displayName}
                     </span>
                     <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
                       Active
                     </span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground truncate">
-                    @{activeAccount.username} • {activeStats.dsaRating} rating
+                  <p className="text-[11px] font-mono text-slate-400 truncate">
+                    @{activeAccount.username} • <span className="text-indigo-400 font-bold">{activeStats.dsaRating} rating</span>
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-xs font-bold text-primary group-hover:translate-x-1 transition-transform shrink-0 ml-2">
+              <div className="flex items-center gap-1 text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2">
                 <span>Profile</span>
                 <span>&rarr;</span>
               </div>

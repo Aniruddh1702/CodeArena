@@ -85,16 +85,18 @@ export function NotificationCenter() {
   return (
     <>
       <div className="relative" ref={dropdownRef}>
-        {/* Bell Button */}
+        {/* 2026 3D Holographic Bell Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="relative p-2 rounded-lg bg-secondary/60 hover:bg-secondary border border-border text-foreground transition-all flex items-center justify-center h-8 w-8"
+          className="relative h-10 w-10 rounded-2xl bg-gradient-to-r from-[#0c102a]/95 via-[#130f30]/90 to-[#0c102a]/95 border border-indigo-500/40 hover:border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:shadow-[0_0_28px_rgba(99,102,241,0.45)] transition-all flex items-center justify-center text-amber-300 group backdrop-blur-xl"
           title="Contest Notifications & Gmail Reminders"
           aria-label="Notifications"
         >
-          <span className="text-sm">🔔</span>
+          <span className="text-base group-hover:scale-110 group-hover:rotate-12 transition-transform drop-shadow-[0_0_10px_rgba(245,158,11,0.6)]">
+            🔔
+          </span>
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full bg-rose-500 text-white font-mono font-black text-[9px] min-w-[16px] text-center shadow-md animate-pulse">
+            <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-600 text-white font-mono font-black text-[9px] min-w-[18px] text-center shadow-[0_0_12px_rgba(244,63,94,0.8)] border border-white/40 animate-pulse">
               {unreadCount}
             </span>
           )}
@@ -102,7 +104,7 @@ export function NotificationCenter() {
 
         {/* Dropdown Panel */}
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-card border border-border/90 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-3xl bg-[#090d20]/95 backdrop-blur-2xl border border-indigo-500/40 shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Header */}
             <div className="p-3 border-b border-border/80 bg-secondary/40 flex flex-col gap-2">
               <div className="flex items-center justify-between">

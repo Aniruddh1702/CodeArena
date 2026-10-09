@@ -373,8 +373,34 @@ export default function ProfilePage() {
       return;
     }
 
+    let authenticName = active.name;
+    if (!authenticName || authenticName === "CodeArena Student") {
+      try {
+        const rawProf = localStorage.getItem("userProfile");
+        if (rawProf) {
+          const p = JSON.parse(rawProf);
+          if (p.name && p.name !== "CodeArena Student" && p.name.trim() !== "") authenticName = p.name.trim();
+        }
+      } catch {}
+      if (!authenticName || authenticName === "CodeArena Student") {
+        try {
+          const rawUser = localStorage.getItem("user");
+          if (rawUser) {
+            const u = JSON.parse(rawUser);
+            const fullName = `${u.firstName || ""} ${u.lastName || ""}`.trim();
+            if (fullName) authenticName = fullName;
+            else if (u.username) authenticName = u.username;
+          }
+        } catch {}
+      }
+    }
+    if (!authenticName || authenticName === "CodeArena Student") {
+      if (active.username && active.username !== "student") authenticName = active.username;
+      else authenticName = active.name || active.username || "Student";
+    }
+
     const activeProfile: UserProfile = {
-      name: active.name || active.username,
+      name: authenticName,
       username: active.username,
       email: active.email,
       bio: active.bio || "Competitive Programmer & DSA Enthusiast",
@@ -397,7 +423,7 @@ export default function ProfilePage() {
     // Dynamic global rank
     const lb = getLeaderboards({
       username: active.username,
-      name: active.name,
+      name: authenticName,
       org: activeProfile.organization,
       score: stats.dsaRating,
       problemsSolved: stats.problemsSolved,
