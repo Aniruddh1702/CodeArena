@@ -76,6 +76,98 @@ function getDailyChallenge(solvedProblems: any[] = []) {
   };
 }
 
+// ── Genuine Topic-Specific Roadmap Calculation ──
+function calculateTopicMilestones(solvedProblems: any[] = []) {
+  const solvedSlugs = new Set<string>();
+  (solvedProblems || []).forEach((p) => {
+    const s = typeof p === "string" ? p : p?.slug || p?.id || "";
+    const clean = s.toLowerCase().trim();
+    if (clean) solvedSlugs.add(clean);
+  });
+
+  let arraysCount = 0;
+  let treesCount = 0;
+  let graphsCount = 0;
+  let dpCount = 0;
+
+  solvedSlugs.forEach((slug) => {
+    const prob = getProblem(slug) || PROBLEMS_DATABASE[slug];
+    if (!prob) {
+      if (/array|two-sum|container|subsequence|window|sort|product|water/i.test(slug)) arraysCount++;
+      if (/tree|bst|trie|invert|order|depth/i.test(slug)) treesCount++;
+      if (/graph|island|dijkstra|path|network|cycle/i.test(slug)) graphsCount++;
+      if (/coin|robber|dp|climb|palindrom|jump|knapsack/i.test(slug)) dpCount++;
+      return;
+    }
+
+    const topicNames = (prob.topics || []).map((t: any) => (t.name || "").toLowerCase());
+    const isArrayMatch = topicNames.some((t) => /array|two pointer|sliding window|prefix sum|hash|matrix/i.test(t));
+    const isTreeMatch = topicNames.some((t) => /tree|binary search|trie|bst/i.test(t));
+    const isGraphMatch = topicNames.some((t) => /graph|breadth-first|depth-first|union find|disjoint|topological/i.test(t));
+    const isDpMatch = topicNames.some((t) => /dynamic programming|dp|memoization/i.test(t));
+
+    if (isArrayMatch) arraysCount++;
+    if (isTreeMatch) treesCount++;
+    if (isGraphMatch) graphsCount++;
+    if (isDpMatch) dpCount++;
+  });
+
+  return [
+    {
+      id: "lvl_1",
+      name: "Arrays & Two Pointers",
+      desc: "Sliding Window, Prefix Sum & Hash Maps",
+      totalCount: 18,
+      solvedCount: arraysCount,
+      problems: `${arraysCount}/18 Solved`,
+      progress: Math.min(100, Math.round((arraysCount / 18) * 100)),
+      badge: "FOUNDATION",
+      color: "from-blue-500 to-indigo-600",
+      tag: "Arrays",
+      icon: "🛡️",
+    },
+    {
+      id: "lvl_2",
+      name: "Trees & Binary Search",
+      desc: "Binary Search Trees, DFS/BFS & Recursion",
+      totalCount: 24,
+      solvedCount: treesCount,
+      problems: `${treesCount}/24 Solved`,
+      progress: Math.min(100, Math.round((treesCount / 24) * 100)),
+      badge: "CORE",
+      color: "from-emerald-500 to-teal-600",
+      tag: "Trees",
+      icon: "🌳",
+    },
+    {
+      id: "lvl_3",
+      name: "Graphs & Shortest Path",
+      desc: "Dijkstra, Topological Sort & Disjoint Set",
+      totalCount: 20,
+      solvedCount: graphsCount,
+      problems: `${graphsCount}/20 Solved`,
+      progress: Math.min(100, Math.round((graphsCount / 20) * 100)),
+      badge: "ADVANCED",
+      color: "from-purple-500 to-pink-600",
+      tag: "Graphs",
+      icon: "🕸️",
+    },
+    {
+      id: "lvl_4",
+      name: "Dynamic Programming",
+      desc: "1D/2D DP, Subsequences & Knapsack",
+      totalCount: 28,
+      solvedCount: dpCount,
+      problems: `${dpCount}/28 Solved`,
+      progress: Math.min(100, Math.round((dpCount / 28) * 100)),
+      badge: "GRANDMASTER",
+      color: "from-amber-500 to-red-600",
+      tag: "Dynamic Programming",
+      icon: "🧠",
+    },
+  ];
+}
+
 // ── 3D Interactive Tilt Card with Multi-Layer Depth Parallax ──
 function TiltCard({
   children,
@@ -493,6 +585,12 @@ export default function DashboardPage() {
         const baseAccuracy = solvedCount > 0 ? 88.4 : 0.0;
         const currentStreak = solvedCount > 0 ? 2 : 0;
 
+        const roadmap = calculateTopicMilestones(userStats.solvedProblems);
+        const arraysCount = roadmap[0].solvedCount;
+        const treesCount = roadmap[1].solvedCount;
+        const graphsCount = roadmap[2].solvedCount;
+        const dpCount = roadmap[3].solvedCount;
+
         setData({
           greeting: `Welcome back, ${currentUserName}!`,
           currentUserName,
@@ -503,60 +601,15 @@ export default function DashboardPage() {
           currentStreak: currentStreak,
           recentActivity: activities,
           radarStats: {
-            algorithms: Math.min(95, 45 + solvedCount * 5),
-            dataStructures: Math.min(92, 50 + solvedCount * 4),
-            speed: Math.min(88, 60 + solvedCount * 3),
-            problemSolving: Math.min(96, 55 + solvedCount * 4),
-            dpOptimization: Math.min(85, 35 + solvedCount * 5),
-            mathLogic: Math.min(90, 48 + solvedCount * 4),
+            algorithms: Math.min(100, Math.max(35, 35 + (graphsCount + arraysCount) * 6)),
+            dataStructures: Math.min(100, Math.max(40, 40 + (arraysCount + treesCount) * 5)),
+            speed: Math.min(100, Math.max(45, 45 + solvedCount * 3)),
+            problemSolving: Math.min(100, Math.max(45, 45 + solvedCount * 4)),
+            dpOptimization: Math.min(100, Math.max(25, 25 + dpCount * 12)),
+            mathLogic: Math.min(100, Math.max(40, 40 + solvedCount * 3)),
           },
           dailyChallenge: getDailyChallenge(userStats.solvedProblems),
-          roadmapLevels: [
-            {
-              id: "lvl_1",
-              name: "Arrays & Two Pointers",
-              desc: "Sliding Window, Prefix Sum & Hash Maps",
-              problems: "18 Problems",
-              progress: Math.min(100, Math.max(15, solvedCount * 25)),
-              badge: "FOUNDATION",
-              color: "from-blue-500 to-indigo-600",
-              tag: "Arrays",
-              icon: "🛡️",
-            },
-            {
-              id: "lvl_2",
-              name: "Trees & Binary Search",
-              desc: "Binary Search Trees, DFS/BFS & Recursion",
-              problems: "24 Problems",
-              progress: Math.min(100, Math.max(10, solvedCount * 18)),
-              badge: "CORE",
-              color: "from-emerald-500 to-teal-600",
-              tag: "Trees",
-              icon: "🌳",
-            },
-            {
-              id: "lvl_3",
-              name: "Graphs & Shortest Path",
-              desc: "Dijkstra, Topological Sort & Disjoint Set",
-              problems: "20 Problems",
-              progress: Math.min(100, Math.max(5, solvedCount * 12)),
-              badge: "ADVANCED",
-              color: "from-purple-500 to-pink-600",
-              tag: "Graphs",
-              icon: "🕸️",
-            },
-            {
-              id: "lvl_4",
-              name: "Dynamic Programming",
-              desc: "1D/2D DP, Subsequences & Knapsack",
-              problems: "28 Problems",
-              progress: Math.min(100, Math.max(0, solvedCount * 8)),
-              badge: "GRANDMASTER",
-              color: "from-amber-500 to-red-600",
-              tag: "Dynamic Programming",
-              icon: "🧠",
-            },
-          ],
+          roadmapLevels: roadmap,
         });
       } catch (err: any) {
         setError(err.message || "Failed to load dashboard");
@@ -1054,7 +1107,7 @@ export default function DashboardPage() {
                     <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
                       <div
                         className={`h-full bg-gradient-to-r ${lvl.color} rounded-full transition-all duration-700`}
-                        style={{ width: `${Math.max(6, lvl.progress)}%` }}
+                        style={{ width: lvl.progress === 0 ? "0%" : `${Math.max(4, lvl.progress)}%` }}
                       />
                     </div>
                   </div>
