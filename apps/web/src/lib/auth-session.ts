@@ -431,3 +431,37 @@ export function saveUserProblemSubmission(userId: string, slug: string, submissi
   const updated = [submission, ...existing].slice(0, 30);
   localStorage.setItem(getUserScopedKey(safeId, `submissions_${slug}`), JSON.stringify(updated));
 }
+
+/**
+ * Update user rating directly (e.g. from battle victories or tournament results)
+ * Ensures scoped isolation, activity logging, and real-time reactive event dispatch.
+ */
+export function updateUserRating(userId: string, newRating: number, activityItem?: any): number {
+  if (typeof window === "undefined") return newRating;
+  const safeId = (userId || "default").replace(/[^a-zA-Z0-9_-]/g, "_");
+  const clampedRating = Math.max(1000, Math.round(newRating));
+
+  localStorage.setItem(getUserScopedKey(safeId, "dsaRating"), clampedRating.toString());
+
+  // If activity item is provided, append it to user's recentActivity
+  if (activityItem) {
+    const stats = getUserStats(safeId);
+    const updatedActivity = [
+      activityItem,
+      ...stats.recentActivity.filter((a: any) => a.id && a.id !== activityItem.id)
+    ].slice(0, 20);
+    localStorage.setItem(getUserScopedKey(safeId, "recentActivity"), JSON.stringify(updatedActivity));
+  }
+
+  // Also sync current active legacy keys if matching active user
+  const activeAcc = getActiveAccount();
+  if (activeAcc && (activeAcc.id === userId || activeAcc.username === userId)) {
+    localStorage.setItem("dsaRating", clampedRating.toString());
+  }
+
+  // Dispatch account change event so Dashboard, Profile, and Header reflect the new rating instantly
+  window.dispatchEvent(new CustomEvent("codearena_account_changed", { detail: activeAcc }));
+
+  return clampedRating;
+}
+
