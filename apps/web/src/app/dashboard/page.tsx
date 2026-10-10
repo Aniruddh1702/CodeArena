@@ -8,6 +8,73 @@ import { getActiveAccount, getUserStats, UserAccount } from "@/lib/auth-session"
 import { getContests, Contest } from "@/lib/contests-data";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { getProblem, PROBLEMS_DATABASE } from "@/lib/problems-data";
+
+// ── Daily Rotating Challenge Pool & Deterministic Date Selector ──
+const POTD_ROTATING_SLUGS = [
+  "two-sum",
+  "container-with-most-water",
+  "longest-palindromic-substring",
+  "coin-change",
+  "maximum-subarray",
+  "search-in-rotated-sorted-array",
+  "merge-intervals",
+  "climbing-stairs",
+  "valid-parentheses",
+  "trapping-rain-water",
+  "number-of-islands",
+  "reverse-linked-list",
+  "longest-substring-without-repeating-characters",
+  "best-time-to-buy-and-sell-stock",
+  "binary-tree-level-order-traversal",
+  "kth-largest-element-in-an-array",
+  "house-robber",
+  "min-stack",
+  "rotate-image",
+  "subsets",
+  "combination-sum",
+  "palindromic-substrings",
+  "product-of-array-except-self",
+  "area-of-triangle",
+  "area-of-circle",
+  "check-voting-eligibility"
+];
+
+function getDailyChallenge(solvedProblems: any[] = []) {
+  const now = new Date();
+  const epoch = Date.UTC(2026, 0, 1);
+  const currentUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const dayIndex = Math.max(0, Math.floor((currentUtc - epoch) / (1000 * 60 * 60 * 24)));
+
+  const selectedSlug = POTD_ROTATING_SLUGS[dayIndex % POTD_ROTATING_SLUGS.length];
+  const problem = getProblem(selectedSlug) || PROBLEMS_DATABASE[selectedSlug] || PROBLEMS_DATABASE["two-sum"];
+
+  const isSolved = (solvedProblems || []).some(
+    (p: any) => (p.slug && p.slug === selectedSlug) || p === selectedSlug || p.id === selectedSlug
+  );
+
+  const formattedDate = now.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+
+  const cleanSnippet = (problem?.description || "Solve today's featured problem to maintain your streak.")
+    .replace(/[`#*]/g, "")
+    .trim()
+    .slice(0, 140);
+
+  return {
+    title: problem?.title || "Daily Algorithm Challenge",
+    slug: selectedSlug,
+    difficulty: problem?.difficulty || "MEDIUM",
+    points: problem?.difficulty === "HARD" ? 300 : problem?.difficulty === "MEDIUM" ? 200 : 100,
+    topics: (problem?.topics || []).map((t: any) => t.name).slice(0, 3),
+    snippet: cleanSnippet + (cleanSnippet.length >= 140 ? "..." : ""),
+    bonus: "+100 XP Daily Boost",
+    date: formattedDate,
+    isSolved,
+  };
+}
 
 // ── 3D Interactive Tilt Card with Multi-Layer Depth Parallax ──
 function TiltCard({
@@ -443,15 +510,7 @@ export default function DashboardPage() {
             dpOptimization: Math.min(85, 35 + solvedCount * 5),
             mathLogic: Math.min(90, 48 + solvedCount * 4),
           },
-          dailyChallenge: {
-            title: "Container With Most Water",
-            slug: "container-with-most-water",
-            difficulty: "MEDIUM",
-            points: 200,
-            topics: ["Arrays", "Two Pointers", "Greedy"],
-            snippet: "Find two lines that together with the x-axis form a container such that the container contains the maximum water.",
-            bonus: "+100 XP Daily Boost",
-          },
+          dailyChallenge: getDailyChallenge(userStats.solvedProblems),
           roadmapLevels: [
             {
               id: "lvl_1",
@@ -758,8 +817,12 @@ export default function DashboardPage() {
               {data.currentStreak} <span className="text-2xl font-sans">🔥</span>
             </div>
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5 text-[11px]">
-              <span className="text-slate-300">Daily Challenge</span>
-              <span className="font-mono text-amber-400 font-bold">Ready</span>
+              <span className="text-slate-300">Daily Challenge ({data.dailyChallenge.date})</span>
+              <span className={`font-mono font-bold ${
+                data.dailyChallenge.isSolved ? "text-emerald-400" : "text-amber-400"
+              }`}>
+                {data.dailyChallenge.isSolved ? "Solved ✓" : "Ready"}
+              </span>
             </div>
           </TiltCard>
         </div>
@@ -767,24 +830,49 @@ export default function DashboardPage() {
         {/* ── 3. CORE 2026 ARENA: POTD & 1V1 DUELIST (CLEAN 2-COLUMN) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Card A: 3D Problem of the Day (POTD) */}
-          <TiltCard glowColor="indigo" className="p-6 bg-gradient-to-br from-indigo-950/40 via-[#0c1024]/90 to-[#0c1024]/90 border-indigo-500/30 flex flex-col justify-between">
+          <TiltCard 
+            glowColor={data.dailyChallenge.isSolved ? "emerald" : "indigo"} 
+            className={`p-6 bg-gradient-to-br from-indigo-950/40 via-[#0c1024]/90 to-[#0c1024]/90 flex flex-col justify-between transition-all ${
+              data.dailyChallenge.isSolved 
+                ? "border-emerald-500/40 shadow-[0_0_25px_rgba(16,185,129,0.15)]" 
+                : "border-indigo-500/30"
+            }`}
+          >
             <div className="space-y-3.5">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-black uppercase">
-                    ⭐ Problem of the Day
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-black uppercase font-mono">
+                    ⭐ POTD • {data.dailyChallenge.date}
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
+                    data.dailyChallenge.difficulty === "HARD"
+                      ? "bg-rose-500/20 text-rose-300 border-rose-500/30"
+                      : data.dailyChallenge.difficulty === "MEDIUM"
+                      ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                      : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                  }`}>
                     {data.dailyChallenge.difficulty}
                   </span>
+                  {data.dailyChallenge.isSolved && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase flex items-center gap-1 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                      <span>✓</span> SOLVED
+                    </span>
+                  )}
                 </div>
-                <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                  {data.dailyChallenge.bonus}
+                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded border ${
+                  data.dailyChallenge.isSolved
+                    ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/30"
+                    : "text-amber-400 bg-amber-500/10 border-amber-500/30"
+                }`}>
+                  {data.dailyChallenge.isSolved ? "+100 XP Claimed ✓" : data.dailyChallenge.bonus}
                 </span>
               </div>
 
-              <h3 className="text-xl font-black text-white tracking-tight">
-                {data.dailyChallenge.title}
+              <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+                <span>{data.dailyChallenge.title}</span>
+                {data.dailyChallenge.isSolved && (
+                  <span className="text-sm text-emerald-400 font-sans">✓</span>
+                )}
               </h3>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
@@ -802,14 +890,26 @@ export default function DashboardPage() {
 
             <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
               <span className="text-xs text-slate-400 font-mono">
-                +200 XP upon solve
+                {data.dailyChallenge.isSolved ? "Challenge solved for today" : `+${data.dailyChallenge.points} XP upon solve`}
               </span>
 
               <button
                 onClick={() => router.push(`/problems/${data.dailyChallenge.slug}`)}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold text-xs shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] transition-all flex items-center justify-center gap-2"
+                className={`px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+                  data.dailyChallenge.isSolved
+                    ? "bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)]"
+                    : "bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)]"
+                }`}
               >
-                <span>🚀</span> Solve in IDE &rarr;
+                {data.dailyChallenge.isSolved ? (
+                  <>
+                    <span>✓</span> Review Solution in IDE &rarr;
+                  </>
+                ) : (
+                  <>
+                    <span>🚀</span> Solve in IDE &rarr;
+                  </>
+                )}
               </button>
             </div>
           </TiltCard>
