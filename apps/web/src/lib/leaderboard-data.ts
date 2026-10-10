@@ -287,18 +287,5 @@ export function getPublicProfileData(
     return cachedMatch;
   }
 
-  // 4. Default authentic profile for a real registered username
-  const cleanName = normalized.replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return {
-    userId: `user_${normalized}`,
-    username: normalized,
-    name: cleanName,
-    org: "CodeArena Academy",
-    score: 1450,
-    problemsSolved: 0,
-    accuracy: 0.0,
-    tier: "Specialist",
-    bio: `Competitive coder @${normalized} on CodeArena.`,
-    joinedAt: "Registered Coder"
-  };
+  return null;
 }

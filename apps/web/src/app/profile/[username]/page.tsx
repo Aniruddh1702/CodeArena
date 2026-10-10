@@ -229,9 +229,11 @@ export default function PublicProfilePage({ params }: { params: { username: stri
       };
     }
 
-    const data = getPublicProfileData(params.username, currentUserStats);
-    setProfile(data);
-    setLoading(false);
+    const localData = getPublicProfileData(params.username, currentUserStats);
+    if (localData) {
+      setProfile(localData);
+      setLoading(false);
+    }
 
     fetch("/api/leaderboard")
       .then((res) => res.json())
@@ -254,13 +256,24 @@ export default function PublicProfilePage({ params }: { params: { username: stri
               bio: `Competitive programmer @${match.username} on CodeArena.`,
               joinedAt: "Registered Coder",
             } as LeaderboardUser));
+          } else if (!localData) {
+            setProfile(null);
           }
+        } else if (!localData) {
+          setProfile(null);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!localData) {
+          setProfile(null);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [params.username]);
 
-  if (loading || !profile) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#070913] flex justify-center items-center">
         <div className="flex flex-col items-center gap-4">
@@ -269,6 +282,105 @@ export default function PublicProfilePage({ params }: { params: { username: stri
             Fetching Profile Telemetry...
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-[#070913] text-foreground selection:bg-indigo-500/30 relative overflow-x-hidden flex flex-col justify-between">
+        <CyberMesh3D />
+
+        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+          <div className="absolute -top-[20%] left-[20%] w-[650px] h-[650px] rounded-full bg-rose-600/10 blur-[150px] animate-glow-pulse" />
+          <div className="absolute top-[35%] -right-[10%] w-[550px] h-[550px] rounded-full bg-purple-600/12 blur-[150px] animate-glow-pulse" />
+          <div className="absolute bottom-[10%] left-[10%] w-[550px] h-[550px] rounded-full bg-indigo-600/10 blur-[140px] animate-glow-pulse" />
+        </div>
+
+        {/* Header */}
+        <header className="sticky top-0 z-50 border-b border-white/10 bg-[#070913]/70 backdrop-blur-2xl">
+          <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+            <Link href="/dashboard" className="group flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
+                <span className="text-white text-base font-black">C</span>
+              </div>
+              <span className="font-extrabold text-xl tracking-tight text-white">
+                Code<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">Arena</span>
+              </span>
+            </Link>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => router.push("/leaderboard")}
+                className="px-4 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 transition-all"
+              >
+                ← Back to Leaderboard
+              </button>
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition-all"
+              >
+                My Dashboard
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Main 404 Container */}
+        <main className="relative z-10 container mx-auto px-6 py-20 flex items-center justify-center flex-1">
+          <div className="w-full max-w-lg">
+            <TiltCard glowColor="rose" className="p-8 md:p-10 border-rose-500/30 bg-gradient-to-b from-card/90 via-card/80 to-[#0e101f]/90 text-center">
+              <div className="flex flex-col items-center gap-5">
+                {/* 404 Visual Icon */}
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-rose-500/20 via-purple-500/20 to-indigo-500/20 border border-rose-500/40 shadow-[0_0_35px_rgba(244,63,94,0.3)] flex items-center justify-center">
+                    <span className="text-3xl select-none">👤❓</span>
+                  </div>
+                  <div className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-md bg-rose-500/30 border border-rose-500/60 text-[10px] font-mono font-bold text-rose-300">
+                    404
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono font-semibold">
+                    <span>STATUS: PROFILE_NOT_FOUND</span>
+                  </div>
+                  <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                    User Not Found
+                  </h1>
+                  <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
+                    No active coder profile found for{" "}
+                    <span className="font-mono font-bold text-slate-200 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                      @{params.username}
+                    </span>
+                    . The coder may have deleted their account, changed handles, or never existed.
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full pt-3">
+                  <button
+                    onClick={() => router.push("/leaderboard")}
+                    className="w-full sm:flex-1 py-3 px-5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold text-sm shadow-[0_0_25px_rgba(99,102,241,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                  >
+                    <span>Return to Leaderboard</span>
+                    <span>→</span>
+                  </button>
+                  <button
+                    onClick={() => router.push("/dashboard")}
+                    className="w-full sm:flex-1 py-3 px-5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-semibold text-sm transition-all hover:border-white/20"
+                  >
+                    Back to Dashboard
+                  </button>
+                </div>
+              </div>
+            </TiltCard>
+          </div>
+        </main>
+
+        <footer className="relative z-10 border-t border-white/5 py-4 text-center text-xs text-muted-foreground">
+          CodeArena Telemetry Protocol • Active Status System
+        </footer>
       </div>
     );
   }
