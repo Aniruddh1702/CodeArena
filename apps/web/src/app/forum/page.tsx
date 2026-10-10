@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Input, Tabs, TabsList, TabsTrigger, TabsContent } from "@codearena/ui";
 
 export default function ForumPage() {
@@ -19,11 +20,18 @@ export default function ForumPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="font-bold text-xl tracking-tight text-primary">Code<span className="text-destructive">Arena</span></div>
+            <Link href="/" className="group flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
+                <span className="text-white text-base font-black">C</span>
+              </div>
+              <span className="font-extrabold text-xl tracking-tight text-white">
+                Code<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">Arena</span>
+              </span>
+            </Link>
             <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
-                <a href="/dashboard" className="hover:text-primary transition-colors">Dashboard</a>
-                <a href="/problems" className="hover:text-primary transition-colors">Practice</a>
-                <a href="/forum" className="text-primary">Discuss</a>
+                <Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
+                <Link href="/problems" className="hover:text-primary transition-colors">Practice</Link>
+                <Link href="/forum" className="text-primary font-semibold">Discuss</Link>
             </nav>
         </div>
       </header>

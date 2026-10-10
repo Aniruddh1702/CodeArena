@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@codearena/ui";
 
 export default function TestReportPage({ params }: { params: { id: string } }) {
@@ -67,12 +68,17 @@ export default function TestReportPage({ params }: { params: { id: string } }) {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="font-bold text-xl tracking-tight flex items-center gap-2">
-            <span className="text-primary">
-              Code<span className="text-destructive">Arena</span>
-            </span>
-            <span className="text-muted-foreground text-sm font-normal">/ Org Panel</span>
-          </div>
+          <Link href="/" className="group flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
+              <span className="text-white text-sm font-black">C</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-lg tracking-tight text-white">
+                Code<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">Arena</span>
+              </span>
+              <span className="text-muted-foreground text-xs font-mono">/ Org</span>
+            </div>
+          </Link>
           <Button variant="ghost" size="sm" onClick={() => router.push("/assessments")}>
             ← Back to Assessments
           </Button>

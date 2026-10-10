@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Card, CardContent, Button, Tabs, TabsList, TabsTrigger, TabsContent, Badge } from "@codearena/ui";
 import { getActiveAccount, getUserAssessments, UserAccount, UserAssessmentRecord } from "@/lib/auth-session";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 export default function AssessmentsPage() {
   const router = useRouter();
@@ -64,8 +65,13 @@ export default function AssessmentsPage() {
       {/* 1. Header */}
       <header className="border-b bg-card/60 backdrop-blur-md sticky top-0 z-40">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="font-bold text-xl tracking-tight text-primary">
-            Code<span className="text-destructive">Arena</span>
+          <Link href="/" className="group flex items-center gap-2.5">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
+              <span className="text-white text-base font-black">C</span>
+            </div>
+            <span className="font-extrabold text-xl tracking-tight text-white">
+              Code<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">Arena</span>
+            </span>
           </Link>
           <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
             <Link href="/" className="hover:text-primary transition-colors">Home</Link>
@@ -78,6 +84,7 @@ export default function AssessmentsPage() {
             <Link href="/profile" className="hover:text-primary transition-colors">Profile</Link>
           </nav>
           <div className="flex items-center gap-3">
+            <NotificationCenter />
             <Link href="/profile">
               <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold gap-1.5 hover:text-primary">
                 <span>👤</span> Profile
