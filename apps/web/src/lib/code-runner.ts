@@ -266,6 +266,15 @@ export function evaluateJavaScript(
           isCorrect = (result[0] === tc.expected[1] && result[1] === tc.expected[0]);
         }
       }
+      if (!isCorrect && problem.slug === "longest-palindromic-substring" && typeof result === "string" && typeof tc.expected === "string") {
+        const s = String(tc.args[0] || "");
+        if (result.length === tc.expected.length && s.includes(result)) {
+          const rev = result.split("").reverse().join("");
+          if (result === rev) {
+            isCorrect = true;
+          }
+        }
+      }
 
       const formattedActual = formatValue(result);
 

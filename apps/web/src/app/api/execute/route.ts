@@ -250,6 +250,10 @@ for i, tc in enumerate(test_cases):
             is_passed = True
         elif "${problem.slug}" == "two-sum" and isinstance(comp_actual, list) and isinstance(expected, list) and len(comp_actual) == 2 and len(expected) == 2:
             is_passed = (comp_actual[0] == expected[1] and comp_actual[1] == expected[0])
+        elif "${problem.slug}" == "longest-palindromic-substring" and isinstance(comp_actual, str) and isinstance(expected, str):
+            orig_s = str(args[0]) if len(args) > 0 else ""
+            if len(comp_actual) == len(expected) and comp_actual in orig_s and comp_actual == comp_actual[::-1]:
+                is_passed = True
             
         try:
             actual_str = json.dumps(actual)
