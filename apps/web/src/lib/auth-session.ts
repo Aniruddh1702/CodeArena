@@ -465,3 +465,57 @@ export function updateUserRating(userId: string, newRating: number, activityItem
   return clampedRating;
 }
 
+export interface UserAssessmentRecord {
+  id: string;
+  testId: string;
+  testTitle: string;
+  score: number;
+  totalPoints: number;
+  status: string;
+  timeTaken: number;
+  date: string;
+  submittedAt: string;
+  language?: string;
+  code?: string;
+  passedTestCases?: number;
+  totalTestCases?: number;
+}
+
+export function getUserAssessments(userId: string): UserAssessmentRecord[] {
+  if (typeof window === "undefined") return [];
+  const safeId = (userId || "default").replace(/[^a-zA-Z0-9_-]/g, "_");
+  try {
+    const raw = localStorage.getItem(getUserScopedKey(safeId, "assessments"));
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return [];
+}
+
+export function saveUserAssessment(userId: string, record: UserAssessmentRecord): void {
+  if (typeof window === "undefined") return;
+  const safeId = (userId || "default").replace(/[^a-zA-Z0-9_-]/g, "_");
+  try {
+    const current = getUserAssessments(safeId);
+    const updated = [record, ...current.filter((r) => r.id !== record.id)];
+    localStorage.setItem(getUserScopedKey(safeId, "assessments"), JSON.stringify(updated));
+
+    // Also append to user recentActivity
+    const stats = getUserStats(safeId);
+    const activityItem = {
+      id: `act_${Date.now()}`,
+      type: "ASSESSMENT_COMPLETED",
+      title: `Completed Assessment: ${record.testTitle}`,
+      score: `${record.score}/${record.totalPoints}`,
+      date: "Just now",
+      timestamp: new Date().toISOString(),
+    };
+    const updatedActivity = [activityItem, ...stats.recentActivity].slice(0, 20);
+    localStorage.setItem(getUserScopedKey(safeId, "recentActivity"), JSON.stringify(updatedActivity));
+
+    const activeAcc = getActiveAccount();
+    window.dispatchEvent(new CustomEvent("codearena_account_changed", { detail: activeAcc }));
+  } catch (e) {
+    console.error("Failed to save user assessment:", e);
+  }
+}
+
