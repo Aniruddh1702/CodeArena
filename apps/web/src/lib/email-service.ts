@@ -1,3 +1,5 @@
+import { getActiveAccount, getUserScopedKey, getAllAccounts } from "./auth-session";
+
 export interface SentEmailRecord {
   id: string;
   recipient: string;
@@ -12,18 +14,40 @@ export interface SentEmailRecord {
 
 const EMAIL_STORAGE_KEY = "codearena_sent_emails";
 
-export function getSentEmails(): SentEmailRecord[] {
+export function getSentEmails(recipientEmail?: string): SentEmailRecord[] {
   if (typeof window === "undefined") return [];
   try {
+    const active = getActiveAccount();
+    const targetEmail = (recipientEmail || active?.email || "").toLowerCase().trim();
+    if (!targetEmail) return [];
+
+    // Check account-scoped sent emails first
+    if (active?.id) {
+      const userKey = getUserScopedKey(active.id, "sent_emails");
+      const userRaw = localStorage.getItem(userKey);
+      if (userRaw) {
+        return JSON.parse(userRaw);
+      }
+    }
+
+    // Otherwise filter global sent emails strictly for this student
     const raw = localStorage.getItem(EMAIL_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const list: SentEmailRecord[] = JSON.parse(raw);
+    if (Array.isArray(list)) {
+      return list.filter((e) => (e.recipient || "").toLowerCase().trim() === targetEmail);
+    }
+    return [];
   } catch (e) {
     console.error("Failed to load sent emails:", e);
     return [];
   }
 }
 
-export function saveSentEmail(record: Omit<SentEmailRecord, "id" | "sentAt" | "status">): SentEmailRecord {
+export function saveSentEmail(
+  record: Omit<SentEmailRecord, "id" | "sentAt" | "status">,
+  targetUserId?: string
+): SentEmailRecord {
   const newEmail: SentEmailRecord = {
     ...record,
     id: `email_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -34,10 +58,29 @@ export function saveSentEmail(record: Omit<SentEmailRecord, "id" | "sentAt" | "s
   if (typeof window === "undefined") return newEmail;
 
   try {
-    const list = getSentEmails();
+    // 1. Save to global list
+    const raw = localStorage.getItem(EMAIL_STORAGE_KEY);
+    const list: SentEmailRecord[] = raw ? JSON.parse(raw) : [];
     list.unshift(newEmail);
     if (list.length > 100) list.length = 100;
     localStorage.setItem(EMAIL_STORAGE_KEY, JSON.stringify(list));
+
+    // 2. Also save to user-scoped list if account can be identified
+    const accounts = getAllAccounts();
+    const recipientLower = (newEmail.recipient || "").toLowerCase().trim();
+    const matchedAccount = targetUserId 
+      ? accounts.find((a) => a.id === targetUserId)
+      : accounts.find((a) => (a.email || "").toLowerCase().trim() === recipientLower);
+
+    if (matchedAccount) {
+      const userKey = getUserScopedKey(matchedAccount.id, "sent_emails");
+      const userRaw = localStorage.getItem(userKey);
+      const userList: SentEmailRecord[] = userRaw ? JSON.parse(userRaw) : [];
+      userList.unshift(newEmail);
+      if (userList.length > 50) userList.length = 50;
+      localStorage.setItem(userKey, JSON.stringify(userList));
+    }
+
     window.dispatchEvent(new CustomEvent("codearena_emails_updated", { detail: newEmail }));
   } catch (e) {
     console.error("Failed to save email record:", e);
@@ -46,10 +89,32 @@ export function saveSentEmail(record: Omit<SentEmailRecord, "id" | "sentAt" | "s
   return newEmail;
 }
 
-export function clearSentEmails(): void {
+export function clearSentEmails(recipientEmail?: string): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(EMAIL_STORAGE_KEY, JSON.stringify([]));
-  window.dispatchEvent(new CustomEvent("codearena_emails_updated"));
+  try {
+    const active = getActiveAccount();
+    const targetEmail = (recipientEmail || active?.email || "").toLowerCase().trim();
+
+    if (active?.id) {
+      const userKey = getUserScopedKey(active.id, "sent_emails");
+      localStorage.setItem(userKey, JSON.stringify([]));
+    }
+
+    if (targetEmail) {
+      const raw = localStorage.getItem(EMAIL_STORAGE_KEY);
+      if (raw) {
+        const list: SentEmailRecord[] = JSON.parse(raw);
+        const filtered = list.filter((e) => (e.recipient || "").toLowerCase().trim() !== targetEmail);
+        localStorage.setItem(EMAIL_STORAGE_KEY, JSON.stringify(filtered));
+      }
+    } else {
+      localStorage.setItem(EMAIL_STORAGE_KEY, JSON.stringify([]));
+    }
+
+    window.dispatchEvent(new CustomEvent("codearena_emails_updated"));
+  } catch (e) {
+    console.error("Failed to clear sent emails:", e);
+  }
 }
 
 export async function dispatchContestEmail(

@@ -13,9 +13,11 @@ import {
   AppNotification
 } from "@/lib/notifications";
 import { getSentEmails, SentEmailRecord, clearSentEmails } from "@/lib/email-service";
+import { getActiveAccount, UserAccount } from "@/lib/auth-session";
 
 export function NotificationCenter() {
   const router = useRouter();
+  const [activeAccount, setActiveAccount] = useState<UserAccount | null>(null);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [sentEmails, setSentEmails] = useState<SentEmailRecord[]>([]);
   const [activeTab, setActiveTab] = useState<"alerts" | "emails">("alerts");
@@ -25,8 +27,13 @@ export function NotificationCenter() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const loadData = () => {
-    setNotifications(getNotifications());
-    setSentEmails(getSentEmails());
+    const active = getActiveAccount();
+    setActiveAccount(active);
+    const activeId = active?.id;
+    const activeEmail = active?.email;
+
+    setNotifications(getNotifications(activeId));
+    setSentEmails(getSentEmails(activeEmail));
     if (typeof Notification !== "undefined") {
       setHasPermission(Notification.permission === "granted");
     }
@@ -41,6 +48,8 @@ export function NotificationCenter() {
 
     window.addEventListener("codearena_notifications_updated", handleUpdate);
     window.addEventListener("codearena_emails_updated", handleUpdate);
+    window.addEventListener("codearena_account_changed", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
 
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -53,6 +62,8 @@ export function NotificationCenter() {
     return () => {
       window.removeEventListener("codearena_notifications_updated", handleUpdate);
       window.removeEventListener("codearena_emails_updated", handleUpdate);
+      window.removeEventListener("codearena_account_changed", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
@@ -65,11 +76,23 @@ export function NotificationCenter() {
   };
 
   const handleItemClick = (notif: AppNotification) => {
-    markNotificationAsRead(notif.id);
+    markNotificationAsRead(notif.id, activeAccount?.id);
     setIsOpen(false);
     if (notif.actionUrl) {
       router.push(notif.actionUrl);
     }
+  };
+
+  const handleMarkAllRead = () => {
+    markAllNotificationsAsRead(activeAccount?.id);
+  };
+
+  const handleClearNotifications = () => {
+    clearNotifications(activeAccount?.id);
+  };
+
+  const handleClearEmails = () => {
+    clearSentEmails(activeAccount?.email);
   };
 
   const formatTimeAgo = (dateStr: string) => {
@@ -110,6 +133,14 @@ export function NotificationCenter() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-xs">Contest Notifications</span>
+                  {activeAccount && (
+                    <span
+                      className="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20 max-w-[100px] truncate"
+                      title={`Account: @${activeAccount.username}`}
+                    >
+                      @{activeAccount.username}
+                    </span>
+                  )}
                   {unreadCount > 0 && (
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary/20 text-primary">
                       {unreadCount} new
@@ -121,7 +152,7 @@ export function NotificationCenter() {
                   {activeTab === "alerts" && notifications.length > 0 && (
                     <>
                       <button
-                        onClick={markAllNotificationsAsRead}
+                        onClick={handleMarkAllRead}
                         className="text-[10px] text-muted-foreground hover:text-primary font-medium"
                         title="Mark all as read"
                       >
@@ -129,7 +160,7 @@ export function NotificationCenter() {
                       </button>
                       <span className="text-muted-foreground text-xs">•</span>
                       <button
-                        onClick={clearNotifications}
+                        onClick={handleClearNotifications}
                         className="text-[10px] text-muted-foreground hover:text-rose-400 font-medium"
                         title="Clear all"
                       >
@@ -139,7 +170,7 @@ export function NotificationCenter() {
                   )}
                   {activeTab === "emails" && sentEmails.length > 0 && (
                     <button
-                      onClick={clearSentEmails}
+                      onClick={handleClearEmails}
                       className="text-[10px] text-muted-foreground hover:text-rose-400 font-medium"
                       title="Clear email log"
                     >

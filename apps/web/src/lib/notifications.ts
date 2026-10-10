@@ -1,3 +1,5 @@
+import { getActiveAccount, getUserScopedKey, getAllAccounts } from "./auth-session";
+
 export interface AppNotification {
   id: string;
   title: string;
@@ -13,18 +15,34 @@ export interface AppNotification {
 const STORAGE_KEY = "codearena_notifications";
 const NOTIFIED_TIMERS_KEY = "codearena_notified_timers";
 
-export function getNotifications(): AppNotification[] {
+export function getNotificationsStorageKey(userId?: string): string {
+  if (typeof window === "undefined") return STORAGE_KEY;
+  const id = userId || getActiveAccount()?.id;
+  if (!id) return STORAGE_KEY;
+  return getUserScopedKey(id, "notifications");
+}
+
+export function getNotifications(userId?: string): AppNotification[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const active = userId ? { id: userId } : getActiveAccount();
+    if (!active?.id) {
+      return [];
+    }
+    const key = getUserScopedKey(active.id, "notifications");
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+    return [];
   } catch (e) {
     console.error("Failed to read notifications:", e);
     return [];
   }
 }
 
-export function saveNotification(notif: Omit<AppNotification, "id" | "timestamp" | "read">): AppNotification {
+export function saveNotification(
+  notif: Omit<AppNotification, "id" | "timestamp" | "read">,
+  targetUserId?: string
+): AppNotification {
   const newNotif: AppNotification = {
     ...notif,
     id: `notif_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
@@ -35,12 +53,27 @@ export function saveNotification(notif: Omit<AppNotification, "id" | "timestamp"
   if (typeof window === "undefined") return newNotif;
 
   try {
-    const list = getNotifications();
-    list.unshift(newNotif);
-    // Keep max 50 notifications
-    if (list.length > 50) list.length = 50;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    window.dispatchEvent(new CustomEvent("codearena_notifications_updated", { detail: newNotif }));
+    if (targetUserId === "ALL") {
+      const accounts = getAllAccounts();
+      accounts.forEach((acc) => {
+        const key = getUserScopedKey(acc.id, "notifications");
+        const list = getNotifications(acc.id);
+        list.unshift(newNotif);
+        if (list.length > 50) list.length = 50;
+        localStorage.setItem(key, JSON.stringify(list));
+      });
+      window.dispatchEvent(new CustomEvent("codearena_notifications_updated", { detail: newNotif }));
+    } else {
+      const targetId = targetUserId || getActiveAccount()?.id;
+      if (targetId) {
+        const key = getUserScopedKey(targetId, "notifications");
+        const list = getNotifications(targetId);
+        list.unshift(newNotif);
+        if (list.length > 50) list.length = 50;
+        localStorage.setItem(key, JSON.stringify(list));
+      }
+      window.dispatchEvent(new CustomEvent("codearena_notifications_updated", { detail: newNotif }));
+    }
 
     // Send Browser OS Notification if permission granted
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
@@ -56,14 +89,17 @@ export function saveNotification(notif: Omit<AppNotification, "id" | "timestamp"
   return newNotif;
 }
 
-export function markNotificationAsRead(id: string): void {
+export function markNotificationAsRead(id: string, userId?: string): void {
   if (typeof window === "undefined") return;
   try {
-    const list = getNotifications();
+    const targetId = userId || getActiveAccount()?.id;
+    if (!targetId) return;
+    const key = getUserScopedKey(targetId, "notifications");
+    const list = getNotifications(targetId);
     const item = list.find((n) => n.id === id);
     if (item) {
       item.read = true;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      localStorage.setItem(key, JSON.stringify(list));
       window.dispatchEvent(new CustomEvent("codearena_notifications_updated", { detail: { id, read: true } }));
     }
   } catch (e) {
@@ -71,22 +107,28 @@ export function markNotificationAsRead(id: string): void {
   }
 }
 
-export function markAllNotificationsAsRead(): void {
+export function markAllNotificationsAsRead(userId?: string): void {
   if (typeof window === "undefined") return;
   try {
-    const list = getNotifications();
+    const targetId = userId || getActiveAccount()?.id;
+    if (!targetId) return;
+    const key = getUserScopedKey(targetId, "notifications");
+    const list = getNotifications(targetId);
     list.forEach((n) => (n.read = true));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    localStorage.setItem(key, JSON.stringify(list));
     window.dispatchEvent(new CustomEvent("codearena_notifications_updated"));
   } catch (e) {
     console.error("Failed to mark all notifications read:", e);
   }
 }
 
-export function clearNotifications(): void {
+export function clearNotifications(userId?: string): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    const targetId = userId || getActiveAccount()?.id;
+    if (!targetId) return;
+    const key = getUserScopedKey(targetId, "notifications");
+    localStorage.setItem(key, JSON.stringify([]));
     window.dispatchEvent(new CustomEvent("codearena_notifications_updated"));
   } catch (e) {
     console.error("Failed to clear notifications:", e);
@@ -129,7 +171,7 @@ export function checkContest1HourReminders(contests: any[]): void {
           contestId: contest.id,
           contestTitle: contest.title,
           actionUrl: `/contests/${contest.id}`,
-        });
+        }, "ALL");
 
         // Dispatch 1-Hour Reminder Gmail/Email to all registered participants and students
         try {
@@ -181,7 +223,7 @@ export function checkContest1HourReminders(contests: any[]): void {
           contestId: contest.id,
           contestTitle: contest.title,
           actionUrl: `/contests/${contest.id}`,
-        });
+        }, "ALL");
       }
     });
 
