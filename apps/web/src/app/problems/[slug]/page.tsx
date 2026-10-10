@@ -31,6 +31,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState<"javascript" | "python" | "cpp" | "java">("javascript");
   const [code, setCode] = useState<string>("");
+  const [codePerLanguage, setCodePerLanguage] = useState<Record<string, string>>({});
   const [isRunning, setIsRunning] = useState(false);
 
   // Tabs & Views
@@ -116,12 +117,78 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     }
   };
 
+  // Helper: Persist and sync code per language scoped to active student
+  const saveCodeForLanguage = (lang: string, val: string, userAcc?: any) => {
+    setCodePerLanguage((prev) => {
+      const next = { ...prev, [lang]: val };
+      const user = userAcc || currentUser || getActiveAccount();
+      if (typeof window !== "undefined" && user?.id) {
+        try {
+          const safeId = user.id.replace(/[^a-zA-Z0-9_-]/g, "_");
+          localStorage.setItem(`codearena_${safeId}_code_${params.slug}`, JSON.stringify(next));
+        } catch (e) {
+          console.error("Failed to save code cache:", e);
+        }
+      }
+      return next;
+    });
+  };
+
+  // Handle Code changes in Monaco
+  const handleCodeChange = (val: string | undefined) => {
+    const nextCode = val || "";
+    setCode(nextCode);
+    saveCodeForLanguage(language, nextCode);
+    clearEditorMarkers();
+  };
+
+  // Handle language switch WITHOUT wiping written solutions
+  const handleLanguageChange = (val: "javascript" | "python" | "cpp" | "java") => {
+    if (val === language) return;
+
+    // 1. Snapshot current editor code into cache for the current language
+    const updatedCache = { ...codePerLanguage, [language]: code };
+    setCodePerLanguage(updatedCache);
+
+    const activeAcc = currentUser || getActiveAccount();
+    if (typeof window !== "undefined" && activeAcc?.id) {
+      try {
+        const safeId = activeAcc.id.replace(/[^a-zA-Z0-9_-]/g, "_");
+        localStorage.setItem(`codearena_${safeId}_code_${params.slug}`, JSON.stringify(updatedCache));
+      } catch (e) {}
+    }
+
+    // 2. Load the student's previously written code for target language, or fallback to starter code
+    const nextCode = updatedCache[val] !== undefined
+      ? updatedCache[val]
+      : (question.starterCode?.[val] || question.starterCode?.javascript || "");
+
+    setLanguage(val);
+    setCode(nextCode);
+    clearEditorMarkers();
+    setRunResult(null);
+    setSubmitFeedback(null);
+  };
+
+  // Reset current language code to template starter code
+  const handleResetCode = () => {
+    const langDisplay = language === "cpp" ? "C++" : language.toUpperCase();
+    if (typeof window !== "undefined" && !window.confirm(`Reset your ${langDisplay} code back to the original starter code?`)) {
+      return;
+    }
+    const starter = question.starterCode?.[language] || question.starterCode?.javascript || "";
+    setCode(starter);
+    saveCodeForLanguage(language, starter);
+    clearEditorMarkers();
+    setRunResult(null);
+    setSubmitFeedback(null);
+  };
+
   // Load problem details & past submissions
   useEffect(() => {
     const prob = getProblem(params.slug) || (PROBLEMS_DATABASE as any)[params.slug] || Object.values(PROBLEMS_DATABASE)[0];
     if (prob) {
       setQuestion(prob);
-      setCode(prob.starterCode[language] || prob.starterCode.javascript);
     }
     setRunResult(null);
     setSubmitFeedback(null);
@@ -138,32 +205,81 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
       setCurrentUser(activeAcc);
       setAuthChecked(true);
       const activeId = activeAcc.id || "default";
+      const safeId = activeId.replace(/[^a-zA-Z0-9_-]/g, "_");
 
-      // 1. Load submissions strictly scoped to active account (never leak other users)
+      // 1. Retrieve cached codes per language for this active student
+      let loadedCodes: Record<string, string> = {};
+      try {
+        const saved = localStorage.getItem(`codearena_${safeId}_code_${params.slug}`);
+        if (saved) {
+          loadedCodes = JSON.parse(saved);
+        }
+      } catch (e) {}
+
+      // Seed starter codes for any languages not yet written
+      if (prob) {
+        const defaultCodes: Record<string, string> = {
+          javascript: prob.starterCode?.javascript || "",
+          python: prob.starterCode?.python || "",
+          cpp: prob.starterCode?.cpp || "",
+          java: prob.starterCode?.java || "",
+        };
+        loadedCodes = { ...defaultCodes, ...loadedCodes };
+      }
+
+      setCodePerLanguage(loadedCodes);
+      const initialCode = loadedCodes[language] !== undefined
+        ? loadedCodes[language]
+        : (prob?.starterCode?.[language] || prob?.starterCode?.javascript || "");
+      setCode(initialCode);
+
+      // 2. Load submissions strictly scoped to active account (never leak other users)
       const userSubs = getUserProblemSubmissions(activeId, params.slug);
       setSubmissions(userSubs);
 
-      // 2. Check if problem is solved by active account
+      // 3. Check if problem is solved by active account
       const stats = getUserStats(activeId);
       const isSolved = stats.solvedProblems.some((p: any) => p.slug === params.slug);
       setIsProblemSolved(isSolved);
 
-      // 3. React to account changes so new user starts completely from new
+      // 4. React to account changes so new user starts completely from new
       const handleAccountChange = () => {
         const currentAcc = getActiveAccount();
         if (!currentAcc) {
           router.push(`/login?redirect=/problems/${params.slug}`);
           return;
         }
+        setCurrentUser(currentAcc);
         const currentId = currentAcc.id || "default";
+        const currentSafeId = currentId.replace(/[^a-zA-Z0-9_-]/g, "_");
+
+        let accCodes: Record<string, string> = {};
+        try {
+          const saved = localStorage.getItem(`codearena_${currentSafeId}_code_${params.slug}`);
+          if (saved) {
+            accCodes = JSON.parse(saved);
+          }
+        } catch (e) {}
+
+        const p = getProblem(params.slug) || (PROBLEMS_DATABASE as any)[params.slug] || Object.values(PROBLEMS_DATABASE)[0];
+        if (p) {
+          const defaultCodes: Record<string, string> = {
+            javascript: p.starterCode?.javascript || "",
+            python: p.starterCode?.python || "",
+            cpp: p.starterCode?.cpp || "",
+            java: p.starterCode?.java || "",
+          };
+          accCodes = { ...defaultCodes, ...accCodes };
+          setQuestion(p);
+        }
+
+        setCodePerLanguage(accCodes);
+        setCode(accCodes[language] || p?.starterCode?.[language] || p?.starterCode?.javascript || "");
+
         const subs = getUserProblemSubmissions(currentId, params.slug);
         setSubmissions(subs);
         const s = getUserStats(currentId);
         setIsProblemSolved(s.solvedProblems.some((p: any) => p.slug === params.slug));
-        const p = getProblem(params.slug) || (PROBLEMS_DATABASE as any)[params.slug] || Object.values(PROBLEMS_DATABASE)[0];
-        if (p) {
-          setCode(p.starterCode[language] || p.starterCode.javascript);
-        }
         clearEditorMarkers();
         setRunResult(null);
         setSubmitFeedback(null);
@@ -175,18 +291,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         window.removeEventListener("codearena_account_changed", handleAccountChange);
       };
     }
-  }, [params.slug, language, router]);
-
-  // Handle language switch
-  const handleLanguageChange = (val: "javascript" | "python" | "cpp" | "java") => {
-    setLanguage(val);
-    clearEditorMarkers();
-    setRunResult(null);
-    setSubmitFeedback(null);
-    if (question.starterCode[val]) {
-      setCode(question.starterCode[val]);
-    }
-  };
+  }, [params.slug, router]);
 
   // Run Code (Public Testcases)
   const handleRunCode = async () => {
@@ -429,9 +534,15 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
   const handleLoadSubmissionIntoEditor = (sub: SavedSubmission) => {
     setCode(sub.code);
     clearEditorMarkers();
-    if (sub.language && (sub.language === "javascript" || sub.language === "python" || sub.language === "cpp" || sub.language === "java")) {
-      setLanguage(sub.language as any);
-    }
+    const rawLang = (sub.language || "").toLowerCase();
+    const subLang: "javascript" | "python" | "cpp" | "java" =
+      rawLang.includes("py") ? "python" :
+      rawLang.includes("cpp") || rawLang.includes("c++") ? "cpp" :
+      rawLang.includes("java") && !rawLang.includes("script") ? "java" :
+      "javascript";
+
+    setLanguage(subLang);
+    saveCodeForLanguage(subLang, sub.code);
     setLoadedIntoEditorNotice(true);
     setTimeout(() => setLoadedIntoEditorNotice(false), 3000);
   };
@@ -515,16 +626,25 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
             </span>
           )}
 
-          <select 
-            className="bg-secondary text-secondary-foreground text-xs font-semibold px-3 py-1.5 rounded-lg border border-border/80 outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
-            value={language}
-            onChange={(e) => handleLanguageChange(e.target.value as any)}
-          >
-            <option value="javascript">JavaScript (Node.js)</option>
-            <option value="python">Python 3</option>
-            <option value="cpp">C++ (g++ 17)</option>
-            <option value="java">Java</option>
-          </select>
+          <div className="flex items-center gap-1.5">
+            <select 
+              className="bg-secondary text-secondary-foreground text-xs font-semibold px-3 py-1.5 rounded-lg border border-border/80 outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+              value={language}
+              onChange={(e) => handleLanguageChange(e.target.value as any)}
+            >
+              <option value="javascript">JavaScript (Node.js)</option>
+              <option value="python">Python 3</option>
+              <option value="cpp">C++ (g++ 17)</option>
+              <option value="java">Java</option>
+            </select>
+            <button
+              onClick={handleResetCode}
+              title={`Reset ${language === "cpp" ? "C++" : language} code to starter template`}
+              className="h-7 w-7 rounded-lg bg-secondary/70 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/80 text-xs font-bold transition-colors flex items-center justify-center"
+            >
+              ↺
+            </button>
+          </div>
 
           <Button 
             variant="secondary" 
@@ -840,10 +960,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
                   editorRef.current = editor;
                   monacoRef.current = monaco;
                 }}
-                onChange={(val) => {
-                  setCode(val || "");
-                  clearEditorMarkers();
-                }}
+                onChange={handleCodeChange}
                 options={{
                   minimap: { enabled: false },
                   fontSize: 14,
