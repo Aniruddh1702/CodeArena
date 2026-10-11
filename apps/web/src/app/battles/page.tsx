@@ -37,13 +37,28 @@ export default function BattlesLobbyPage() {
     }
   }, [router]);
 
+  const BATTLE_PROBLEMS = [
+    "two-sum",
+    "valid-parentheses",
+    "maximum-subarray",
+    "climbing-stairs",
+    "best-time-to-buy-and-sell-stock",
+    "contains-duplicate",
+    "valid-palindrome",
+    "valid-anagram",
+    "binary-search",
+    "majority-element",
+    "longest-palindromic-substring",
+  ];
+
   const findMatch = () => {
     setSearching(true);
     // Simulate socket matchmaking delay
     setTimeout(() => {
       setMatchFound(true);
+      const selectedProblem = BATTLE_PROBLEMS[Math.floor(Math.random() * BATTLE_PROBLEMS.length)];
       setTimeout(() => {
-        router.push("/battles/b1_demo");
+        router.push(`/battles/${selectedProblem}`);
       }, 1500);
     }, 2500);
   };

@@ -103,3 +103,75 @@ export function recordUserLoginEvent(user: Partial<PlatformUserRecord> & { usern
   saveUsersToFile(map);
   return updated;
 }
+
+const RESET_TOKENS_FILE = path.join(os.tmpdir(), "codearena_reset_tokens.json");
+
+interface ResetTokenRecord {
+  token: string;
+  email: string;
+  expiresAt: number;
+}
+
+function loadResetTokens(): Map<string, ResetTokenRecord> {
+  const map = new Map<string, ResetTokenRecord>();
+  try {
+    if (fs.existsSync(RESET_TOKENS_FILE)) {
+      const raw = fs.readFileSync(RESET_TOKENS_FILE, "utf-8");
+      const list: ResetTokenRecord[] = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        const now = Date.now();
+        for (const item of list) {
+          if (item && item.token && item.expiresAt > now) {
+            map.set(item.token, item);
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Error loading reset tokens:", e);
+  }
+  return map;
+}
+
+function saveResetTokens(map: Map<string, ResetTokenRecord>): void {
+  try {
+    const list = Array.from(map.values());
+    fs.writeFileSync(RESET_TOKENS_FILE, JSON.stringify(list, null, 2), "utf-8");
+  } catch (e) {
+    console.error("Error saving reset tokens:", e);
+  }
+}
+
+export function savePasswordResetToken(token: string, email: string): void {
+  const tokens = loadResetTokens();
+  tokens.set(token, {
+    token,
+    email: email.toLowerCase().trim(),
+    expiresAt: Date.now() + 3600 * 1000, // 1 hour expiry
+  });
+  saveResetTokens(tokens);
+}
+
+export function verifyAndConsumeResetToken(token: string, newPassword: string): { success: boolean; email?: string } {
+  const tokens = loadResetTokens();
+  const record = tokens.get(token);
+  if (!record || record.expiresAt < Date.now()) {
+    return { success: false };
+  }
+
+  // Consume token
+  tokens.delete(token);
+  saveResetTokens(tokens);
+
+  // Update password in user registry
+  const registry = getUserRegistry();
+  const user = registry.get(record.email);
+  if (user) {
+    user.password = newPassword;
+    registry.set(user.username.toLowerCase(), user);
+    registry.set(user.email.toLowerCase(), user);
+    saveUsersToFile(registry);
+  }
+
+  return { success: true, email: record.email };
+}

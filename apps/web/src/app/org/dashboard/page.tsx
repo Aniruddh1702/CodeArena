@@ -53,10 +53,10 @@ export default function OrgDashboardPage() {
               </div>
             </Link>
             <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
-                <a href="/org/dashboard" className="text-primary">Overview</a>
-                <a href="/org/batches" className="hover:text-primary transition-colors">Batches</a>
-                <a href="/org/students" className="hover:text-primary transition-colors">Students</a>
-                <a href="/org/tests" className="hover:text-primary transition-colors">Test Assignments</a>
+                <Link href="/org/dashboard" className="text-primary font-semibold">Overview</Link>
+                <Link href="/org/batches" className="hover:text-primary transition-colors">Batches</Link>
+                <Link href="/org/tests" className="hover:text-primary transition-colors">Test Assignments</Link>
+                <Link href="/org/analytics" className="hover:text-primary transition-colors">Analytics</Link>
             </nav>
             <Button variant="outline" size="sm" onClick={() => router.push('/dashboard')}>Exit to Student View</Button>
         </div>
@@ -68,7 +68,7 @@ export default function OrgDashboardPage() {
                   <h1 className="text-3xl font-bold tracking-tight">{orgData.name}</h1>
                   <p className="text-muted-foreground">Organization Management Dashboard</p>
               </div>
-              <Button>+ Create New Batch</Button>
+              <Button onClick={() => router.push('/org/batches')}>+ Create New Batch</Button>
           </div>
 
           {/* KPI Cards */}

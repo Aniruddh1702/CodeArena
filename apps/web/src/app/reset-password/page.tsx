@@ -32,30 +32,38 @@ function ResetPasswordContent() {
     setError("");
 
     try {
-      const { getBackendApiUrl } = await import("@/lib/api-config");
-      const apiUrl = getBackendApiUrl();
-      const res = await fetch(`${apiUrl}/api/auth/reset-password`, {
+      let res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),
       });
 
-      const data = await res.json();
+      if (!res.ok) {
+        const { getBackendApiUrl } = await import("@/lib/api-config");
+        const apiUrl = getBackendApiUrl();
+        res = await fetch(`${apiUrl}/api/auth/reset-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, password }),
+        });
+      }
+
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         let errorMsg = data.message;
         if (Array.isArray(errorMsg)) {
-            errorMsg = errorMsg.join(', ');
+          errorMsg = errorMsg.join(", ");
         }
         throw new Error(errorMsg || "Failed to reset password");
       }
 
       setSuccess(true);
       setTimeout(() => {
-          router.push("/login");
+        router.push("/login");
       }, 3000);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to reset password. Please verify your token.");
     } finally {
       setLoading(false);
     }

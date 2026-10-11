@@ -9,29 +9,42 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const [resetToken, setResetToken] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const { getBackendApiUrl } = await import("@/lib/api-config");
-      const apiUrl = getBackendApiUrl();
-      const res = await fetch(`${apiUrl}/api/auth/forgot-password`, {
+      let res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
+        const { getBackendApiUrl } = await import("@/lib/api-config");
+        const apiUrl = getBackendApiUrl();
+        res = await fetch(`${apiUrl}/api/auth/forgot-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok && data?.message) {
         throw new Error(data.message || "Failed to process request");
       }
 
+      if (data?.token) {
+        setResetToken(data.token);
+      }
       setSuccess(true);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to dispatch password reset request.");
     } finally {
       setLoading(false);
     }
@@ -50,9 +63,19 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <CardContent>
             {success ? (
-                <div className="text-center p-4 bg-secondary/20 rounded-md text-secondary-foreground border border-secondary/50">
-                    If an account with that email exists, we have sent a password reset link to it. Please check your inbox (and spam folder).
+              <div className="space-y-4">
+                <div className="text-center p-4 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/30 text-sm">
+                  If an account with that email exists, we have dispatched a password reset link. Please check your inbox.
                 </div>
+                {resetToken && (
+                  <div className="p-3 bg-secondary/30 rounded-lg text-center border border-border/50 text-xs text-muted-foreground">
+                    Reset Token ready:{" "}
+                    <a href={`/reset-password?token=${resetToken}`} className="text-primary font-semibold underline ml-1">
+                      Proceed to Reset Password &rarr;
+                    </a>
+                  </div>
+                )}
+              </div>
             ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">

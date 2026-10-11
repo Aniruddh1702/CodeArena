@@ -9,6 +9,7 @@ import {
   getContestById,
   Contest,
   ContestProblem,
+  ContestSubmission,
   recordContestSubmission,
   getContestStandings,
   ContestStanding,
@@ -229,82 +230,133 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
-  // Run Code on Public Test Cases
+function parseCustomArgs(raw: string): any[] {
+  const trimmed = raw.trim();
+  if (!trimmed) return [];
+  try {
+    return JSON.parse(`[${trimmed}]`);
+  } catch (e) {}
+  try {
+    const single = JSON.parse(trimmed);
+    return Array.isArray(single) ? [single] : [single];
+  } catch (e) {}
+  try {
+    const fn = new Function(`return [${trimmed}];`);
+    return fn();
+  } catch (e) {}
+  return [trimmed];
+}
+
+  // Run Code on Public Test Cases (Real Multi-Language Execution)
   const handleRunCode = async () => {
     if (!activeProblemDef) return;
     setIsRunning(true);
     setConsoleBottomTab("result");
     clearEditorMarkers();
 
-    try {
-      if (language === "javascript") {
-        const testCasesToRun = customInputMode && customInputText.trim()
-          ? [
-              {
-                input: customInputText,
-                output: "?",
-                args: [eval(`(${customInputText})`)],
-                expected: undefined,
-              },
-            ]
-          : activeProblemDef.publicTestCases;
+    const isCustom = customInputMode && customInputText.trim().length > 0;
+    const customTestCases = isCustom
+      ? [
+          {
+            input: customInputText.trim(),
+            output: "?",
+            args: parseCustomArgs(customInputText.trim()),
+            expected: undefined,
+          },
+        ]
+      : undefined;
 
-        const result = evaluateJavaScript(code, activeProblemDef, testCasesToRun);
-        setRunResult(result);
-        updateEditorMarkers(result, code);
+    try {
+      const res = await fetch("/api/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: activeProblemDef.slug,
+          language,
+          code,
+          isSubmission: false,
+          customTestCases,
+        }),
+      });
+
+      if (res.ok) {
+        const data: ExecutionSummary = await res.json();
+        setRunResult(data);
+        setActiveTestCaseTab(data.status === "Accepted" ? 0 : data.failedTestCaseIndex);
+        updateEditorMarkers(data, code);
       } else {
-        // Multi-language sandbox simulation
-        await new Promise((r) => setTimeout(r, 600));
-        const mockRes: ExecutionSummary = {
-          status: "Accepted",
-          statusColor: "text-emerald-400",
-          runtime: "42 ms",
-          memory: "41.2 MB",
-          totalTestCases: activeProblemDef.publicTestCases.length,
-          passedTestCases: activeProblemDef.publicTestCases.length,
-          failedTestCaseIndex: -1,
-          testResults: activeProblemDef.publicTestCases.map((tc, idx) => ({
-            caseIndex: idx + 1,
-            passed: true,
-            input: tc.input,
-            expectedOutput: tc.output,
-            actualOutput: tc.output,
-            stdout: "",
-            runtimeMs: 12,
-          })),
-        };
-        setRunResult(mockRes);
+        const errJson = await res.json().catch(() => null);
+        if (errJson && errJson.status) {
+          setRunResult(errJson);
+          setActiveTestCaseTab(errJson.status === "Accepted" ? 0 : errJson.failedTestCaseIndex);
+          updateEditorMarkers(errJson, code);
+        } else if (language === "javascript") {
+          const testCasesToRun = customTestCases || activeProblemDef.publicTestCases;
+          const fallback = evaluateJavaScript(code, activeProblemDef, testCasesToRun);
+          setRunResult(fallback);
+          setActiveTestCaseTab(fallback.status === "Accepted" ? 0 : fallback.failedTestCaseIndex);
+          updateEditorMarkers(fallback, code);
+        } else {
+          const targetCases = customTestCases || activeProblemDef.publicTestCases;
+          const errRes: ExecutionSummary = {
+            status: "Runtime Error",
+            statusColor: "text-rose-400",
+            runtime: "0 ms",
+            memory: "0 MB",
+            totalTestCases: targetCases.length,
+            passedTestCases: 0,
+            failedTestCaseIndex: 0,
+            errorDetails: "Execution failed",
+            testResults: targetCases.map((tc, idx) => ({
+              caseIndex: idx + 1,
+              passed: false,
+              input: tc.input,
+              expectedOutput: tc.output,
+              actualOutput: "Execution Failed",
+              stdout: "",
+              error: "Compilation or execution error occurred",
+            })),
+          };
+          setRunResult(errRes);
+          updateEditorMarkers(errRes, code);
+        }
       }
     } catch (err: any) {
-      const errRes: ExecutionSummary = {
-        status: "Runtime Error",
-        statusColor: "text-rose-400",
-        runtime: "0 ms",
-        memory: "0 MB",
-        totalTestCases: activeProblemDef.publicTestCases.length,
-        passedTestCases: 0,
-        failedTestCaseIndex: 0,
-        errorDetails: err.message,
-        testResults: [
-          {
-            caseIndex: 1,
+      const targetCases = customTestCases || activeProblemDef.publicTestCases;
+      if (language === "javascript") {
+        const fallback = evaluateJavaScript(code, activeProblemDef, targetCases);
+        setRunResult(fallback);
+        setActiveTestCaseTab(fallback.status === "Accepted" ? 0 : fallback.failedTestCaseIndex);
+        updateEditorMarkers(fallback, code);
+      } else {
+        const errRes: ExecutionSummary = {
+          status: "Runtime Error",
+          statusColor: "text-rose-400",
+          runtime: "0 ms",
+          memory: "0 MB",
+          totalTestCases: targetCases.length,
+          passedTestCases: 0,
+          failedTestCaseIndex: 0,
+          errorDetails: err.message || "Failed to reach execution runner.",
+          testResults: targetCases.map((tc, idx) => ({
+            caseIndex: idx + 1,
             passed: false,
-            input: activeProblemDef.publicTestCases[0]?.input || "",
-            expectedOutput: activeProblemDef.publicTestCases[0]?.output || "",
+            input: tc.input,
+            expectedOutput: tc.output,
             actualOutput: "Runtime Error",
             stdout: "",
-            error: err.message,
-          },
-        ],
-      };
-      setRunResult(errRes);
-      updateEditorMarkers(errRes, code);
+            error: err.message || "Network error",
+          })),
+        };
+        setRunResult(errRes);
+        updateEditorMarkers(errRes, code);
+      }
     } finally {
       setIsRunning(false);
     }
   };
 
-  // Submit for Contest (Public + Hidden cases)
+  // Submit for Contest (Real Multi-Language Evaluation Against All Test Cases)
   const handleSubmitCode = async () => {
     if (!activeProblemDef || !activeContestProblem || !contest) return;
     if (!currentUser) {
@@ -321,30 +373,54 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
       let isSuccess = false;
       let evalSummary: ExecutionSummary;
 
-      if (language === "javascript") {
-        const allCases = [...activeProblemDef.publicTestCases, ...activeProblemDef.hiddenTestCases];
-        evalSummary = evaluateJavaScript(code, activeProblemDef, allCases);
-        setRunResult(evalSummary);
-        updateEditorMarkers(evalSummary, code);
-        isSuccess = evalSummary.status === "Accepted";
+      const res = await fetch("/api/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: activeProblemDef.slug,
+          language,
+          code,
+          isSubmission: true,
+        }),
+      });
+
+      if (res.ok) {
+        evalSummary = await res.json();
       } else {
-        await new Promise((r) => setTimeout(r, 800));
-        isSuccess = true;
-        evalSummary = {
-          status: "Accepted",
-          statusColor: "text-emerald-400",
-          runtime: "35 ms",
-          memory: "38.6 MB",
-          totalTestCases: activeProblemDef.publicTestCases.length + activeProblemDef.hiddenTestCases.length,
-          passedTestCases: activeProblemDef.publicTestCases.length + activeProblemDef.hiddenTestCases.length,
-          failedTestCaseIndex: -1,
-          testResults: [],
-        };
-        setRunResult(evalSummary);
+        const errJson = await res.json().catch(() => null);
+        if (errJson && errJson.status) {
+          evalSummary = errJson;
+        } else if (language === "javascript") {
+          const allCases = [...activeProblemDef.publicTestCases, ...activeProblemDef.hiddenTestCases];
+          evalSummary = evaluateJavaScript(code, activeProblemDef, allCases);
+        } else {
+          const allCases = [...activeProblemDef.publicTestCases, ...activeProblemDef.hiddenTestCases];
+          evalSummary = {
+            status: "Runtime Error",
+            statusColor: "text-rose-400",
+            runtime: "0 ms",
+            memory: "0 MB",
+            totalTestCases: allCases.length,
+            passedTestCases: 0,
+            failedTestCaseIndex: 0,
+            errorDetails: "Execution failed during contest submission.",
+            testResults: [],
+          };
+        }
       }
 
+      setRunResult(evalSummary);
+      updateEditorMarkers(evalSummary, code);
+      isSuccess = evalSummary.status === "Accepted";
+
       // Record Submission into Contest Engine
-      recordContestSubmission({
+      const submissionStatus: ContestSubmission["status"] = isSuccess 
+        ? "ACCEPTED" 
+        : evalSummary.status === "Runtime Error" 
+        ? "RUNTIME_ERROR" 
+        : "WRONG_ANSWER";
+
+      const submissionRecord: ContestSubmission = {
         id: `sub_${Date.now()}`,
         contestId: contest.id,
         userEmail: currentUser.email,
@@ -357,11 +433,20 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
         memory: evalSummary.memory || "36.4 MB",
         passedTestCases: evalSummary.passedTestCases,
         totalTestCases: evalSummary.totalTestCases,
-        status: isSuccess ? "ACCEPTED" : "WRONG_ANSWER",
+        status: submissionStatus,
         score: isSuccess ? activeContestProblem.points : 0,
         penaltyMinutes: 0,
         submittedAt: new Date().toISOString(),
-      });
+      };
+
+      recordContestSubmission(submissionRecord);
+
+      // Dispatch to server API so other contestants and admins see live submissions
+      fetch(`/api/contests/${contest.id}/submissions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submissionRecord),
+      }).catch(() => {});
 
       // Update Standings State
       const updatedStandings = getContestStandings(contest.id);

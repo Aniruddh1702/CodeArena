@@ -300,7 +300,7 @@ export default function PublicProfilePage({ params }: { params: { username: stri
         {/* Header */}
         <header className="sticky top-0 z-50 border-b border-white/10 bg-[#070913]/70 backdrop-blur-2xl">
           <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-            <Link href="/dashboard" className="group flex items-center gap-2.5">
+            <Link href="/" className="group flex items-center gap-2.5">
               <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
                 <span className="text-white text-base font-black">C</span>
               </div>
@@ -422,7 +422,7 @@ export default function PublicProfilePage({ params }: { params: { username: stri
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#070913]/70 backdrop-blur-2xl">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/dashboard" className="group flex items-center gap-2.5">
+          <Link href="/" className="group flex items-center gap-2.5">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
               <span className="text-white text-base font-black">C</span>
             </div>

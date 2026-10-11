@@ -110,11 +110,13 @@ export default function ContestsPage() {
       <header className="border-b border-border/80 bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 font-bold text-lg tracking-tight hover:opacity-90 transition-opacity">
-              <span className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-primary-foreground font-black shadow-md shadow-primary/20">
-                ⚡
+            <Link href="/" className="group flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
+                <span className="text-white text-base font-black">C</span>
+              </div>
+              <span className="font-extrabold text-xl tracking-tight text-white">
+                Code<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">Arena</span>
               </span>
-              <span>CodeArena</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-1 text-sm font-medium">

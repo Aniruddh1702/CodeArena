@@ -68,11 +68,39 @@ const DEFAULT_PROBLEM: ProblemDefinition = {
   ]
 };
 
+const BATTLE_PROBLEMS = [
+  "two-sum",
+  "valid-parentheses",
+  "maximum-subarray",
+  "climbing-stairs",
+  "best-time-to-buy-and-sell-stock",
+  "contains-duplicate",
+  "valid-palindrome",
+  "valid-anagram",
+  "binary-search",
+  "majority-element",
+  "longest-palindromic-substring",
+];
+
 export default function ActiveBattlePage({ params }: { params: { id: string } }) {
   const router = useRouter();
 
   // Problem Definition
   const [problem] = useState<ProblemDefinition>(() => {
+    if (params?.id) {
+      const direct = getProblem(params.id);
+      if (direct) return direct;
+
+      // Match ID or session ID hashing (e.g. b1_demo, battle-123)
+      let hash = 0;
+      for (let i = 0; i < params.id.length; i++) {
+        hash = (hash << 5) - hash + params.id.charCodeAt(i);
+        hash |= 0;
+      }
+      const idx = Math.abs(hash) % BATTLE_PROBLEMS.length;
+      const hashedProb = getProblem(BATTLE_PROBLEMS[idx]);
+      if (hashedProb) return hashedProb;
+    }
     return getProblem("longest-palindromic-substring") || DEFAULT_PROBLEM;
   });
 
@@ -85,10 +113,10 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
   // Language & Code Cache
   const [language, setLanguage] = useState<SupportedLanguage>("javascript");
   const [codes, setCodes] = useState<Record<SupportedLanguage, string>>({
-    javascript: problem.starterCode.javascript || DEFAULT_PROBLEM.starterCode.javascript,
-    python: problem.starterCode.python || DEFAULT_PROBLEM.starterCode.python,
-    cpp: problem.starterCode.cpp || DEFAULT_PROBLEM.starterCode.cpp,
-    java: problem.starterCode.java || DEFAULT_PROBLEM.starterCode.java,
+    javascript: problem?.starterCode?.javascript || DEFAULT_PROBLEM.starterCode.javascript,
+    python: problem?.starterCode?.python || DEFAULT_PROBLEM.starterCode.python,
+    cpp: problem?.starterCode?.cpp || DEFAULT_PROBLEM.starterCode.cpp,
+    java: problem?.starterCode?.java || DEFAULT_PROBLEM.starterCode.java,
   });
 
   // Battle State
