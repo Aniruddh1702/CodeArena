@@ -275,6 +275,7 @@ function parseCustomArgs(raw: string): any[] {
           language,
           code,
           isSubmission: false,
+          customProblem: activeProblemDef,
           customTestCases,
         }),
       });
@@ -381,6 +382,7 @@ function parseCustomArgs(raw: string): any[] {
           language,
           code,
           isSubmission: true,
+          customProblem: activeProblemDef,
         }),
       });
 

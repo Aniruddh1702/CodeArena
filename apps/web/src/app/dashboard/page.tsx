@@ -522,7 +522,7 @@ export default function DashboardPage() {
         setMatchmakingTime((prev) => {
           if (prev >= 3) {
             setMatchmakingActive(false);
-            router.push("/battles/match-quick-clash");
+            router.push(`/battles/match_${Date.now()}`);
             return 0;
           }
           return prev + 1;

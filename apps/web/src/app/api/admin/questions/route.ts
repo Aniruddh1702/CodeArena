@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
+import { ProblemDefinition } from "@/lib/problems-data";
+import { saveCustomProblemServer } from "@/lib/server-problems-store";
 
 export async function GET(req: NextRequest) {
   try {
@@ -74,6 +76,35 @@ export async function POST(req: NextRequest) {
         } else {
           results.push(payload);
         }
+
+        // Always save question to server problem store so runtime execution evaluates against its real test cases
+        const publicCases = Array.isArray(q.publicTestCases)
+          ? q.publicTestCases
+          : (Array.isArray(q.testCases) ? q.testCases.filter((tc: any) => tc.isPublic !== false) : []);
+        const hiddenCases = Array.isArray(q.hiddenTestCases)
+          ? q.hiddenTestCases
+          : (Array.isArray(q.testCases) ? q.testCases.filter((tc: any) => tc.isPublic === false) : []);
+
+        const problemDef: ProblemDefinition = {
+          id: q.id || `custom-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+          slug: payload.slug,
+          title: payload.title,
+          difficulty: payload.difficulty as any,
+          topics: Array.isArray(q.topics) ? q.topics.map((t: any) => typeof t === "string" ? { name: t } : t) : [{ name: "Algorithms" }],
+          description: payload.description,
+          constraints: payload.constraints,
+          methodName: payload.methodName,
+          supportedLanguages: payload.supportedLanguages as any,
+          starterCode: {
+            javascript: q.starterCode?.javascript || `var ${payload.methodName} = function() {\n    \n};`,
+            python: q.starterCode?.python || `class Solution:\n    def ${payload.methodName}(self):\n        pass`,
+            cpp: q.starterCode?.cpp || `#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    void ${payload.methodName}() {\n        \n    }\n};`,
+            java: q.starterCode?.java || `class Solution {\n    public void ${payload.methodName}() {\n        \n    }\n}`
+          },
+          publicTestCases: publicCases,
+          hiddenTestCases: hiddenCases
+        };
+        saveCustomProblemServer(problemDef);
       } catch (err: any) {
         errors.push({ question: q.title, error: err.message });
       }

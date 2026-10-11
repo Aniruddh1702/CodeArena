@@ -222,7 +222,8 @@ export default function ExamEnvironment({ params }: { params: { id: string } }) 
           slug: activeSlug,
           language,
           code: activeCode,
-          isSubmission: false
+          isSubmission: false,
+          customProblem: activeQuestion.problemDef
         })
       });
 
@@ -327,7 +328,8 @@ export default function ExamEnvironment({ params }: { params: { id: string } }) 
             slug: activeSlug,
             language,
             code: activeCode,
-            isSubmission: true
+            isSubmission: true,
+            customProblem: activeQuestion.problemDef
           })
         });
 

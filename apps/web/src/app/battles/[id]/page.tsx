@@ -354,6 +354,7 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
           language,
           code: currentCode,
           isSubmission,
+          customProblem: problem,
         }),
       });
 

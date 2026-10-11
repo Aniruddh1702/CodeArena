@@ -352,6 +352,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
           language,
           code,
           isSubmission: false,
+          customProblem: question,
           customTestCases
         })
       });
@@ -457,7 +458,8 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
           slug: question.slug,
           language,
           code,
-          isSubmission: true
+          isSubmission: true,
+          customProblem: question
         })
       });
 

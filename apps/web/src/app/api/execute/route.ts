@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProblem, TestCase } from "@/lib/problems-data";
+import { getServerCustomProblems } from "@/lib/server-problems-store";
 import { evaluateJavaScript, ExecutionSummary, TestResult } from "@/lib/code-runner";
 import { exec } from "child_process";
 import fs from "fs";
@@ -20,7 +21,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { slug, language, code, isSubmission, customProblem, customTestCases } = body;
 
-    const problem = customProblem || getProblem(slug || "two-sum") || getProblem("two-sum");
+    const serverProblems = getServerCustomProblems();
+    const normSlug = slug ? String(slug).toLowerCase().trim().replace(/_/g, "-") : "";
+    const problem = customProblem || serverProblems[normSlug] || serverProblems[slug] || getProblem(slug || "two-sum") || getProblem("two-sum");
     if (!problem) {
       return NextResponse.json(
         {
