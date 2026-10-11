@@ -136,14 +136,36 @@ export function saveServerContest(contest: Contest): Contest {
   return contest;
 }
 
+const SUBMISSIONS_FILE = path.join(process.cwd(), ".data_contest_submissions.json");
+
+function readSubmissionsFromFile(): Record<string, ContestSubmission[]> {
+  try {
+    if (fs.existsSync(SUBMISSIONS_FILE)) {
+      const raw = fs.readFileSync(SUBMISSIONS_FILE, "utf-8");
+      return JSON.parse(raw);
+    }
+  } catch (e) {}
+  return {};
+}
+
+function writeSubmissionsToFile(subs: Record<string, ContestSubmission[]>) {
+  try {
+    fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(subs, null, 2), "utf-8");
+  } catch (e) {}
+}
+
 export function deleteServerContest(id: string): boolean {
   const current = getServerContests();
   const filtered = current.filter((c) => c.id !== id);
   global.__codearena_server_contests = filtered;
   global.__codearena_server_contests_initialized = true;
   writeToFile(filtered);
-  if (global.__codearena_server_submissions) {
+  if (!global.__codearena_server_submissions) {
+    global.__codearena_server_submissions = readSubmissionsFromFile();
+  }
+  if (global.__codearena_server_submissions[id]) {
     delete global.__codearena_server_submissions[id];
+    writeSubmissionsToFile(global.__codearena_server_submissions);
   }
   return true;
 }
@@ -153,22 +175,27 @@ export function clearAllServerContests(): void {
   global.__codearena_server_contests_initialized = true;
   global.__codearena_server_submissions = {};
   writeToFile([]);
+  writeSubmissionsToFile({});
 }
 
 export function getServerSubmissions(contestId: string): ContestSubmission[] {
   if (!global.__codearena_server_submissions) {
-    global.__codearena_server_submissions = { ...DEFAULT_SERVER_SUBMISSIONS };
+    global.__codearena_server_submissions = readSubmissionsFromFile();
   }
   return global.__codearena_server_submissions[contestId] || [];
 }
 
 export function saveServerSubmission(sub: ContestSubmission): ContestSubmission {
   if (!global.__codearena_server_submissions) {
-    global.__codearena_server_submissions = { ...DEFAULT_SERVER_SUBMISSIONS };
+    global.__codearena_server_submissions = readSubmissionsFromFile();
   }
   if (!global.__codearena_server_submissions[sub.contestId]) {
     global.__codearena_server_submissions[sub.contestId] = [];
   }
-  global.__codearena_server_submissions[sub.contestId].unshift(sub);
+  global.__codearena_server_submissions[sub.contestId] = [
+    sub,
+    ...global.__codearena_server_submissions[sub.contestId].filter((s) => s.id !== sub.id),
+  ];
+  writeSubmissionsToFile(global.__codearena_server_submissions);
   return sub;
 }

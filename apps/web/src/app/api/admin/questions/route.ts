@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
 import { ProblemDefinition } from "@/lib/problems-data";
-import { saveCustomProblemServer, deleteCustomProblemServer, clearAllCustomProblemsServer, getServerCustomProblems } from "@/lib/server-problems-store";
+import {
+  saveCustomProblemServer,
+  deleteCustomProblemServer,
+  clearAllCustomProblemsServer,
+  getServerCustomProblems,
+  getServerDeletedProblemSlugs,
+  restoreAllServerProblems,
+} from "@/lib/server-problems-store";
 
 export async function GET(req: NextRequest) {
   try {
     const apiUrl = getBackendApiUrl();
     const serverCustom = Object.values(getServerCustomProblems());
+    const deletedSlugs = getServerDeletedProblemSlugs();
     let backendItems: any[] = [];
     try {
       const res = await fetch(`${apiUrl}/api/questions?pageSize=100`, {
@@ -29,6 +37,7 @@ export async function GET(req: NextRequest) {
       success: true,
       data: { items: Array.from(map.values()) },
       customItems: serverCustom,
+      deletedSlugs,
     });
   } catch (err: any) {
     return NextResponse.json(
@@ -150,6 +159,12 @@ export async function DELETE(req: NextRequest) {
     if (clearAll === "true") {
       const cleared = clearAllCustomProblemsServer();
       return NextResponse.json({ success: true, message: "All server custom questions cleared", cleared });
+    }
+
+    const restoreAll = searchParams.get("restoreAll");
+    if (restoreAll === "true") {
+      const restored = restoreAllServerProblems();
+      return NextResponse.json({ success: true, message: "All questions restored on server", restored });
     }
 
     const slug = searchParams.get("slug");

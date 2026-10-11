@@ -7,7 +7,7 @@ import { Card, Button, Input } from "@codearena/ui";
 import { getActiveAccount, getUserStats } from "@/lib/auth-session";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
 import { NotificationCenter } from "@/components/NotificationCenter";
-import { getAllProblems } from "@/lib/problems-data";
+import { getAllProblems, syncProblemsWithServer } from "@/lib/problems-data";
 
 interface Problem {
   id: string;
@@ -93,6 +93,7 @@ function ProblemsContent() {
 
   useEffect(() => {
     loadAllProblems();
+    syncProblemsWithServer().catch(() => {});
 
     const handleProblemsUpdated = () => {
       loadAllProblems();

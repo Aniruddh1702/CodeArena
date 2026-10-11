@@ -56,10 +56,63 @@ export function restoreAllProblems(): void {
   try {
     localStorage.removeItem(DELETED_PROBLEMS_KEY);
     resetQuestionOrder();
+    fetch("/api/admin/questions?restoreAll=true", { method: "DELETE" }).catch(() => {});
     window.dispatchEvent(new CustomEvent("codearena_problems_updated", { detail: { restoredAll: true } }));
   } catch (e) {
     console.error("Failed to restore all problems:", e);
   }
+}
+
+let isSyncingProblems = false;
+
+export async function syncProblemsWithServer(): Promise<ProblemDefinition[]> {
+  if (typeof window === "undefined" || isSyncingProblems) return getAllProblems();
+  isSyncingProblems = true;
+  try {
+    const res = await fetch("/api/admin/questions", { cache: "no-store" });
+    const json = await res.json().catch(() => null);
+    let changed = false;
+
+    // 1. Sync custom problems
+    if (json?.success && Array.isArray(json?.customItems)) {
+      const current = getCustomProblems();
+      for (const p of json.customItems) {
+        if (!p.slug) continue;
+        if (!current[p.slug] || JSON.stringify(current[p.slug]) !== JSON.stringify(p)) {
+          current[p.slug] = p;
+          changed = true;
+        }
+      }
+      if (changed) {
+        localStorage.setItem(CUSTOM_PROBLEMS_KEY, JSON.stringify(current));
+      }
+    }
+
+    // 2. Sync deleted slugs from server
+    if (json?.success && Array.isArray(json?.deletedSlugs)) {
+      const deleted = getDeletedProblemSlugs();
+      let delChanged = false;
+      for (const s of json.deletedSlugs) {
+        if (!deleted.has(s)) {
+          deleted.add(s);
+          delChanged = true;
+        }
+      }
+      if (delChanged) {
+        localStorage.setItem(DELETED_PROBLEMS_KEY, JSON.stringify(Array.from(deleted)));
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      window.dispatchEvent(new CustomEvent("codearena_problems_updated", { detail: { synced: true } }));
+    }
+  } catch (err) {
+    console.warn("Problem background sync:", err);
+  } finally {
+    isSyncingProblems = false;
+  }
+  return getAllProblems();
 }
 
 export function getCustomProblems(): Record<string, ProblemDefinition> {

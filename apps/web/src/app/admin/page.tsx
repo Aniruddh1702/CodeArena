@@ -12,6 +12,7 @@ import {
   saveQuestionOrder,
   getQuestionOrder,
   resetQuestionOrder,
+  getDeletedProblemSlugs,
   ProblemDefinition,
   TestCase,
 } from "@/lib/problems-data";
@@ -29,6 +30,7 @@ import {
   ContestSubmission,
 } from "@/lib/contests-data";
 import { getActiveAccount, getAllAccounts, getUserStats, banUser, unbanUser, deleteUserAccount } from "@/lib/auth-session";
+import { saveNotification } from "@/lib/notifications";
 
 const AVAILABLE_TOPICS = [
   "Arrays",
@@ -507,6 +509,7 @@ export default function AdminPortalPage() {
       for (const s of sessionAccounts) {
         const stats = getUserStats(s.id);
         const existing = map.get(s.username.toLowerCase());
+        const isBanned = s.status === "BANNED" || s.isBanned || existing?.status === "BANNED" || existing?.status === "SUSPENDED";
         map.set(s.username.toLowerCase(), {
           userId: s.id,
           username: s.username,
@@ -517,7 +520,8 @@ export default function AdminPortalPage() {
           problemsSolved: stats.problemsSolved || existing?.problemsSolved || 0,
           org: s.college || existing?.org || "CodeArena Academy",
           lastLoginAt: existing?.lastLoginAt || new Date().toISOString(),
-          status: "ONLINE",
+          status: isBanned ? "BANNED" : "ONLINE",
+          isBanned: isBanned,
         });
       }
 
@@ -710,6 +714,32 @@ export default function AdminPortalPage() {
   const [submissionFilterStatus, setSubmissionFilterStatus] = useState<"ALL" | "ACCEPTED" | "WRONG_ANSWER">("ALL");
   const [submissionSearchQuery, setSubmissionSearchQuery] = useState("");
   const [codeCopied, setCodeCopied] = useState(false);
+
+  // Broadcast Announcement State
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+  const [broadcastTitle, setBroadcastTitle] = useState("");
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [broadcastFeedback, setBroadcastFeedback] = useState<string | null>(null);
+
+  const handleBroadcastAnnouncement = () => {
+    if (!broadcastTitle.trim() || !broadcastMessage.trim()) return;
+    saveNotification(
+      {
+        title: `📢 ${broadcastTitle.trim()}`,
+        message: broadcastMessage.trim(),
+        type: "GENERAL",
+        actionUrl: "/dashboard",
+      },
+      "ALL"
+    );
+    setBroadcastFeedback("Live announcement broadcasted to all students!");
+    setTimeout(() => {
+      setBroadcastFeedback(null);
+      setIsBroadcastModalOpen(false);
+      setBroadcastTitle("");
+      setBroadcastMessage("");
+    }, 2000);
+  };
 
   const loadContests = async () => {
     try {
@@ -921,7 +951,9 @@ export default function AdminPortalPage() {
     }
   };
 
-  // Check auth session on mount
+  const [, setSubmissionTick] = useState(0);
+
+  // Check auth session on mount & listen to real-time events from student panel
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedAdmin = localStorage.getItem("codearena_admin_authorized");
@@ -932,6 +964,35 @@ export default function AdminPortalPage() {
       loadQuestions();
       loadUsers();
       loadContests();
+
+      const handleSubmissionsChange = () => {
+        setSubmissionTick((t) => t + 1);
+      };
+      const handleAccountChange = () => {
+        loadUsers();
+      };
+      const handleContestChange = () => {
+        loadContests();
+      };
+      const handleProblemChange = () => {
+        loadQuestions();
+      };
+
+      window.addEventListener("codearena_contest_submission", handleSubmissionsChange);
+      window.addEventListener("codearena_contest_submissions_updated", handleSubmissionsChange);
+      window.addEventListener("codearena_account_changed", handleAccountChange);
+      window.addEventListener("codearena_contests_updated", handleContestChange);
+      window.addEventListener("codearena_problems_updated", handleProblemChange);
+      window.addEventListener("storage", handleSubmissionsChange);
+
+      return () => {
+        window.removeEventListener("codearena_contest_submission", handleSubmissionsChange);
+        window.removeEventListener("codearena_contest_submissions_updated", handleSubmissionsChange);
+        window.removeEventListener("codearena_account_changed", handleAccountChange);
+        window.removeEventListener("codearena_contests_updated", handleContestChange);
+        window.removeEventListener("codearena_problems_updated", handleProblemChange);
+        window.removeEventListener("storage", handleSubmissionsChange);
+      };
     }
   }, []);
 
@@ -955,6 +1016,21 @@ export default function AdminPortalPage() {
         if (updatedLocal) {
           list = getAllProblems();
           custom = getCustomProblems();
+        }
+      }
+
+      if (Array.isArray(json?.deletedSlugs) && json.deletedSlugs.length > 0) {
+        const deleted = getDeletedProblemSlugs();
+        let delChanged = false;
+        for (const s of json.deletedSlugs) {
+          if (!deleted.has(s)) {
+            deleted.add(s);
+            delChanged = true;
+          }
+        }
+        if (delChanged) {
+          localStorage.setItem("codearena_deleted_problem_slugs", JSON.stringify(Array.from(deleted)));
+          list = getAllProblems();
         }
       }
     } catch (e) {}
@@ -2722,7 +2798,99 @@ export default function AdminPortalPage() {
                     </p>
                   </div>
                 </button>
+
+                <button
+                  onClick={() => {
+                    setIsBroadcastModalOpen(true);
+                    playCyberSound("blip");
+                  }}
+                  className="group p-4 rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-400/50 backdrop-blur-2xl transition-all duration-200 text-left flex items-start gap-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-inner">
+                    📢
+                  </div>
+                  <div className="flex-1 min-w-0 font-mono">
+                    <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
+                      <span>[07: BROADCAST_ALERT]</span>
+                      <span className="text-xs text-amber-400 group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
+                      Push instant live announcement alerts to every student's notification bell and dashboard.
+                    </p>
+                  </div>
+                </button>
               </div>
+
+              {/* Broadcast Modal Dialog */}
+              {isBroadcastModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+                  <div className="w-full max-w-lg bg-[#0c1024] border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden font-mono">
+                    <div className="p-5 border-b border-white/10 flex items-center justify-between bg-amber-500/10">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-xl">📢</span>
+                        <div>
+                          <h3 className="text-sm font-bold text-white">BROADCAST_STUDENT_ALERT</h3>
+                          <p className="text-[11px] text-slate-400">Sends live notification to all connected students</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setIsBroadcastModalOpen(false)}
+                        className="text-slate-400 hover:text-white p-1 rounded-lg"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="p-5 space-y-4">
+                      {broadcastFeedback && (
+                        <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2">
+                          <span>✓</span> {broadcastFeedback}
+                        </div>
+                      )}
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-300">ALERT_TITLE</Label>
+                        <Input
+                          placeholder="e.g. Contest starting soon or System maintenance"
+                          value={broadcastTitle}
+                          onChange={(e) => setBroadcastTitle(e.target.value)}
+                          className="bg-white/5 border-white/10 text-xs text-white"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-300">MESSAGE_PAYLOAD</Label>
+                        <textarea
+                          rows={4}
+                          placeholder="Enter details for all students..."
+                          value={broadcastMessage}
+                          onChange={(e) => setBroadcastMessage(e.target.value)}
+                          className="w-full rounded-xl bg-white/5 border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-amber-500/60 transition-colors"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsBroadcastModalOpen(false)}
+                          className="h-8 text-xs border-white/10 text-slate-300"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleBroadcastAnnouncement}
+                          disabled={!broadcastTitle.trim() || !broadcastMessage.trim()}
+                          className="h-8 text-xs bg-amber-500 hover:bg-amber-600 text-black font-bold gap-1.5 shadow-md shadow-amber-500/20"
+                        >
+                          <span>⚡</span> Dispatch Live Alert
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Split Section: Algorithmic Topic Visualizer & Live Audit Stream */}

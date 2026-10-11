@@ -401,30 +401,28 @@ export function getContestSubmissions(contestId: string): ContestSubmission[] {
   if (typeof window === "undefined") return DEFAULT_SUBMISSIONS[contestId] || [];
   try {
     const raw = localStorage.getItem(`${SUBMISSIONS_PREFIX}${contestId}`);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      // Trigger background sync with server submissions
-      fetch(`/api/contests/${contestId}/submissions`)
-        .then((res) => res.json())
-        .then((json) => {
-          if (json?.success && Array.isArray(json.submissions)) {
-            const map = new Map<string, ContestSubmission>();
-            json.submissions.forEach((s: ContestSubmission) => map.set(s.id, s));
-            parsed.forEach((s: ContestSubmission) => {
-              if (!map.has(s.id)) map.set(s.id, s);
-            });
-            const merged = Array.from(map.values());
+    const parsed: ContestSubmission[] = raw ? JSON.parse(raw) : (DEFAULT_SUBMISSIONS[contestId] || []);
+
+    // Always trigger background sync with server submissions
+    fetch(`/api/contests/${contestId}/submissions`, { cache: "no-store" })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && Array.isArray(json.submissions)) {
+          const map = new Map<string, ContestSubmission>();
+          json.submissions.forEach((s: ContestSubmission) => map.set(s.id, s));
+          parsed.forEach((s: ContestSubmission) => {
+            if (!map.has(s.id)) map.set(s.id, s);
+          });
+          const merged = Array.from(map.values());
+          if (merged.length !== parsed.length || JSON.stringify(merged) !== JSON.stringify(parsed)) {
             localStorage.setItem(`${SUBMISSIONS_PREFIX}${contestId}`, JSON.stringify(merged));
+            window.dispatchEvent(new CustomEvent("codearena_contest_submissions_updated", { detail: { contestId, submissions: merged } }));
           }
-        })
-        .catch(() => {});
-      return parsed;
-    }
-    if (DEFAULT_SUBMISSIONS[contestId]) {
-      localStorage.setItem(`${SUBMISSIONS_PREFIX}${contestId}`, JSON.stringify(DEFAULT_SUBMISSIONS[contestId]));
-      return DEFAULT_SUBMISSIONS[contestId];
-    }
-    return [];
+        }
+      })
+      .catch(() => {});
+
+    return parsed;
   } catch (e) {
     console.error("Failed to get contest submissions:", e);
     return DEFAULT_SUBMISSIONS[contestId] || [];
@@ -458,6 +456,7 @@ export function recordContestSubmission(submission: ContestSubmission): void {
       subs.unshift(submission);
       localStorage.setItem(key, JSON.stringify(subs));
       window.dispatchEvent(new CustomEvent("codearena_contest_submission", { detail: submission }));
+      window.dispatchEvent(new CustomEvent("codearena_contest_submissions_updated", { detail: { contestId: submission.contestId, submissions: subs } }));
     } catch (e) {
       console.error("Failed to record contest submission locally:", e);
     }

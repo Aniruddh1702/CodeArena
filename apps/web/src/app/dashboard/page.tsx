@@ -752,6 +752,22 @@ export default function DashboardPage() {
         </div>
       </header>
 
+      {/* Account Restricted Banner */}
+      {(activeAccount?.status === "BANNED" || activeAccount?.isBanned) && (
+        <div className="bg-rose-500/20 border-b border-rose-500/40 px-6 py-3">
+          <div className="container mx-auto flex items-center justify-between gap-4 text-xs font-mono">
+            <div className="flex items-center gap-2.5 text-rose-300">
+              <span className="text-base animate-pulse">⚠️</span>
+              <span className="font-bold">ACCOUNT SUSPENDED BY ADMINISTRATOR:</span>
+              <span>Your student account has been placed under administrative restriction. Contest registrations, 1v1 battle arena, and live test evaluations are locked.</span>
+            </div>
+            <span className="px-2 py-0.5 rounded bg-rose-500/30 text-rose-200 border border-rose-500/50 text-[10px] uppercase font-bold shrink-0">
+              RESTRICTED
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Main 2026 3D Command Arena Container */}
       <main className="relative z-10 container mx-auto px-6 py-8 space-y-8 max-w-7xl">
         {/* ── 1. 3D HERO COMMAND BRIDGE ── */}
@@ -768,8 +784,12 @@ export default function DashboardPage() {
                     </span>
                   </div>
                 </div>
-                <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-md bg-emerald-500 text-[10px] font-black text-black shadow-md">
-                  ACTIVE
+                <span className={`absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-md text-[10px] font-black shadow-md ${
+                  activeAccount?.status === "BANNED" || activeAccount?.isBanned
+                    ? "bg-rose-500 text-white"
+                    : "bg-emerald-500 text-black"
+                }`}>
+                  {activeAccount?.status === "BANNED" || activeAccount?.isBanned ? "BANNED" : "ACTIVE"}
                 </span>
               </div>
 
