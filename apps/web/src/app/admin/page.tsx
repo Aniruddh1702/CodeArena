@@ -117,11 +117,11 @@ const DEFAULT_SAMPLE_JSON = [
   }
 ];
 
-// ── 3D Interactive Tilt Card Component for Admin 2026 ──
+// ── 3D Interactive Tilt Card Component for Admin 2026 (Cyber Terminal Theme) ──
 function AdminTiltCard({
   children,
   className = "",
-  glowColor = "purple",
+  glowColor = "emerald",
   maxTilt = 6,
   onClick,
 }: {
@@ -160,23 +160,23 @@ function AdminTiltCard({
   };
 
   const glowMap: Record<string, string> = {
-    indigo: "rgba(99, 102, 241, 0.3)",
-    emerald: "rgba(16, 185, 129, 0.3)",
-    purple: "rgba(168, 85, 247, 0.3)",
-    blue: "rgba(59, 130, 246, 0.3)",
-    amber: "rgba(245, 158, 11, 0.3)",
-    rose: "rgba(244, 63, 94, 0.3)",
-    cyan: "rgba(6, 182, 212, 0.3)",
+    emerald: "rgba(16, 185, 129, 0.35)",
+    cyan: "rgba(6, 182, 212, 0.35)",
+    amber: "rgba(245, 158, 11, 0.35)",
+    rose: "rgba(244, 63, 94, 0.35)",
+    indigo: "rgba(56, 189, 248, 0.35)",
+    purple: "rgba(16, 185, 129, 0.35)",
+    blue: "rgba(14, 165, 233, 0.35)",
   };
 
   const borderMap: Record<string, string> = {
-    indigo: "hover:border-indigo-500/50 hover:shadow-[0_15px_35px_rgba(99,102,241,0.25)]",
-    emerald: "hover:border-emerald-500/50 hover:shadow-[0_15px_35px_rgba(16,185,129,0.25)]",
-    purple: "hover:border-purple-500/50 hover:shadow-[0_15px_35px_rgba(168,85,247,0.25)]",
-    blue: "hover:border-blue-500/50 hover:shadow-[0_15px_35px_rgba(59,130,246,0.25)]",
-    amber: "hover:border-amber-500/50 hover:shadow-[0_15px_35px_rgba(245,158,11,0.25)]",
-    rose: "hover:border-rose-500/50 hover:shadow-[0_15px_35px_rgba(244,63,94,0.25)]",
-    cyan: "hover:border-cyan-500/50 hover:shadow-[0_15px_35px_rgba(6,182,212,0.25)]",
+    emerald: "border-emerald-500/35 hover:border-emerald-400 hover:shadow-[0_0_35px_rgba(16,185,129,0.22)]",
+    cyan: "border-cyan-500/35 hover:border-cyan-400 hover:shadow-[0_0_35px_rgba(6,182,212,0.22)]",
+    amber: "border-amber-500/35 hover:border-amber-400 hover:shadow-[0_0_35px_rgba(245,158,11,0.22)]",
+    rose: "border-rose-500/35 hover:border-rose-400 hover:shadow-[0_0_35px_rgba(244,63,94,0.22)]",
+    indigo: "border-sky-500/35 hover:border-sky-400 hover:shadow-[0_0_35px_rgba(56,189,248,0.22)]",
+    purple: "border-emerald-500/35 hover:border-emerald-400 hover:shadow-[0_0_35px_rgba(16,185,129,0.22)]",
+    blue: "border-sky-500/35 hover:border-sky-400 hover:shadow-[0_0_35px_rgba(14,165,233,0.22)]",
   };
 
   return (
@@ -191,16 +191,25 @@ function AdminTiltCard({
           transition: sheen.opacity ? "transform 0.08s ease-out" : "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)",
           transformStyle: "preserve-3d",
         }}
-        className={`relative rounded-2xl border border-white/10 bg-card/75 backdrop-blur-2xl shadow-[0_12px_35px_rgba(0,0,0,0.4)] transition-all duration-300 overflow-hidden ${borderMap[glowColor] || borderMap.purple} ${className}`}
+        className={`relative rounded-xl border bg-[#0b101a]/95 backdrop-blur-2xl shadow-[0_12px_35px_rgba(0,0,0,0.6)] transition-all duration-300 overflow-hidden ${borderMap[glowColor] || borderMap.emerald} ${className}`}
       >
+        {/* Subtle Tech Corner Brackets */}
+        <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-emerald-400/50 pointer-events-none z-30" />
+        <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-emerald-400/50 pointer-events-none z-30" />
+        <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-emerald-400/50 pointer-events-none z-30" />
+        <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-emerald-400/50 pointer-events-none z-30" />
+
+        {/* Scanline Texture Overlay */}
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px)] [background-size:100%_4px] z-10 opacity-70" />
+
         <div
-          className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 z-10"
+          className="pointer-events-none absolute inset-0 rounded-xl transition-opacity duration-300 z-10"
           style={{
             opacity: sheen.opacity,
-            background: `radial-gradient(circle 320px at ${sheen.x}% ${sheen.y}%, ${glowMap[glowColor] || glowMap.purple}, transparent 75%)`,
+            background: `radial-gradient(circle 320px at ${sheen.x}% ${sheen.y}%, ${glowMap[glowColor] || glowMap.emerald}, transparent 75%)`,
           }}
         />
-        <div className="relative z-20 w-full h-full" style={{ transformStyle: "preserve-3d" }}>
+        <div className="relative z-20 w-full h-full text-slate-100" style={{ transformStyle: "preserve-3d" }}>
           {children}
         </div>
       </div>
@@ -217,6 +226,80 @@ export default function AdminPortalPage() {
   const [passcodeError, setPasscodeError] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Cyber Audio SFX & Live Digital Clock State
+  const [sfxEnabled, setSfxEnabled] = useState(true);
+  const [clockTime, setClockTime] = useState("");
+
+  useEffect(() => {
+    const fn = () => {
+      const now = new Date();
+      const pad = (n: number) => String(n).padStart(2, "0");
+      setClockTime(`${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} // ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);
+    };
+    fn();
+    const iv = setInterval(fn, 1000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const playCyberSound = (type: "blip" | "success" | "alert" | "lock" | "click") => {
+    if (!sfxEnabled || typeof window === "undefined") return;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      if (type === "blip") {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(820, ctx.currentTime);
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.05);
+      } else if (type === "click") {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(1200, ctx.currentTime);
+        gain.gain.setValueAtTime(0.03, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.03);
+      } else if (type === "success") {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+        osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.06);
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.16);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.16);
+      } else if (type === "alert") {
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(320, ctx.currentTime);
+        gain.gain.setValueAtTime(0.06, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.12);
+      } else if (type === "lock") {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.setValueAtTime(220, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.18);
+      }
+    } catch (e) {}
+  };
 
   // Admin Profile & Security Configuration State
   const [adminProfile, setAdminProfile] = useState<{
@@ -236,13 +319,13 @@ export default function AdminPortalPage() {
       } catch (e) {}
     }
     return {
-      name: "Nexus Admin Root",
-      email: "admin@codearena.dev",
-      title: "Chief System Architect & Judge",
-      avatar: "🛡️",
-      bio: "Master authority of CodeArena 2026. Architecting quad-engine compilation fabrics, live competition telemetry, and algorithmic sandbox isolation.",
-      securityLevel: "LEVEL 5 (ROOT AUTHORITY)",
-      themeColor: "purple",
+      name: "Nexus Root Operator",
+      email: "root@codearena.dev",
+      title: "Chief System Architect & Root Judge",
+      avatar: "⚡",
+      bio: "Root master authority of CodeArena 2026. Managing quad-engine compilation fabrics, live competition telemetry, and algorithmic sandbox isolation.",
+      securityLevel: "CLASSIFIED LEVEL 5 [SUPER-ADMIN ROOT]",
+      themeColor: "emerald",
       sessionTimeout: "8h",
     };
   });
@@ -862,6 +945,7 @@ export default function AdminPortalPage() {
   };
 
   const handleLockAdmin = () => {
+    playCyberSound("lock");
     localStorage.removeItem("codearena_admin_authorized");
     document.cookie = "codearena_admin_auth=; path=/; max-age=0";
     setIsAuthorized(false);
@@ -869,6 +953,7 @@ export default function AdminPortalPage() {
 
   const handleSaveAdminProfile = (e: React.FormEvent) => {
     e.preventDefault();
+    playCyberSound("success");
     if (typeof window !== "undefined") {
       localStorage.setItem("codearena_admin_profile", JSON.stringify(adminProfile));
       try {
@@ -897,17 +982,21 @@ export default function AdminPortalPage() {
     e.preventDefault();
     setPasscodeUpdateMsg(null);
     if (!newPasscodeVal.trim()) {
+      playCyberSound("alert");
       setPasscodeUpdateMsg({ type: "error", text: "Please enter a valid new passcode." });
       return;
     }
     if (newPasscodeVal !== confirmPasscodeVal) {
+      playCyberSound("alert");
       setPasscodeUpdateMsg({ type: "error", text: "Passcodes do not match. Please re-enter." });
       return;
     }
     if (newPasscodeVal.length < 6) {
+      playCyberSound("alert");
       setPasscodeUpdateMsg({ type: "error", text: "Passcode must be at least 6 characters long." });
       return;
     }
+    playCyberSound("success");
     if (typeof window !== "undefined") {
       localStorage.setItem("codearena_custom_admin_passcode", newPasscodeVal.trim());
     }
@@ -1551,36 +1640,52 @@ export default function AdminPortalPage() {
     return true;
   });
 
-  // Security Passcode Gate if not authorized
+  // Security Passcode Gate if not authorized (Classified Root Terminal)
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 selection:bg-primary/30">
-        <div className="w-full max-w-md space-y-6">
-          <div className="text-center space-y-2">
-            <div className="inline-flex h-14 w-14 rounded-2xl bg-destructive/10 border border-destructive/20 items-center justify-center text-3xl mb-2 shadow-lg">
-              🛡️
-            </div>
-            <h1 className="text-2xl font-black tracking-tight text-foreground">CodeArena Admin Portal</h1>
-            <p className="text-xs text-muted-foreground">
-              Super-Administrator authorization required to manage questions and contests.
-            </p>
-          </div>
+      <div className="min-h-screen bg-[#04060a] text-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden font-mono selection:bg-emerald-500/30 selection:text-emerald-200">
+        {/* Ambient Cyber Grid & Radar Rings */}
+        <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(#103020_1px,transparent_1px)] [background-size:20px_20px] opacity-40 z-0" />
+        <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-emerald-950/20 via-transparent to-cyan-950/20 z-0" />
 
-          <Card className="border-border/80 shadow-2xl bg-card/80 backdrop-blur-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-bold">Admin Authentication</CardTitle>
-              <CardDescription className="text-xs">
-                Enter your authorized administrator password to access the platform control studio.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+        <div className="w-full max-w-lg space-y-5 relative z-10">
+          {/* Mainframe Terminal Window */}
+          <div className="rounded-xl border border-emerald-500/30 bg-[#090e18]/95 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden">
+            {/* Terminal Header Bar */}
+            <div className="p-3 bg-[#0c1424] border-b border-emerald-500/20 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                <span className="text-[11px] font-mono font-bold tracking-wider text-emerald-400 ml-2">
+                  [CLASSIFIED // ROOT GATEWAY v2026.4]
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span>PORT 443 // SECURE</span>
+              </div>
+            </div>
+
+            {/* Terminal Output Banner */}
+            <div className="p-5 space-y-4">
+              <div className="space-y-1.5 p-3 rounded-lg bg-[#060a12] border border-[#162338] text-[11px] text-emerald-400/90 leading-relaxed font-mono">
+                <div>&gt; HOST: CODEARENA_CORE_MAIN // 127.0.0.1</div>
+                <div>&gt; SECURITY_CLEARANCE: LEVEL 5 (ROOT AUTHORITY) REQUIRED</div>
+                <div>&gt; CHIP_SIGNATURE: HARDWARE_TOKEN_VERIFIED</div>
+                <div className="text-emerald-300 font-bold">&gt; ENTER AUTHORIZATION MASTER KEY TO ENGAGE CONSOLE_</div>
+              </div>
+
               <form onSubmit={handleVerifyPasscode} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="passcode" className="text-xs font-bold">Admin Password</Label>
+                  <Label htmlFor="passcode" className="text-[11px] font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center justify-between">
+                    <span>Root Authorization Passcode</span>
+                    <span className="text-emerald-400 text-[10px] font-normal">AES-256 ENCRYPTED</span>
+                  </Label>
                   <Input
                     id="passcode"
                     type="password"
-                    placeholder="Enter Admin Password"
+                    placeholder="ENTER ROOT PASSCODE"
                     value={passcode}
                     onChange={(e) => {
                       setPasscode(e.target.value);
@@ -1588,327 +1693,341 @@ export default function AdminPortalPage() {
                     }}
                     required
                     autoFocus
-                    className="h-10 text-sm font-mono tracking-wider"
+                    className="h-11 text-sm font-mono tracking-widest bg-[#060a12] border-emerald-500/40 text-emerald-300 placeholder:text-slate-600 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:shadow-[0_0_20px_rgba(16,185,129,0.3)] rounded-lg"
                   />
                 </div>
 
                 {passcodeError && (
-                  <p className="text-xs font-semibold text-destructive bg-destructive/10 p-2.5 rounded-lg border border-destructive/20 animate-in fade-in">
-                    {passcodeError}
-                  </p>
+                  <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs font-mono flex items-center gap-2 animate-in fade-in">
+                    <span>⚠️</span>
+                    <span>[ALERT] ACCESS_DENIED // {passcodeError}</span>
+                  </div>
                 )}
 
                 <Button
                   type="submit"
                   disabled={verifying || !passcode.trim()}
-                  className="w-full h-10 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
+                  onClick={() => playCyberSound("blip")}
+                  className="w-full h-11 text-xs font-mono font-black tracking-widest uppercase bg-emerald-500 hover:bg-emerald-400 text-black shadow-[0_0_25px_rgba(16,185,129,0.4)] border border-emerald-300 rounded-lg transition-all"
                 >
-                  {verifying ? "Verifying Credentials..." : "Sign In to Admin Studio →"}
+                  {verifying ? "VERIFYING CRYPTOGRAPHIC KEY..." : "[AUTHENTICATE ROOT SESSION ↵]"}
                 </Button>
               </form>
-            </CardContent>
-          </Card>
 
-          <div className="text-center text-[11px] text-muted-foreground/70 font-mono">
-            🔒 CodeArena Security • Authorized Administrators Only
+              <div className="pt-2 border-t border-[#162338] flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                <span>IDENTITY: SUPER-ADMINISTRATOR</span>
+                <span className="text-emerald-500/80">TOKEN: ACTIVE</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center text-[11px] text-slate-500 font-mono flex items-center justify-center gap-2">
+            <span>🛡️</span>
+            <span>CodeArena Classified Operations • Root Administrators Only</span>
           </div>
         </div>
       </div>
     );
   }
 
-  // Full Admin Portal (Directly rendered for Admin)
+  // Full Admin Portal (Directly rendered for Admin - Cyber Terminal Theme)
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/30">
+    <div className="min-h-screen bg-[#06080e] text-slate-100 flex flex-col selection:bg-emerald-500/30 selection:text-emerald-200 relative overflow-x-hidden font-sans">
+      {/* Cyber Grid Background */}
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(#142636_1px,transparent_1px)] [background-size:24px_24px] opacity-40 z-0" />
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-emerald-950/15 via-transparent to-cyan-950/15 z-0" />
+
       {/* Top Admin Header */}
-      <header className="sticky top-0 z-50 border-b bg-background/90 backdrop-blur-xl border-border/80 shadow-md">
+      <header className="sticky top-0 z-50 border-b bg-[#080c14]/95 backdrop-blur-xl border-emerald-500/20 shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="font-extrabold text-xl tracking-tight text-foreground flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-destructive to-purple-600 flex items-center justify-center text-primary-foreground font-black text-sm shadow-md">
-                🛡️
+            <Link
+              href="/admin"
+              onClick={() => playCyberSound("blip")}
+              className="font-extrabold text-xl tracking-tight text-white flex items-center gap-2.5"
+            >
+              <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center text-black font-black text-base shadow-[0_0_20px_rgba(16,185,129,0.5)] border border-emerald-300">
+                ⚡
               </div>
-              Code<span className="text-primary">Arena</span> <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/15 text-destructive font-mono font-bold border border-destructive/30">ADMIN</span>
+              <div className="flex flex-col">
+                <div className="font-mono font-black text-sm sm:text-base tracking-widest text-slate-100 flex items-center gap-1.5">
+                  NEXUS<span className="text-emerald-400 font-bold">//MAINFRAME</span>
+                </div>
+                <span className="text-[9px] font-mono tracking-widest text-emerald-400/80 uppercase">
+                  ROOT CONSOLE • 2026.4
+                </span>
+              </div>
             </Link>
           </div>
 
-          <nav className="hidden lg:flex gap-2 text-xs font-semibold items-center">
-            <button
-              onClick={() => setActiveTab("overview")}
-              className={`transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
-                activeTab === "overview"
-                  ? "bg-primary/15 text-primary border border-primary/30 font-bold shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-              }`}
-            >
-              <span>⚡</span> Overview
-            </button>
-            <button
-              onClick={() => setActiveTab("questions")}
-              className={`transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
-                activeTab === "questions"
-                  ? "bg-primary/15 text-primary border border-primary/30 font-bold shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-              }`}
-            >
-              <span>📚</span> Questions ({allQuestions.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab("contests");
-                loadContests();
-              }}
-              className={`transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
-                activeTab === "contests"
-                  ? "bg-amber-500/15 text-amber-400 border border-amber-500/30 font-bold shadow-sm"
-                  : "text-amber-400/80 hover:text-amber-300 hover:bg-amber-500/10"
-              }`}
-            >
-              <span>🏆</span> Contests ({contestsList.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("create")}
-              className={`transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
-                activeTab === "create"
-                  ? "bg-primary/15 text-primary border border-primary/30 font-bold shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-              }`}
-            >
-              <span>➕</span> Create
-            </button>
-            <button
-              onClick={() => setActiveTab("import")}
-              className={`transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
-                activeTab === "import"
-                  ? "bg-primary/15 text-primary border border-primary/30 font-bold shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-              }`}
-            >
-              <span>📁</span> Import
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab("users");
-                loadUsers();
-              }}
-              className={`transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
-                activeTab === "users"
-                  ? "bg-primary/15 text-primary border border-primary/30 font-bold shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-              }`}
-            >
-              <span>👥</span> Users ({allUsersList.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("system")}
-              className={`transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
-                activeTab === "system"
-                  ? "bg-primary/15 text-primary border border-primary/30 font-bold shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-              }`}
-            >
-              <span>🎛️</span> Health
-            </button>
-            <button
-              onClick={() => setActiveTab("profile")}
-              className={`transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
-                activeTab === "profile"
-                  ? "bg-purple-500/15 text-purple-400 border border-purple-500/30 font-bold shadow-sm"
-                  : "text-purple-400/80 hover:text-purple-300 hover:bg-purple-500/10"
-              }`}
-            >
-              <span>🛡️</span> Profile
-            </button>
+          <nav className="hidden lg:flex gap-1.5 text-xs font-mono items-center">
+            {[
+              { id: "overview", label: "[01 // OVERVIEW]", icon: "⚡" },
+              { id: "questions", label: `[02 // QUESTIONS (${allQuestions.length})]`, icon: "📚" },
+              { id: "contests", label: `[03 // CONTESTS (${contestsList.length})]`, icon: "🏆", action: loadContests },
+              { id: "create", label: "[04 // CREATOR]", icon: "➕" },
+              { id: "import", label: "[05 // IMPORT]", icon: "📁" },
+              { id: "users", label: `[06 // ROSTER (${allUsersList.length})]`, icon: "👥", action: loadUsers },
+              { id: "system", label: "[07 // HEALTH]", icon: "🎛️" },
+              { id: "profile", label: "[08 // VAULT]", icon: "🛡️" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  playCyberSound("blip");
+                  if (tab.action) tab.action();
+                }}
+                className={`transition-all px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1.5 ${
+                  activeTab === tab.id
+                    ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.25)] font-bold"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-[#0f172a] border border-transparent"
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
           </nav>
 
-          <div className="flex items-center gap-3">
-            {/* Clickable Admin Profile Quick Pill */}
+          <div className="flex items-center gap-2.5">
+            {/* Live Digital Clock */}
+            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-md bg-[#0d1422] border border-emerald-500/30 text-emerald-400 font-mono text-[11px] shadow-inner">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping opacity-75" />
+              <span>{clockTime || "2026.10.11 // 17:05:00"}</span>
+            </div>
+
+            {/* Audio SFX Toggle */}
             <button
-              onClick={() => setActiveTab("profile")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-xs font-semibold group ${
-                activeTab === "profile"
-                  ? "bg-purple-500/20 border-purple-500/40 text-purple-300 shadow-sm"
-                  : "bg-secondary/60 hover:bg-secondary/90 border-border/80 text-foreground"
-              }`}
-              title="Admin Profile & Security Center"
+              onClick={() => {
+                setSfxEnabled(!sfxEnabled);
+                if (!sfxEnabled) playCyberSound("blip");
+              }}
+              className="hidden sm:flex px-2 py-1 rounded-md bg-[#0d1422] border border-[#1e2a3f] hover:border-emerald-500/50 text-[10px] font-mono text-slate-300 items-center gap-1 transition-colors"
+              title="Toggle Cyber Sound Effects"
             >
-              <span className="text-base group-hover:scale-110 transition-transform">
-                {adminProfile.avatar || "🛡️"}
-              </span>
-              <span className="hidden sm:inline font-mono text-[11px] font-bold">
-                {adminProfile.name.split(" ")[0]}
-              </span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>{sfxEnabled ? "🔊 ON" : "🔈 MUTED"}</span>
             </button>
 
+            {/* Root Operator Identity */}
+            <button
+              onClick={() => {
+                setActiveTab("profile");
+                playCyberSound("blip");
+              }}
+              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border transition-all text-xs font-mono font-bold ${
+                activeTab === "profile"
+                  ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                  : "bg-[#0c121e] hover:bg-[#111928] border-emerald-500/30 text-slate-200"
+              }`}
+              title="Root Operator Profile & Vault"
+            >
+              <span className="text-sm">{adminProfile.avatar || "⚡"}</span>
+              <span className="hidden sm:inline text-[11px] text-emerald-400 font-mono tracking-wider">
+                {adminProfile.name.split(" ")[0].toUpperCase()}
+              </span>
+              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] border border-emerald-500/40">
+                ROOT
+              </span>
+            </button>
+
+            {/* Lock Button */}
             <Button
               variant="destructive"
               size="sm"
-              onClick={handleLockAdmin}
-              className="h-8 text-xs font-bold shadow-sm gap-1.5"
-              title="Lock Admin and require password again"
+              onClick={() => {
+                playCyberSound("lock");
+                handleLockAdmin();
+              }}
+              className="h-8 text-xs font-mono font-bold bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-300 gap-1.5 shadow-[0_0_15px_rgba(244,63,94,0.2)]"
+              title="Terminate Root Session"
             >
-              <span>🔒</span> Lock & Exit
+              <span>🔒</span> <span className="hidden sm:inline">[LOCK]</span>
             </Button>
           </div>
         </div>
       </header>
 
       {/* Main Admin Workspace */}
-      <main className="flex-1 container mx-auto px-6 py-8 space-y-6 max-w-7xl">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4 border-border/60">
+      <main className="flex-1 container mx-auto px-6 py-8 space-y-6 max-w-7xl relative z-10">
+        <Tabs
+          value={activeTab}
+          onValueChange={(val) => {
+            setActiveTab(val);
+            playCyberSound("blip");
+          }}
+          className="space-y-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4 border-emerald-500/20">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-2.5">
-                {activeTab === "overview" && <span>⚡ Nexus Command Center • 2026 Telemetry HUD</span>}
-                {activeTab === "profile" && <span>🛡️ Super-Admin Profile & Security Vault</span>}
-                {activeTab === "questions" && <span>📚 Question Operations & Content Studio</span>}
-                {activeTab === "contests" && <span>🏆 Live Contest Studio & Tournament Orchestrator</span>}
-                {activeTab === "create" && <span>➕ Algorithmic Problem Creator Studio</span>}
-                {activeTab === "import" && <span>📁 JSON File Drop & Batch Staging Suite</span>}
-                {activeTab === "system" && <span>🎛️ Quad-Engine Execution Fabric & Health</span>}
-                {activeTab === "users" && <span>👥 Platform Users, Roles & Roster Governance</span>}
+              <h1 className="text-2xl sm:text-3xl font-mono font-black tracking-wide text-slate-100 flex items-center gap-2.5">
+                {activeTab === "overview" && <span className="text-emerald-400">⚡ // NEXUS_COMMAND_CENTER [TELEMETRY_HUD]</span>}
+                {activeTab === "profile" && <span className="text-emerald-400">🛡️ // ROOT_OPERATOR_VAULT [SECURITY_CLEARANCE]</span>}
+                {activeTab === "questions" && <span className="text-cyan-400">📚 // PROBLEM_BANK_MATRIX [CONTENT_STUDIO]</span>}
+                {activeTab === "contests" && <span className="text-amber-400">🏆 // TOURNAMENT_ORCHESTRATOR [LIVE_ARENA]</span>}
+                {activeTab === "create" && <span className="text-emerald-400">➕ // ALGORITHM_AUTHORING_LAB [DEV_STUDIO]</span>}
+                {activeTab === "import" && <span className="text-cyan-400">📁 // BATCH_IMPORT_STAGING [JSON_FABRIC]</span>}
+                {activeTab === "system" && <span className="text-emerald-400">🎛️ // QUAD_ENGINE_DIAGNOSTICS [KERNEL_HEALTH]</span>}
+                {activeTab === "users" && <span className="text-sky-400">👥 // PLATFORM_ROSTER_REGISTRY [ACCESS_CONTROL]</span>}
               </h1>
-              <p className="text-xs text-muted-foreground mt-1">
-                {activeTab === "overview" && "Real-time orchestration platform, execution health telemetry, live algorithmic monitoring, and system metrics."}
-                {activeTab === "profile" && "Manage root credentials, cryptographic key status, visual theme accents, and audit governance."}
-                {activeTab === "questions" && "Add, edit, drop files, and manage algorithmic problems across the platform with immediate IDE synchronization."}
-                {activeTab === "contests" && "Schedule and deploy competitive programming contests with live leaderboards and instant execution."}
-                {activeTab === "create" && "Author bespoke coding challenges with auto-generated multi-language templates and test cases."}
-                {activeTab === "import" && "Upload raw JSON questions or drag & drop files to batch-import into the platform."}
-                {activeTab === "system" && "Telemetry and sandbox verification for JavaScript V8, Python 3, C++20, and Java 21 runtimes."}
-                {activeTab === "users" && "Manage permissions, elevate student roles to Super-Admin, and calibrate rating statistics."}
+              <p className="text-xs font-mono text-slate-400 mt-1">
+                {activeTab === "overview" && "> REAL-TIME KERNEL STATUS • QUAD-ENGINE ISOLATION ACTIVE • METRIC STREAM ONLINE"}
+                {activeTab === "profile" && "> ROOT CREDENTIAL GOVERNANCE • ENCRYPTION KEYS • HUD THEME SKINS"}
+                {activeTab === "questions" && "> IN-MEMORY PROBLEM STORE SYNCHRONIZED ACROSS DISTRIBUTED SANDBOXES"}
+                {activeTab === "contests" && "> REAL-TIME MULTI-CODER ARENA ORCHESTRATION WITH INSTANT CLOCK RUNNERS"}
+                {activeTab === "create" && "> GENERATE BESPOKE CHALLENGES WITH QUAD-LANGUAGE (V8/PY3/CPP/JVM) TEMPLATES"}
+                {activeTab === "import" && "> BULK PARSE AND PUBLISH LEETCODE-STYLE PROBLEMS INTO CODEARENA IDE"}
+                {activeTab === "system" && "> CPU / MEMORY / LATENCY RUNTIME BENCHMARK GAUGES FOR CODEARENA RUNNERS"}
+                {activeTab === "users" && "> ELEVATE STUDENT ROLES • CALIBRATE COMPETITOR ELO • GOVERN PERMISSIONS"}
               </p>
             </div>
+
+            {/* Tactical Quick Dock Buttons */}
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant={activeTab === "overview" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setActiveTab("overview")}
-                className="h-8 text-xs font-bold gap-1.5 shadow-sm"
+                onClick={() => { setActiveTab("overview"); playCyberSound("blip"); }}
+                className={`h-8 text-xs font-mono font-bold gap-1.5 ${
+                  activeTab === "overview"
+                    ? "bg-emerald-500 hover:bg-emerald-400 text-black border border-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                    : "bg-[#0b121e] border-emerald-500/30 text-emerald-300 hover:bg-[#111c2e]"
+                }`}
               >
-                <span>⚡</span> Overview (Home)
+                <span>⚡</span> OVERVIEW
               </Button>
               <Button
                 variant={activeTab === "questions" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setActiveTab("questions")}
-                className="h-8 text-xs font-semibold gap-1.5"
+                onClick={() => { setActiveTab("questions"); playCyberSound("blip"); }}
+                className={`h-8 text-xs font-mono font-bold gap-1.5 ${
+                  activeTab === "questions"
+                    ? "bg-cyan-500 hover:bg-cyan-400 text-black border border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.4)]"
+                    : "bg-[#0b121e] border-cyan-500/30 text-cyan-300 hover:bg-[#111c2e]"
+                }`}
               >
-                <span>📚</span> Problems ({allQuestions.length})
+                <span>📚</span> PROBLEMS ({allQuestions.length})
               </Button>
               <Button
                 variant={activeTab === "contests" ? "default" : "outline"}
                 size="sm"
-                onClick={() => {
-                  setActiveTab("contests");
-                  loadContests();
-                }}
-                className="h-8 text-xs font-bold gap-1.5 border-amber-500/40 text-amber-400 hover:bg-amber-500/10"
+                onClick={() => { setActiveTab("contests"); loadContests(); playCyberSound("blip"); }}
+                className={`h-8 text-xs font-mono font-bold gap-1.5 ${
+                  activeTab === "contests"
+                    ? "bg-amber-500 hover:bg-amber-400 text-black border border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
+                    : "bg-[#0b121e] border-amber-500/30 text-amber-300 hover:bg-[#111c2e]"
+                }`}
               >
-                <span>🏆</span> Contests ({contestsList.length})
+                <span>🏆</span> CONTESTS ({contestsList.length})
               </Button>
               <Button
                 size="sm"
                 onClick={() => {
                   handleResetForm();
                   setActiveTab("create");
+                  playCyberSound("blip");
                 }}
-                className="h-8 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5"
+                className="h-8 text-xs font-mono font-bold bg-emerald-500 hover:bg-emerald-400 text-black border border-emerald-300 gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.35)]"
               >
-                <span>➕</span> Create Question
+                <span>➕</span> CREATE
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setActiveTab("import")}
-                className="h-8 text-xs font-semibold gap-1.5 border-primary/40 text-primary hover:bg-primary/10"
+                onClick={() => { setActiveTab("import"); playCyberSound("blip"); }}
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#0b121e] border-cyan-500/30 text-cyan-300 hover:bg-[#111c2e]"
               >
-                <span>📁</span> Drop / Import
+                <span>📁</span> IMPORT
               </Button>
               <Button
                 variant={activeTab === "users" ? "default" : "outline"}
                 size="sm"
-                onClick={() => {
-                  setActiveTab("users");
-                  loadUsers();
-                }}
-                className="h-8 text-xs font-semibold gap-1.5"
+                onClick={() => { setActiveTab("users"); loadUsers(); playCyberSound("blip"); }}
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#0b121e] border-sky-500/30 text-sky-300 hover:bg-[#111c2e]"
               >
-                <span>👥</span> Users ({allUsersList.length})
+                <span>👥</span> USERS ({allUsersList.length})
               </Button>
               <Button
                 variant={activeTab === "profile" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setActiveTab("profile")}
-                className="h-8 text-xs font-bold gap-1.5 border-purple-500/40 text-purple-400 hover:bg-purple-500/10"
+                onClick={() => { setActiveTab("profile"); playCyberSound("blip"); }}
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#0b121e] border-emerald-500/30 text-emerald-300 hover:bg-[#111c2e]"
               >
-                <span>🛡️</span> Profile & Vault
+                <span>🛡️</span> ROOT VAULT
               </Button>
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={handleExportJson}
-                className="h-8 text-xs font-semibold gap-1.5"
+                onClick={() => { handleExportJson(); playCyberSound("success"); }}
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#141d2f] hover:bg-[#1b273e] text-slate-200 border border-[#22324f]"
                 title="Download complete JSON backup of all problems"
               >
-                <span>📥</span> Export JSON
+                <span>📥</span> EXPORT JSON
               </Button>
             </div>
           </div>
 
-          {/* TAB 0: 2026 NEXUS OVERVIEW & COMMAND CENTER */}
+          {/* TAB 0: 2026 NEXUS OVERVIEW & COMMAND CENTER (Cyber Terminal Theme) */}
           <TabsContent value="overview" className="space-y-6 m-0 focus-visible:outline-none">
             {/* Live Telemetry Status Ticker */}
-            <div className="relative rounded-2xl border border-primary/25 bg-gradient-to-r from-card/90 via-primary/5 to-purple-950/20 backdrop-blur-xl p-4 md:p-5 overflow-hidden shadow-lg">
-              <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative rounded-xl border border-emerald-500/30 bg-gradient-to-r from-[#09111c] via-[#0b1726] to-[#07131b] backdrop-blur-xl p-4 md:p-5 overflow-hidden shadow-[0_0_35px_rgba(16,185,129,0.08)]">
+              {/* Corner Tech Notches */}
+              <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-emerald-400 pointer-events-none" />
+              <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-emerald-400 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-emerald-400 pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-emerald-400 pointer-events-none" />
+
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
                 <div className="flex items-center gap-3">
-                  <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-xl shadow-inner">
+                  <div className="relative flex items-center justify-center w-11 h-11 rounded-lg bg-[#0e1b2b] border border-emerald-500/40 text-xl shadow-inner text-emerald-400 font-mono">
                     <span>⚡</span>
-                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 animate-ping opacity-75" />
-                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500" />
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-sm md:text-base font-black tracking-wide uppercase text-foreground">
-                        Nexus Admin Matrix 2026
+                      <h2 className="text-sm md:text-base font-mono font-black tracking-widest uppercase text-slate-100">
+                        NEXUS // REALTIME TELEMETRY MATRIX
                       </h2>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-bold">
-                        ONLINE • v2.8 PRO
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px] font-bold">
+                        ACTIVE • KERNEL 2026.4
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Quad-Engine Sandboxing • Real-Time Contest Studio • Live Problem Fabric
+                    <p className="text-xs font-mono text-slate-400 mt-0.5">
+                      QUAD-ENGINE SANDBOXES ONLINE • MULTI-CODER ARENA ORCHESTRATION • IN-MEMORY PROBLEM STORE
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="px-3 py-1.5 rounded-xl bg-secondary/60 border border-border/80 text-[11px] font-mono flex items-center gap-2">
-                    <span className="text-muted-foreground">Admin:</span>
-                    <span className="font-bold text-foreground">{adminProfile.name}</span>
-                    <span className="text-primary text-[10px] px-1.5 py-0.5 rounded bg-primary/15 font-semibold">
-                      {adminProfile.securityLevel.split(" ")[0]}
+                <div className="flex flex-wrap items-center gap-2 font-mono">
+                  <div className="px-3 py-1.5 rounded-lg bg-[#0c1424] border border-[#1b2b44] text-[11px] font-mono flex items-center gap-2">
+                    <span className="text-slate-400">OPERATOR:</span>
+                    <span className="font-bold text-emerald-300">{adminProfile.name.toUpperCase()}</span>
+                    <span className="text-emerald-400 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 font-bold border border-emerald-500/30">
+                      ROOT
                     </span>
                   </div>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={handleRunHealthDiagnostic}
-                    className="h-8 text-xs font-semibold gap-1.5 border-primary/30 hover:bg-primary/10"
+                    onClick={() => {
+                      playCyberSound("blip");
+                      handleRunHealthDiagnostic();
+                    }}
+                    className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#0b1424] border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15"
                   >
-                    <span>🩺</span> Ping Quad-Engine
+                    <span>🩺</span> [PING_KERNEL]
                   </Button>
                   <Button
                     size="sm"
                     onClick={() => {
                       handleResetForm();
                       setActiveTab("create");
+                      playCyberSound("blip");
                     }}
-                    className="h-8 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 shadow-md"
+                    className="h-8 text-xs font-mono font-black bg-emerald-500 hover:bg-emerald-400 text-black border border-emerald-300 gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.35)]"
                   >
-                    <span>➕</span> New Problem
+                    <span>➕</span> [NEW_PROBLEM]
                   </Button>
                 </div>
               </div>
@@ -1917,51 +2036,51 @@ export default function AdminPortalPage() {
             {/* 4 Core Telemetry Metric 3D Tilt Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Telemetry Card 1: Problems Repository */}
-              <AdminTiltCard glowColor="indigo" className="p-5 flex flex-col justify-between">
-                <div className="space-y-3">
+              <AdminTiltCard glowColor="emerald" className="p-5 flex flex-col justify-between">
+                <div className="space-y-3 font-mono">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider font-mono">
-                      Algorithmic Repository
+                    <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
+                      // 01: REPOSITORY_MATRIX
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-sm">
                       📚
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl font-black tracking-tight text-foreground">
+                    <div className="text-3xl font-black tracking-tight text-white font-mono">
                       {allQuestions.length}
                     </div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      Problems available in platform IDE
+                    <div className="text-[11px] text-slate-400 mt-0.5 font-mono">
+                      Algorithmic problems indexed
                     </div>
                   </div>
 
                   {/* Difficulty Distribution Bar */}
                   <div className="space-y-1.5 pt-1">
-                    <div className="h-2 w-full rounded-full bg-secondary/80 overflow-hidden flex">
+                    <div className="h-2 w-full rounded bg-[#0d1422] border border-[#1b2a42] overflow-hidden flex">
                       <div
                         style={{
                           width: `${allQuestions.length ? (allQuestions.filter((q) => q.difficulty === "EASY").length / allQuestions.length) * 100 : 0}%`,
                         }}
-                        className="bg-emerald-500 h-full"
+                        className="bg-emerald-400 h-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"
                         title="Easy"
                       />
                       <div
                         style={{
                           width: `${allQuestions.length ? (allQuestions.filter((q) => q.difficulty === "MEDIUM").length / allQuestions.length) * 100 : 0}%`,
                         }}
-                        className="bg-amber-500 h-full"
+                        className="bg-amber-400 h-full shadow-[0_0_8px_rgba(245,158,11,0.8)]"
                         title="Medium"
                       />
                       <div
                         style={{
                           width: `${allQuestions.length ? (allQuestions.filter((q) => q.difficulty === "HARD").length / allQuestions.length) * 100 : 0}%`,
                         }}
-                        className="bg-rose-500 h-full"
+                        className="bg-rose-400 h-full shadow-[0_0_8px_rgba(244,63,94,0.8)]"
                         title="Hard"
                       />
                     </div>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
+                    <div className="flex items-center justify-between text-[10px] font-mono">
                       <span className="text-emerald-400 font-bold">
                         {allQuestions.filter((q) => q.difficulty === "EASY").length} Easy
                       </span>
@@ -1975,190 +2094,198 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                  <span className="text-[11px] text-muted-foreground font-mono">
+                <div className="pt-4 border-t border-[#1a283e] flex items-center justify-between font-mono">
+                  <span className="text-[10px] text-slate-400">
                     {customSlugs.size} Custom Ideations
                   </span>
                   <button
-                    onClick={() => setActiveTab("questions")}
-                    className="text-[11px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                    onClick={() => {
+                      setActiveTab("questions");
+                      playCyberSound("blip");
+                    }}
+                    className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
                   >
-                    View Bank →
+                    INSPECT_BANK →
                   </button>
                 </div>
               </AdminTiltCard>
 
               {/* Telemetry Card 2: Contests Studio */}
               <AdminTiltCard glowColor="amber" className="p-5 flex flex-col justify-between">
-                <div className="space-y-3">
+                <div className="space-y-3 font-mono">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono">
-                      Tournaments Studio
+                    <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
+                      // 02: TOURNAMENTS_ARENA
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-sm">
                       🏆
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
+                    <div className="text-3xl font-black tracking-tight text-white flex items-center gap-2">
                       {contestsList.length}
                       {contestsList.some((c) => c.status === "LIVE") && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse font-mono font-bold">
-                          LIVE
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/50 animate-pulse font-mono font-bold">
+                          ● LIVE_NOW
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      Competitive tournaments registered
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      Competitive tournaments scheduled
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-1.5 py-1">
-                    <div className="p-1.5 rounded-lg bg-secondary/50 border border-border/50 text-center">
+                    <div className="p-1.5 rounded bg-[#0d1422] border border-[#1b2a42] text-center">
                       <div className="text-xs font-bold text-rose-400">
                         {contestsList.filter((c) => c.status === "LIVE").length}
                       </div>
-                      <div className="text-[9px] text-muted-foreground">Live</div>
+                      <div className="text-[9px] text-slate-400">Live</div>
                     </div>
-                    <div className="p-1.5 rounded-lg bg-secondary/50 border border-border/50 text-center">
+                    <div className="p-1.5 rounded bg-[#0d1422] border border-[#1b2a42] text-center">
                       <div className="text-xs font-bold text-amber-400">
                         {contestsList.filter((c) => c.status === "UPCOMING").length}
                       </div>
-                      <div className="text-[9px] text-muted-foreground">Upcoming</div>
+                      <div className="text-[9px] text-slate-400">Upcoming</div>
                     </div>
-                    <div className="p-1.5 rounded-lg bg-secondary/50 border border-border/50 text-center">
-                      <div className="text-xs font-bold text-muted-foreground">
+                    <div className="p-1.5 rounded bg-[#0d1422] border border-[#1b2a42] text-center">
+                      <div className="text-xs font-bold text-slate-400">
                         {contestsList.filter((c) => c.status === "ENDED").length}
                       </div>
-                      <div className="text-[9px] text-muted-foreground">Ended</div>
+                      <div className="text-[9px] text-slate-400">Ended</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                  <span className="text-[11px] text-muted-foreground font-mono">
+                <div className="pt-4 border-t border-[#1a283e] flex items-center justify-between font-mono">
+                  <span className="text-[10px] text-slate-400">
                     {contestsList.reduce((acc, c) => acc + (c.participantsCount || 0), 0)} Registrations
                   </span>
                   <button
                     onClick={() => {
                       setActiveTab("contests");
                       loadContests();
+                      playCyberSound("blip");
                     }}
                     className="text-[11px] font-bold text-amber-400 hover:text-amber-300 transition-colors"
                   >
-                    Open Studio →
+                    OPEN_ARENA →
                   </button>
                 </div>
               </AdminTiltCard>
 
               {/* Telemetry Card 3: Student Community & Roster */}
-              <AdminTiltCard glowColor="purple" className="p-5 flex flex-col justify-between">
-                <div className="space-y-3">
+              <AdminTiltCard glowColor="cyan" className="p-5 flex flex-col justify-between">
+                <div className="space-y-3 font-mono">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-purple-400 uppercase tracking-wider font-mono">
-                      Student Community
+                    <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-widest">
+                      // 03: COMPETITOR_ROSTER
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center text-sm">
                       👥
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl font-black tracking-tight text-foreground">
+                    <div className="text-3xl font-black tracking-tight text-white font-mono">
                       {allUsersList.length || 6}
                     </div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      Platform coder accounts active
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      Registered coder credentials
                     </div>
                   </div>
 
                   <div className="space-y-1.5 py-1 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-[11px]">Active Students:</span>
-                      <span className="font-bold text-foreground font-mono">
+                      <span className="text-slate-400 text-[11px]">Active Coders:</span>
+                      <span className="font-bold text-slate-200">
                         {allUsersList.filter((u) => u.role !== "ADMIN" && u.role !== "SUPER_ADMIN").length || 5}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-[11px]">Peak DSA Rating:</span>
-                      <span className="font-bold text-purple-400 font-mono">
-                        {Math.max(...allUsersList.map((u) => u.score || 1450), 1850)} Elo
+                      <span className="text-slate-400 text-[11px]">Peak Elo Rating:</span>
+                      <span className="font-bold text-cyan-300">
+                        {Math.max(...allUsersList.map((u) => u.score || 1450), 1850)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-[11px]">Global Pass Rate:</span>
-                      <span className="font-bold text-emerald-400 font-mono">68.4%</span>
+                      <span className="text-slate-400 text-[11px]">Global Pass Rate:</span>
+                      <span className="font-bold text-emerald-400">68.4%</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                  <span className="text-[11px] text-muted-foreground font-mono">
+                <div className="pt-4 border-t border-[#1a283e] flex items-center justify-between font-mono">
+                  <span className="text-[10px] text-slate-400">
                     {allUsersList.filter((u) => u.role === "ADMIN" || u.role === "SUPER_ADMIN").length || 1} Admins
                   </span>
                   <button
                     onClick={() => {
                       setActiveTab("users");
                       loadUsers();
+                      playCyberSound("blip");
                     }}
-                    className="text-[11px] font-bold text-purple-400 hover:text-purple-300 transition-colors"
+                    className="text-[11px] font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
                   >
-                    Manage Roster →
+                    ROSTER_ADMIN →
                   </button>
                 </div>
               </AdminTiltCard>
 
               {/* Telemetry Card 4: Quad-Engine Execution Fabric */}
-              <AdminTiltCard glowColor="cyan" className="p-5 flex flex-col justify-between">
-                <div className="space-y-3">
+              <AdminTiltCard glowColor="emerald" className="p-5 flex flex-col justify-between">
+                <div className="space-y-3 font-mono">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">
-                      Execution Fabric
+                    <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
+                      // 04: QUAD_EXECUTION_FABRIC
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-sm">
                       🎛️
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl font-black tracking-tight text-foreground flex items-center gap-1.5">
+                    <div className="text-3xl font-black tracking-tight text-white flex items-center gap-1.5">
                       <span>4 / 4</span>
-                      <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30">
-                        HEALTHY
+                      <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40">
+                        OPERATIONAL
                       </span>
                     </div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      Compilers & runtimes isolated
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      Process sandbox isolation verified
                     </div>
                   </div>
 
-                  <div className="space-y-1 text-[11px] font-mono">
-                    <div className="flex items-center justify-between text-muted-foreground">
+                  <div className="space-y-1 text-[11px]">
+                    <div className="flex items-center justify-between text-slate-400">
                       <span>JavaScript V8:</span>
-                      <span className="text-emerald-400 font-bold">12ms • OK</span>
+                      <span className="text-emerald-400 font-bold">12ms • ONLINE</span>
                     </div>
-                    <div className="flex items-center justify-between text-muted-foreground">
+                    <div className="flex items-center justify-between text-slate-400">
                       <span>Python 3.12:</span>
-                      <span className="text-emerald-400 font-bold">24ms • OK</span>
+                      <span className="text-emerald-400 font-bold">24ms • ONLINE</span>
                     </div>
-                    <div className="flex items-center justify-between text-muted-foreground">
+                    <div className="flex items-center justify-between text-slate-400">
                       <span>C++20 Clang:</span>
-                      <span className="text-emerald-400 font-bold">18ms • OK</span>
+                      <span className="text-emerald-400 font-bold">18ms • ONLINE</span>
                     </div>
-                    <div className="flex items-center justify-between text-muted-foreground">
+                    <div className="flex items-center justify-between text-slate-400">
                       <span>Java 21 JVM:</span>
-                      <span className="text-emerald-400 font-bold">36ms • OK</span>
+                      <span className="text-emerald-400 font-bold">36ms • ONLINE</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                  <span className="text-[11px] text-emerald-400 font-mono font-bold">
-                    Zero Sandbox Leaks
+                <div className="pt-4 border-t border-[#1a283e] flex items-center justify-between font-mono">
+                  <span className="text-[10px] text-emerald-400 font-bold">
+                    Zero Leaks
                   </span>
                   <button
-                    onClick={() => setActiveTab("system")}
-                    className="text-[11px] font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
+                    onClick={() => {
+                      setActiveTab("system");
+                      playCyberSound("blip");
+                    }}
+                    className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
                   >
-                    Diagnostics →
+                    RUN_DIAGNOSTICS →
                   </button>
                 </div>
               </AdminTiltCard>
@@ -2168,11 +2295,11 @@ export default function AdminPortalPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-extrabold tracking-tight text-foreground">
-                    ⚡ 2026 Command Launchpad
+                  <h3 className="text-base font-mono font-black tracking-wide text-slate-100 flex items-center gap-2">
+                    <span className="text-emerald-400">⚡</span> // TACTICAL_COMMAND_LAUNCHPAD
                   </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Quick-deploy administrative actions with immediate system synchronization
+                  <p className="text-xs font-mono text-slate-400">
+                    High-priority administrative actions with instant distributed synchronization
                   </p>
                 </div>
               </div>
@@ -2182,19 +2309,20 @@ export default function AdminPortalPage() {
                   onClick={() => {
                     handleResetForm();
                     setActiveTab("create");
+                    playCyberSound("blip");
                   }}
-                  className="group p-4 rounded-xl border border-primary/25 bg-card/60 hover:bg-primary/10 hover:border-primary/50 transition-all duration-200 text-left flex items-start gap-3.5 shadow-sm hover:shadow-md"
+                  className="group p-4 rounded-xl border border-emerald-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-emerald-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                     ➕
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                      <span>Create Algorithmic Problem</span>
-                      <span className="text-xs text-primary group-hover:translate-x-1 transition-transform">→</span>
+                  <div className="flex-1 min-w-0 font-mono">
+                    <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
+                      <span>[01: CREATE_PROBLEM]</span>
+                      <span className="text-xs text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      Design problems with starter templates in JS/Py/C++/Java, hidden test cases, and immediate IDE sync.
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
+                      Author challenges with auto multi-language starter code, hidden test vectors, and live IDE sync.
                     </p>
                   </div>
                 </button>
@@ -2203,37 +2331,41 @@ export default function AdminPortalPage() {
                   onClick={() => {
                     setActiveTab("contests");
                     loadContests();
+                    playCyberSound("blip");
                   }}
-                  className="group p-4 rounded-xl border border-amber-500/25 bg-card/60 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all duration-200 text-left flex items-start gap-3.5 shadow-sm hover:shadow-md"
+                  className="group p-4 rounded-xl border border-amber-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-amber-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-lg bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                     🏆
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                      <span>Deploy Live Contest</span>
+                  <div className="flex-1 min-w-0 font-mono">
+                    <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
+                      <span>[02: DEPLOY_CONTEST]</span>
                       <span className="text-xs text-amber-400 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      Spin up instant live battles or schedule ranked tournaments with dynamic leaderboards and timers.
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
+                      Deploy real-time ranked coding battles with dynamic live leaderboards and instant countdowns.
                     </p>
                   </div>
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("import")}
-                  className="group p-4 rounded-xl border border-primary/25 bg-card/60 hover:bg-primary/10 hover:border-primary/50 transition-all duration-200 text-left flex items-start gap-3.5 shadow-sm hover:shadow-md"
+                  onClick={() => {
+                    setActiveTab("import");
+                    playCyberSound("blip");
+                  }}
+                  className="group p-4 rounded-xl border border-cyan-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-cyan-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-lg bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                     📁
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                      <span>File Drop & JSON Import</span>
-                      <span className="text-xs text-primary group-hover:translate-x-1 transition-transform">→</span>
+                  <div className="flex-1 min-w-0 font-mono">
+                    <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
+                      <span>[03: BATCH_IMPORT]</span>
+                      <span className="text-xs text-cyan-400 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      Drag & drop complete question bundles or import via single JSON file with batch validation.
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
+                      Drag & drop raw LeetCode-style question packages with instant schema validation and staging.
                     </p>
                   </div>
                 </button>
@@ -2242,55 +2374,62 @@ export default function AdminPortalPage() {
                   onClick={() => {
                     setActiveTab("users");
                     loadUsers();
+                    playCyberSound("blip");
                   }}
-                  className="group p-4 rounded-xl border border-purple-500/25 bg-card/60 hover:bg-purple-500/10 hover:border-purple-500/50 transition-all duration-200 text-left flex items-start gap-3.5 shadow-sm hover:shadow-md"
+                  className="group p-4 rounded-xl border border-sky-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-sky-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-lg bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                     👥
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                      <span>User Roster & Permissions</span>
-                      <span className="text-xs text-purple-400 group-hover:translate-x-1 transition-transform">→</span>
+                  <div className="flex-1 min-w-0 font-mono">
+                    <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
+                      <span>[04: ROSTER_PERMISSIONS]</span>
+                      <span className="text-xs text-sky-400 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      Elevate student roles to Super-Admin, calibrate DSA ratings, and manage academy accounts.
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
+                      Elevate coder accounts to Super-Admin, calibrate Elo scores, and inspect activity logs.
                     </p>
                   </div>
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("profile")}
-                  className="group p-4 rounded-xl border border-purple-500/25 bg-card/60 hover:bg-purple-500/10 hover:border-purple-500/50 transition-all duration-200 text-left flex items-start gap-3.5 shadow-sm hover:shadow-md"
+                  onClick={() => {
+                    setActiveTab("profile");
+                    playCyberSound("blip");
+                  }}
+                  className="group p-4 rounded-xl border border-emerald-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-emerald-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                     🛡️
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                      <span>Admin Profile & Vault</span>
-                      <span className="text-xs text-purple-400 group-hover:translate-x-1 transition-transform">→</span>
+                  <div className="flex-1 min-w-0 font-mono">
+                    <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
+                      <span>[05: ROOT_VAULT]</span>
+                      <span className="text-xs text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      Customize your 3D administrative badge, rotate master passcodes, and choose HUD visual skins.
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
+                      Manage root credentials, rotate master passcodes, configure audio SFX, and choose HUD themes.
                     </p>
                   </div>
                 </button>
 
                 <button
-                  onClick={handleExportJson}
-                  className="group p-4 rounded-xl border border-cyan-500/25 bg-card/60 hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all duration-200 text-left flex items-start gap-3.5 shadow-sm hover:shadow-md"
+                  onClick={() => {
+                    handleExportJson();
+                    playCyberSound("success");
+                  }}
+                  className="group p-4 rounded-xl border border-slate-700 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-slate-500 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                     📥
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                      <span>Export Global JSON Archive</span>
-                      <span className="text-xs text-cyan-400 group-hover:translate-x-1 transition-transform">→</span>
+                  <div className="flex-1 min-w-0 font-mono">
+                    <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
+                      <span>[06: GLOBAL_EXPORT]</span>
+                      <span className="text-xs text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      Download complete JSON backup of all problems and test cases for version control and migration.
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
+                      Download complete JSON backup of all problems and test cases for disaster recovery.
                     </p>
                   </div>
                 </button>
@@ -2301,109 +2440,112 @@ export default function AdminPortalPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left: Topic Breakdown & Difficulty Visualizer (7 cols) */}
               <div className="lg:col-span-7 space-y-4">
-                <Card className="border-border/80 bg-card/75 backdrop-blur-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-sm font-bold flex items-center gap-2">
-                          <span>📊</span> Algorithmic Topics Distribution
-                        </CardTitle>
-                        <CardDescription className="text-xs">
-                          Click any topic to filter and inspect questions in the Question Bank
-                        </CardDescription>
-                      </div>
-                      <span className="text-xs font-mono text-muted-foreground">
-                        {AVAILABLE_TOPICS.length} Topics
-                      </span>
+                <div className="rounded-xl border border-emerald-500/25 bg-[#0a0f19]/95 backdrop-blur-md p-5 shadow-lg space-y-4 font-mono">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#18263a]">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                        <span className="text-emerald-400">📊</span> // ALGORITHMIC_TOPIC_MATRIX
+                      </h4>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Filter questions by classification topic across the platform
+                      </p>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                      {AVAILABLE_TOPICS.map((topic) => {
-                        const count = allQuestions.filter((q) =>
-                          q.topics.some((t) => t.name.toLowerCase() === topic.toLowerCase())
-                        ).length;
-                        return (
-                          <button
-                            key={topic}
-                            onClick={() => {
-                              setSearchQuery(topic);
-                              setActiveTab("questions");
-                            }}
-                            className="px-2.5 py-1.5 rounded-lg bg-secondary/60 hover:bg-primary/20 hover:border-primary/40 border border-border/80 text-xs font-medium transition-all flex items-center gap-1.5 group"
-                          >
-                            <span className="text-foreground group-hover:text-primary transition-colors">
-                              {topic}
-                            </span>
-                            <span className="px-1.5 py-0.2 rounded-full bg-secondary text-[10px] font-mono text-muted-foreground font-bold">
-                              {count}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <span className="text-xs text-emerald-400">
+                      [{AVAILABLE_TOPICS.length} TOPICS]
+                    </span>
+                  </div>
 
-                    <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/60 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <span>💡</span>
-                        <span>Need a new category? Custom topics are automatically indexed upon creation.</span>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setActiveTab("create")}
-                        className="h-7 text-xs font-bold text-primary hover:bg-primary/10"
-                      >
-                        Add Topic →
-                      </Button>
+                  <div className="flex flex-wrap gap-2">
+                    {AVAILABLE_TOPICS.map((topic) => {
+                      const count = allQuestions.filter((q) =>
+                        q.topics.some((t) => t.name.toLowerCase() === topic.toLowerCase())
+                      ).length;
+                      return (
+                        <button
+                          key={topic}
+                          onClick={() => {
+                            setSearchQuery(topic);
+                            setActiveTab("questions");
+                            playCyberSound("blip");
+                          }}
+                          className="px-2.5 py-1.5 rounded-lg bg-[#0e1626] hover:bg-emerald-500/15 hover:border-emerald-400/60 border border-[#1a293f] text-xs transition-all flex items-center gap-1.5 group"
+                        >
+                          <span className="text-slate-300 group-hover:text-emerald-300 transition-colors">
+                            {topic}
+                          </span>
+                          <span className="px-1.5 py-0.2 rounded bg-[#080d17] text-[10px] text-emerald-400 font-bold border border-[#1a293f]">
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-[#080e18] border border-[#162235] flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <span className="text-emerald-400">⚡</span>
+                      <span>Custom topics dynamically indexed upon question authoring.</span>
                     </div>
-                  </CardContent>
-                </Card>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setActiveTab("create");
+                        playCyberSound("blip");
+                      }}
+                      className="h-7 text-xs font-mono font-bold text-emerald-400 hover:bg-emerald-500/15"
+                    >
+                      [+ ADD_TOPIC]
+                    </Button>
+                  </div>
+                </div>
               </div>
 
               {/* Right: Live Audit & Activity Stream (5 cols) */}
               <div className="lg:col-span-5 space-y-4">
-                <Card className="border-border/80 bg-card/75 backdrop-blur-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-sm font-bold flex items-center gap-2">
-                          <span>🛰️</span> Live Audit & Telemetry Stream
-                        </CardTitle>
-                        <CardDescription className="text-xs">
-                          Real-time administrative events & engine pings
-                        </CardDescription>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={handleRunHealthDiagnostic}
-                          className="p-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground text-xs"
-                          title="Refresh / Run Diagnostic"
-                        >
-                          🔄
-                        </button>
-                      </div>
+                <div className="rounded-xl border border-emerald-500/25 bg-[#0a0f19]/95 backdrop-blur-md p-5 shadow-lg space-y-3 font-mono">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#18263a]">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                        <span className="text-emerald-400">🛰️</span> // KERNEL_AUDIT_STREAM
+                      </h4>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Real-time kernel events & runtime execution pings
+                      </p>
                     </div>
+                    <button
+                      onClick={() => {
+                        playCyberSound("blip");
+                        handleRunHealthDiagnostic();
+                      }}
+                      className="p-1.5 rounded-lg bg-[#0e1626] border border-[#1b2b42] hover:border-emerald-400 text-emerald-400 text-xs"
+                      title="Run Diagnostic Ping"
+                    >
+                      🔄
+                    </button>
+                  </div>
 
-                    {/* Filter Pills */}
-                    <div className="flex items-center gap-1.5 pt-2">
-                      {(["all", "system", "question", "contest", "security"] as const).map((filter) => (
-                        <button
-                          key={filter}
-                          onClick={() => setAuditFilter(filter)}
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-bold transition-colors ${
-                            auditFilter === filter
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-secondary/60 text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {filter}
-                        </button>
-                      ))}
-                    </div>
-                  </CardHeader>
+                  {/* Filter Pills */}
+                  <div className="flex items-center gap-1.5 pb-2">
+                    {(["all", "system", "question", "contest", "security"] as const).map((filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => {
+                          setAuditFilter(filter);
+                          playCyberSound("blip");
+                        }}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider font-bold transition-colors ${
+                          auditFilter === filter
+                            ? "bg-emerald-500 text-black border border-emerald-300"
+                            : "bg-[#0e1626] text-slate-400 border border-[#1b2b42] hover:text-slate-200"
+                        }`}
+                      >
+                        {filter}
+                      </button>
+                    ))}
+                  </div>
 
-                  <CardContent className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                     {auditLogs
                       .filter((l) => auditFilter === "all" || l.type === auditFilter)
                       .map((log) => {
@@ -2414,21 +2556,21 @@ export default function AdminPortalPage() {
                           security: "🛡️",
                         };
                         const colorMap = {
-                          system: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
-                          question: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
-                          contest: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-                          security: "text-rose-400 bg-rose-500/10 border-rose-500/20",
+                          system: "text-cyan-400 bg-cyan-500/10 border-cyan-500/25",
+                          question: "text-emerald-400 bg-emerald-500/10 border-emerald-500/25",
+                          contest: "text-amber-400 bg-amber-500/10 border-amber-500/25",
+                          security: "text-rose-400 bg-rose-500/10 border-rose-500/25",
                         };
                         return (
                           <div
                             key={log.id}
-                            className="p-2.5 rounded-xl bg-secondary/40 border border-border/60 flex items-start gap-2.5 text-xs animate-in fade-in"
+                            className="p-2.5 rounded-lg bg-[#070b13] border border-[#141e2e] flex items-start gap-2.5 text-xs animate-in fade-in"
                           >
                             <span className="text-sm mt-0.5">{iconMap[log.type]}</span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-foreground leading-snug">{log.message}</p>
+                              <p className="text-slate-200 leading-snug font-mono text-[11px]">{log.message}</p>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[10px] font-mono text-muted-foreground">{log.time}</span>
+                                <span className="text-[10px] font-mono text-slate-500">{log.time}</span>
                                 <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded border font-bold ${colorMap[log.type]}`}>
                                   {log.type.toUpperCase()}
                                 </span>
@@ -2437,8 +2579,8 @@ export default function AdminPortalPage() {
                           </div>
                         );
                       })}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
             </div>
           </TabsContent>
@@ -2457,23 +2599,23 @@ export default function AdminPortalPage() {
             )}
 
             {/* Filter, Search, and Reordering Toolbar */}
-            <div className="flex flex-col gap-3 p-4 rounded-xl bg-card border border-border/80 shadow-sm">
+            <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#0b101a]/95 border border-cyan-500/25 shadow-xl backdrop-blur-md">
               <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
                 <div className="w-full md:w-80">
                   <Input
                     placeholder="Search by title, slug, or topic..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-9 text-xs"
+                    className="h-9 text-xs font-mono bg-[#06080e] border-cyan-500/30 text-cyan-200 placeholder-cyan-900/60 focus:border-cyan-400"
                   />
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                  <span className="text-xs text-muted-foreground font-semibold">Filter:</span>
+                  <span className="text-xs font-mono text-cyan-400 font-semibold">// FILTER:</span>
                   <select
                     value={difficultyFilter}
                     onChange={(e) => setDifficultyFilter(e.target.value)}
-                    className="h-9 text-xs rounded-md bg-secondary px-3 py-1 border border-border font-medium"
+                    className="h-9 text-xs font-mono rounded-md bg-[#06080e] text-cyan-200 px-3 py-1 border border-cyan-500/30 font-medium focus:border-cyan-400 focus:outline-none"
                   >
                     <option value="ALL">All Difficulties</option>
                     <option value="EASY">Easy</option>
@@ -2484,7 +2626,7 @@ export default function AdminPortalPage() {
                   <select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className="h-9 text-xs rounded-md bg-secondary px-3 py-1 border border-border font-medium"
+                    className="h-9 text-xs font-mono rounded-md bg-[#06080e] text-cyan-200 px-3 py-1 border border-cyan-500/30 font-medium focus:border-cyan-400 focus:outline-none"
                   >
                     <option value="ALL">All Sources</option>
                     <option value="CUSTOM">Custom Admin Only ({customSlugs.size})</option>
@@ -2494,13 +2636,13 @@ export default function AdminPortalPage() {
               </div>
 
               {/* Order Tools Row */}
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/60 text-xs">
-                <div className="flex items-center gap-2 text-muted-foreground text-[11px]">
-                  <span className="text-primary font-bold">⠿ Drag & Drop:</span>
-                  <span>Grab the drag handles to reorder questions in real-time.</span>
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-cyan-500/15 text-xs font-mono">
+                <div className="flex items-center gap-2 text-slate-400 text-[11px]">
+                  <span className="text-cyan-400 font-bold">⠿ DRAG & REORDER:</span>
+                  <span>Grab drag handles to reorder question sequence in real-time.</span>
                   {isCustomOrderActive && (
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[10px] font-bold">
-                      Custom Order Active
+                    <span className="px-2 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-500/30 text-[10px] font-bold">
+                      CUSTOM_ORDER_ACTIVE
                     </span>
                   )}
                 </div>
@@ -2509,30 +2651,30 @@ export default function AdminPortalPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={handleSortByDifficulty}
-                    className="h-7 text-[11px] font-bold gap-1 border-primary/40 text-primary hover:bg-primary/10"
+                    onClick={() => { handleSortByDifficulty(); playCyberSound("blip"); }}
+                    className="h-7 text-[11px] font-mono font-bold gap-1 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10"
                     title="Strictly arrange 50 Easy -> 50 Medium -> 50 Hard"
                   >
-                    <span>🎯</span> Tier by Difficulty (50 Easy → 50 Medium → 50 Hard)
+                    <span>🎯</span> TIER_BY_DIFFICULTY (50E → 50M → 50H)
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={handleResetToDefaultOrder}
-                    className="h-7 text-[11px] text-muted-foreground hover:text-foreground gap-1"
+                    onClick={() => { handleResetToDefaultOrder(); playCyberSound("blip"); }}
+                    className="h-7 text-[11px] font-mono text-slate-400 hover:text-cyan-300 gap-1 hover:bg-[#06080e]"
                     title="Reset to factory default sequence"
                   >
-                    <span>🔄</span> Reset Order
+                    <span>🔄</span> RESET_ORDER
                   </Button>
                 </div>
               </div>
             </div>
 
             {/* Questions Table */}
-            <div className="rounded-xl border border-border/80 bg-card overflow-hidden shadow-sm">
+            <div className="rounded-xl border border-cyan-500/25 bg-[#0b101a]/95 overflow-hidden shadow-xl backdrop-blur-md">
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-secondary/60 text-muted-foreground uppercase tracking-wider font-mono text-[10px] border-b border-border">
+                  <thead className="bg-[#06080e] text-cyan-400/80 uppercase tracking-wider font-mono text-[10px] border-b border-cyan-500/20">
                     <tr>
                       <th className="py-3 px-3 text-center w-12">#</th>
                       <th className="py-3 px-2 text-center w-14">Order</th>
@@ -2545,11 +2687,11 @@ export default function AdminPortalPage() {
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border/60">
+                  <tbody className="divide-y divide-cyan-500/10 font-mono">
                     {filteredQuestions.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="py-8 text-center text-muted-foreground">
-                          No questions matched your filters.
+                        <td colSpan={9} className="py-8 text-center text-slate-500 font-mono">
+                          // NO QUESTIONS MATCHED THE ACTIVE TELEMETRY FILTER //
                         </td>
                       </tr>
                     ) : (
@@ -2570,14 +2712,14 @@ export default function AdminPortalPage() {
                             onDragEnd={handleDragEnd}
                             className={`transition-all ${
                               isBeingDragged
-                                ? "opacity-30 bg-secondary/80 scale-[0.99]"
+                                ? "opacity-30 bg-cyan-950/60 scale-[0.99]"
                                 : isTargeted
-                                ? "bg-primary/20 border-y-2 border-primary"
-                                : "hover:bg-secondary/30"
+                                ? "bg-cyan-950/40 border-y-2 border-cyan-400"
+                                : "hover:bg-cyan-950/20"
                             }`}
                           >
                             {/* Sequence Number */}
-                            <td className="py-3.5 px-3 text-center font-mono text-muted-foreground font-bold text-[11px]">
+                            <td className="py-3.5 px-3 text-center font-mono text-cyan-400 font-bold text-[11px]">
                               {idx + 1}
                             </td>
 
@@ -2585,7 +2727,7 @@ export default function AdminPortalPage() {
                             <td className="py-3.5 px-2 text-center">
                               <div className="flex items-center justify-center gap-1">
                                 <span
-                                  className="cursor-grab active:cursor-grabbing text-base text-muted-foreground hover:text-primary transition-colors select-none p-1"
+                                  className="cursor-grab active:cursor-grabbing text-base text-slate-500 hover:text-cyan-400 transition-colors select-none p-1"
                                   title="Click and drag to reposition"
                                 >
                                   ⠿
@@ -2595,7 +2737,7 @@ export default function AdminPortalPage() {
                                     type="button"
                                     onClick={() => handleMoveQuestion(q.slug, "UP")}
                                     disabled={idx === 0}
-                                    className="text-[9px] text-muted-foreground hover:text-foreground disabled:opacity-20 px-1 py-0.2 rounded hover:bg-secondary"
+                                    className="text-[9px] text-slate-500 hover:text-cyan-300 disabled:opacity-20 px-1 py-0.2 rounded hover:bg-[#06080e]"
                                     title="Move up"
                                   >
                                     ▲
@@ -2604,7 +2746,7 @@ export default function AdminPortalPage() {
                                     type="button"
                                     onClick={() => handleMoveQuestion(q.slug, "DOWN")}
                                     disabled={idx === filteredQuestions.length - 1}
-                                    className="text-[9px] text-muted-foreground hover:text-foreground disabled:opacity-20 px-1 py-0.2 rounded hover:bg-secondary"
+                                    className="text-[9px] text-slate-500 hover:text-cyan-300 disabled:opacity-20 px-1 py-0.2 rounded hover:bg-[#06080e]"
                                     title="Move down"
                                   >
                                     ▼
@@ -2615,21 +2757,21 @@ export default function AdminPortalPage() {
 
                             {/* Title & Slug */}
                             <td className="py-3.5 px-4 font-semibold">
-                              <div className="text-foreground text-xs font-bold flex items-center gap-1.5">
+                              <div className="text-slate-100 text-xs font-bold flex items-center gap-1.5">
                                 <span>{q.title}</span>
                               </div>
-                              <div className="text-[11px] text-muted-foreground font-mono mt-0.5">{q.slug}</div>
+                              <div className="text-[11px] text-cyan-500/70 font-mono mt-0.5">{q.slug}</div>
                             </td>
 
                             {/* Difficulty */}
                             <td className="py-3.5 px-4">
                               <span
-                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
                                   q.difficulty === "EASY"
-                                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                                    ? "bg-emerald-950/60 text-emerald-400 border-emerald-500/30"
                                     : q.difficulty === "MEDIUM"
-                                    ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                                    : "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                                    ? "bg-amber-950/60 text-amber-400 border-amber-500/30"
+                                    : "bg-rose-950/60 text-rose-400 border-rose-500/30"
                                 }`}
                               >
                                 {q.difficulty}
@@ -2638,55 +2780,55 @@ export default function AdminPortalPage() {
 
                             {/* Topics */}
                             <td className="py-3.5 px-4">
-                              <div className="flex flex-wrap gap-1 max-w-xs">
+                              <div className="flex flex-wrap gap-1 max-w-xs font-mono">
                                 {q.topics?.slice(0, 3).map((t, tIdx) => (
-                                  <span key={tIdx} className="px-1.5 py-0.5 rounded bg-secondary text-[10px] text-foreground font-medium">
+                                  <span key={tIdx} className="px-1.5 py-0.5 rounded bg-[#06080e] text-[10px] text-slate-300 border border-cyan-500/20">
                                     {t.name}
                                   </span>
                                 ))}
                                 {q.topics && q.topics.length > 3 && (
-                                  <span className="text-[10px] text-muted-foreground font-mono">+{q.topics.length - 3}</span>
+                                  <span className="text-[10px] text-cyan-400/70 font-mono">+{q.topics.length - 3}</span>
                                 )}
                               </div>
                             </td>
 
                             {/* Method Name */}
-                            <td className="py-3.5 px-4 font-mono text-[11px] text-primary">
+                            <td className="py-3.5 px-4 font-mono text-[11px] text-cyan-400">
                               {q.methodName || "solution"}()
                             </td>
 
                             {/* Test Cases */}
-                            <td className="py-3.5 px-4 font-mono text-xs">
+                            <td className="py-3.5 px-4 font-mono text-xs text-slate-300">
                               {totalCases} cases ({q.publicTestCases?.length || 0} pub / {q.hiddenTestCases?.length || 0} hid)
                             </td>
 
                             {/* Source */}
                             <td className="py-3.5 px-4">
                               {isCustom ? (
-                                <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold border border-primary/30">
-                                  Custom Admin
+                                <span className="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 text-[10px] font-mono font-bold border border-emerald-500/40">
+                                  ADMIN_CUSTOM
                                 </span>
                               ) : (
-                                <span className="px-2 py-0.5 rounded-full bg-secondary text-muted-foreground text-[10px] font-medium border border-border">
-                                  Built-in
+                                <span className="px-2 py-0.5 rounded bg-[#06080e] text-slate-400 text-[10px] font-mono border border-slate-700">
+                                  BUILT_IN
                                 </span>
                               )}
                             </td>
 
                             {/* Actions */}
                             <td className="py-3.5 px-4 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                              <div className="flex items-center justify-end gap-1.5 font-mono">
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => handleEditQuestion(q)}
-                                  className="h-7 px-2.5 text-[11px]"
+                                  onClick={() => { handleEditQuestion(q); playCyberSound("blip"); }}
+                                  className="h-7 px-2.5 text-[11px] font-mono border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/15"
                                 >
-                                  Edit
+                                  EDIT
                                 </Button>
 
                                 <Link href={`/problems/${q.slug}`} target="_blank">
-                                  <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px] text-primary hover:text-primary">
+                                  <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px] font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/30">
                                     ▶ IDE
                                   </Button>
                                 </Link>
@@ -2695,8 +2837,8 @@ export default function AdminPortalPage() {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    onClick={() => handleDelete(q.slug)}
-                                    className="h-7 px-2 text-[11px] text-destructive hover:bg-destructive/10"
+                                    onClick={() => { handleDelete(q.slug); playCyberSound("alert"); }}
+                                    className="h-7 px-2 text-[11px] font-mono text-rose-400 hover:bg-rose-950/40 hover:text-rose-300"
                                   >
                                     ✕
                                   </Button>
@@ -2715,18 +2857,19 @@ export default function AdminPortalPage() {
 
           {/* TAB 2: MANUAL QUESTION CREATOR / EDITOR */}
           <TabsContent value="create" className="space-y-6 m-0 focus-visible:outline-none">
-            <Card className="shadow-lg border-border/80 bg-card">
-              <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
+            <Card className="shadow-2xl border-emerald-500/25 bg-[#0b101a]/95 text-slate-100 backdrop-blur-md">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-emerald-500/20 pb-4">
                 <div>
-                  <CardTitle className="text-xl">
+                  <div className="text-[10px] font-mono text-emerald-400 tracking-widest uppercase mb-0.5">// CONTENT_STUDIO // LAB</div>
+                  <CardTitle className="text-xl font-mono font-bold text-slate-100">
                     {editingSlug ? `Editing Question: ${formData.title}` : "Create & Publish New Question"}
                   </CardTitle>
-                  <CardDescription className="text-xs mt-1">
+                  <CardDescription className="text-xs font-mono text-slate-400 mt-1">
                     Configure question parameters, test cases, and starter code. Saved questions will be immediately available in the IDE.
                   </CardDescription>
                 </div>
                 {editingSlug && (
-                  <Button variant="outline" size="sm" onClick={handleResetForm} className="text-xs h-8">
+                  <Button variant="outline" size="sm" onClick={() => { handleResetForm(); playCyberSound("blip"); }} className="text-xs font-mono h-8 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10">
                     Cancel Edit (Create New)
                   </Button>
                 )}
@@ -3065,11 +3208,11 @@ export default function AdminPortalPage() {
 
                   {/* Submit Button */}
                   <div className="flex items-center gap-3 pt-2">
-                    <Button type="submit" className="h-10 px-8 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">
-                      {editingSlug ? "Save Changes" : "Create & Publish Question"}
+                    <Button type="submit" className="h-10 px-8 text-xs font-mono font-bold bg-emerald-500 hover:bg-emerald-400 text-black shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                      {editingSlug ? "SAVE_CHANGES" : "CREATE & PUBLISH QUESTION"}
                     </Button>
-                    <Button type="button" variant="outline" onClick={handleResetForm} className="h-10 text-xs">
-                      Reset
+                    <Button type="button" variant="outline" onClick={() => { handleResetForm(); playCyberSound("blip"); }} className="h-10 text-xs font-mono border-emerald-500/30 text-slate-300 hover:bg-emerald-500/10">
+                      RESET_FORM
                     </Button>
                   </div>
                 </form>
@@ -3079,18 +3222,18 @@ export default function AdminPortalPage() {
 
           {/* TAB 3: SECURED DRAG & DROP FILE IMPORTER (.JSON, .PDF, .MD, .TXT) */}
           <TabsContent value="import" className="space-y-6 m-0 focus-visible:outline-none">
-            <Card className="shadow-xl border-border/80 bg-card overflow-hidden">
-              <CardHeader className="border-b pb-5 bg-gradient-to-r from-card via-secondary/30 to-card">
+            <Card className="shadow-2xl border-cyan-500/25 bg-[#0b101a]/95 text-slate-100 overflow-hidden backdrop-blur-md">
+              <CardHeader className="border-b border-cyan-500/20 pb-5 bg-gradient-to-r from-[#0b101a] via-[#0e1726] to-[#0b101a]">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="p-1.5 rounded-lg bg-primary/10 text-primary text-base">🛡️</span>
-                      <CardTitle className="text-xl font-bold tracking-tight">Secured Question & Document Importer</CardTitle>
+                      <span className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 text-base">🛡️</span>
+                      <CardTitle className="text-xl font-mono font-bold tracking-tight text-slate-100">Secured Question & Document Importer</CardTitle>
                       <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
                         Anti-Crash Sandboxed
                       </span>
                     </div>
-                    <CardDescription className="text-xs text-muted-foreground">
+                    <CardDescription className="text-xs font-mono text-slate-400">
                       Upload verified algorithmic problem documents or JSON question arrays. Prevents crashes, malicious payloads, and memory overflow.
                     </CardDescription>
                   </div>
@@ -3403,58 +3546,58 @@ export default function AdminPortalPage() {
           {/* TAB 4: SYSTEM HEALTH & STATS */}
           <TabsContent value="system" className="space-y-6 m-0 focus-visible:outline-none">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-card shadow-sm border-border/80">
+              <Card className="bg-[#0b101a]/95 shadow-xl border-emerald-500/25 text-slate-100 backdrop-blur-md">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs text-muted-foreground">Total Questions</CardTitle>
+                  <CardTitle className="text-xs font-mono text-emerald-400">// TOTAL_QUESTIONS</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-black text-foreground">{allQuestions.length}</div>
-                  <p className="text-[11px] text-muted-foreground mt-1">Available in practice bank</p>
+                  <div className="text-3xl font-mono font-black text-slate-100">{allQuestions.length}</div>
+                  <p className="text-[11px] font-mono text-slate-400 mt-1">Available in practice bank</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card shadow-sm border-border/80">
+              <Card className="bg-[#0b101a]/95 shadow-xl border-cyan-500/25 text-slate-100 backdrop-blur-md">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs text-muted-foreground">Custom Admin Questions</CardTitle>
+                  <CardTitle className="text-xs font-mono text-cyan-400">// CUSTOM_ADMIN_QUESTIONS</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-black text-primary">{customSlugs.size}</div>
-                  <p className="text-[11px] text-muted-foreground mt-1">Created / imported by you</p>
+                  <div className="text-3xl font-mono font-black text-cyan-400">{customSlugs.size}</div>
+                  <p className="text-[11px] font-mono text-slate-400 mt-1">Created / imported by root</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card shadow-sm border-border/80">
+              <Card className="bg-[#0b101a]/95 shadow-xl border-amber-500/25 text-slate-100 backdrop-blur-md">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs text-muted-foreground">Built-in Questions</CardTitle>
+                  <CardTitle className="text-xs font-mono text-amber-400">// BUILT_IN_QUESTIONS</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-black text-foreground">{allQuestions.length - customSlugs.size}</div>
-                  <p className="text-[11px] text-muted-foreground mt-1">Factory curated set</p>
+                  <div className="text-3xl font-mono font-black text-amber-400">{allQuestions.length - customSlugs.size}</div>
+                  <p className="text-[11px] font-mono text-slate-400 mt-1">Factory curated set</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card shadow-sm border-border/80">
+              <Card className="bg-[#0b101a]/95 shadow-xl border-emerald-500/25 text-slate-100 backdrop-blur-md">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs text-muted-foreground">Connected Accounts</CardTitle>
+                  <CardTitle className="text-xs font-mono text-emerald-400">// CONNECTED_ACCOUNTS</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-black text-emerald-400">{getAllAccounts().length}</div>
-                  <p className="text-[11px] text-muted-foreground mt-1">Logged in on this browser</p>
+                  <div className="text-3xl font-mono font-black text-emerald-400">{getAllAccounts().length}</div>
+                  <p className="text-[11px] font-mono text-slate-400 mt-1">Logged in on this browser</p>
                 </CardContent>
               </Card>
             </div>
 
-            <Card className="shadow-lg border-border/80 bg-card">
-              <CardHeader className="border-b pb-4">
-                <CardTitle className="text-lg">Maintenance & Operations</CardTitle>
-                <CardDescription className="text-xs">
+            <Card className="shadow-2xl border-emerald-500/25 bg-[#0b101a]/95 text-slate-100 backdrop-blur-md">
+              <CardHeader className="border-b border-emerald-500/20 pb-4">
+                <CardTitle className="text-lg font-mono font-bold text-slate-100">Maintenance & Kernel Operations</CardTitle>
+                <CardDescription className="text-xs font-mono text-slate-400">
                   Tools to manage local storage caches and platform data integrity.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-secondary/40 border border-border">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-[#06080e] border border-emerald-500/20">
                   <div>
-                    <h4 className="text-xs font-bold text-foreground">Export All Platform Data</h4>
+                    <h4 className="text-xs font-mono font-bold text-slate-100">Export All Platform Data</h4>
                     <p className="text-[11px] text-muted-foreground mt-0.5">
                       Download full JSON archive of all built-in and custom questions with complete test suites.
                     </p>
@@ -3492,14 +3635,15 @@ export default function AdminPortalPage() {
 
           {/* TAB 5: USER MANAGEMENT */}
           <TabsContent value="users" className="space-y-6 m-0 focus-visible:outline-none">
-            <Card className="bg-card/80 backdrop-blur-md border-border/80 shadow-xl overflow-hidden">
-              <CardHeader className="border-b border-border/60 pb-4">
+            <Card className="bg-[#0b101a]/95 backdrop-blur-md border-sky-500/25 shadow-2xl overflow-hidden text-slate-100">
+              <CardHeader className="border-b border-sky-500/20 pb-4 bg-gradient-to-r from-[#0b101a] via-[#081726] to-[#0b101a]">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <CardTitle className="text-xl font-bold flex items-center gap-2">
+                    <div className="text-[10px] font-mono text-sky-400 tracking-widest uppercase mb-0.5">// PLATFORM_REGISTRY // ACCESS_CONTROL</div>
+                    <CardTitle className="text-xl font-mono font-bold flex items-center gap-2 text-slate-100">
                       <span>👥</span> Platform User Accounts & Access Controls
                     </CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground mt-1">
+                    <CardDescription className="text-xs font-mono text-slate-400 mt-1">
                       Manage administrator roles, review user algorithmic progress, and control system privileges.
                     </CardDescription>
                   </div>
@@ -3508,23 +3652,23 @@ export default function AdminPortalPage() {
                       placeholder="Search by username or name..."
                       value={userSearchQuery}
                       onChange={(e) => setUserSearchQuery(e.target.value)}
-                      className="h-8 text-xs w-64 bg-background"
+                      className="h-8 text-xs font-mono w-64 bg-[#06080e] border-sky-500/30 text-sky-200 placeholder-sky-900/60 focus:border-sky-400"
                     />
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={loadUsers}
-                      className="h-8 text-xs font-semibold gap-1"
+                      onClick={() => { loadUsers(); playCyberSound("blip"); }}
+                      className="h-8 text-xs font-mono font-semibold gap-1 border-sky-500/30 text-sky-300 hover:bg-sky-500/10"
                     >
-                      <span>🔄</span> Refresh
+                      <span>🔄</span> REFRESH
                     </Button>
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={handleClearAllUsers}
-                      className="h-8 text-xs font-semibold gap-1"
+                      onClick={() => { handleClearAllUsers(); playCyberSound("alert"); }}
+                      className="h-8 text-xs font-mono font-semibold gap-1 bg-rose-950/80 border border-rose-500/30 text-rose-300 hover:bg-rose-900"
                     >
-                      <span>🗑️</span> Clear All Users (Fresh Start)
+                      <span>🗑️</span> CLEAR_ALL_USERS
                     </Button>
                   </div>
                 </div>
@@ -3674,45 +3818,45 @@ export default function AdminPortalPage() {
 
               return (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-                  <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg font-bold">
+                  <div className="p-4 rounded-xl bg-[#0b101a]/95 border border-emerald-500/25 shadow-xl flex items-center gap-3 backdrop-blur-md">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg font-bold border border-emerald-500/20">
                       🟢
                     </div>
                     <div>
-                      <p className="text-[11px] text-muted-foreground font-semibold uppercase">Live & Upcoming</p>
-                      <p className="text-xl font-black">
-                        {contestsList.filter(c => c.status === "LIVE").length} <span className="text-xs text-muted-foreground font-normal">Live</span> / {contestsList.filter(c => c.status === "UPCOMING").length} <span className="text-xs text-muted-foreground font-normal">Up</span>
+                      <p className="text-[11px] font-mono text-emerald-400 font-semibold uppercase">// LIVE & UPCOMING</p>
+                      <p className="text-xl font-mono font-black text-slate-100">
+                        {contestsList.filter(c => c.status === "LIVE").length} <span className="text-xs text-emerald-400 font-normal">Live</span> / {contestsList.filter(c => c.status === "UPCOMING").length} <span className="text-xs text-amber-400 font-normal">Up</span>
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg font-bold">
+                  <div className="p-4 rounded-xl bg-[#0b101a]/95 border border-cyan-500/25 shadow-xl flex items-center gap-3 backdrop-blur-md">
+                    <div className="w-10 h-10 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-lg font-bold border border-cyan-500/20">
                       👥
                     </div>
                     <div>
-                      <p className="text-[11px] text-muted-foreground font-semibold uppercase">Total Enrolled</p>
-                      <p className="text-xl font-black">{totalEnrolled} <span className="text-xs text-muted-foreground font-normal">Students</span></p>
+                      <p className="text-[11px] font-mono text-cyan-400 font-semibold uppercase">// TOTAL_ENROLLED</p>
+                      <p className="text-xl font-mono font-black text-slate-100">{totalEnrolled} <span className="text-xs text-slate-400 font-normal">Students</span></p>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-lg font-bold">
+                  <div className="p-4 rounded-xl bg-[#0b101a]/95 border border-purple-500/25 shadow-xl flex items-center gap-3 backdrop-blur-md">
+                    <div className="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg font-bold border border-purple-500/20">
                       📝
                     </div>
                     <div>
-                      <p className="text-[11px] text-muted-foreground font-semibold uppercase">Total Submissions</p>
-                      <p className="text-xl font-black">{totalSubs} <span className="text-xs text-muted-foreground font-normal">Solved/Tried</span></p>
+                      <p className="text-[11px] font-mono text-purple-400 font-semibold uppercase">// SUBMISSIONS_TOTAL</p>
+                      <p className="text-xl font-mono font-black text-slate-100">{totalSubs} <span className="text-xs text-slate-400 font-normal">Submits</span></p>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg font-bold">
+                  <div className="p-4 rounded-xl bg-[#0b101a]/95 border border-amber-500/25 shadow-xl flex items-center gap-3 backdrop-blur-md">
+                    <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold border border-amber-500/20">
                       🏆
                     </div>
                     <div>
-                      <p className="text-[11px] text-muted-foreground font-semibold uppercase">Accepted Solves</p>
-                      <p className="text-xl font-black">{totalAc} <span className="text-xs text-muted-foreground font-normal">({successRate}%)</span></p>
+                      <p className="text-[11px] font-mono text-amber-400 font-semibold uppercase">// ACCEPTED_SOLVES</p>
+                      <p className="text-xl font-mono font-black text-slate-100">{totalAc} <span className="text-xs text-amber-400 font-normal">({successRate}%)</span></p>
                     </div>
                   </div>
                 </div>
@@ -3720,14 +3864,15 @@ export default function AdminPortalPage() {
             })()}
 
             {/* Create & Launch Contest Builder */}
-            <Card className="border-border/80 shadow-sm overflow-hidden">
-              <CardHeader className="bg-secondary/40 border-b border-border/60 pb-4">
+            <Card className="border-amber-500/25 bg-[#0b101a]/95 shadow-2xl overflow-hidden text-slate-100 backdrop-blur-md">
+              <CardHeader className="bg-gradient-to-r from-[#0b101a] via-[#1a1408] to-[#0b101a] border-b border-amber-500/20 pb-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg font-bold flex items-center gap-2">
+                    <div className="text-[10px] font-mono text-amber-400 tracking-widest uppercase mb-0.5">// TOURNAMENT_ORCHESTRATOR // BUILDER</div>
+                    <CardTitle className="text-lg font-mono font-bold flex items-center gap-2 text-slate-100">
                       <span>🚀</span> Create & Launch New Contest
                     </CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground">
+                    <CardDescription className="text-xs font-mono text-slate-400">
                       Pick questions from the 150 DSA bank, set timing & duration, and start contests instantly for all students.
                     </CardDescription>
                   </div>
@@ -4600,86 +4745,87 @@ export default function AdminPortalPage() {
           {/* TAB 7: SUPER-ADMIN PROFILE & SECURITY CENTER */}
           <TabsContent value="profile" className="space-y-6 m-0 focus-visible:outline-none">
             {profileSuccessMsg && (
-              <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center justify-between animate-in fade-in shadow-sm">
+              <div className="p-3.5 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold flex items-center justify-between animate-in fade-in shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 <div className="flex items-center gap-2">
-                  <span>⚡</span>
+                  <span className="text-emerald-400">⚡</span>
                   <span>{profileSuccessMsg}</span>
                 </div>
-                <span className="text-[10px] text-emerald-300 font-mono">Synchronized</span>
+                <span className="text-[10px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30 font-mono tracking-widest uppercase">SYNCHRONIZED</span>
               </div>
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left Column: 3D Holographic Admin Identity Card (5 cols) */}
+              {/* Left Column: Tactical Cyber Identity HUD (5 cols) */}
               <div className="lg:col-span-5 space-y-4">
-                <AdminTiltCard glowColor={adminProfile.themeColor || "purple"} className="p-6 md:p-8 flex flex-col justify-between">
+                <AdminTiltCard glowColor={adminProfile.themeColor || "emerald"} className="p-6 md:p-8 flex flex-col justify-between">
                   <div className="space-y-6">
                     {/* Top Identity Banner */}
                     <div className="flex items-start justify-between">
                       <div className="relative">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/30 to-purple-600/30 border-2 border-primary/50 flex items-center justify-center text-4xl shadow-xl">
+                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-950/80 to-[#0b101a] border-2 border-emerald-500/50 flex items-center justify-center text-4xl shadow-[0_0_25px_rgba(16,185,129,0.25)]">
                           {adminProfile.avatar || "🛡️"}
                         </div>
-                        <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-background flex items-center justify-center text-[10px] text-white font-bold">
+                        <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#06080e] flex items-center justify-center text-[10px] text-black font-black">
                           ✓
                         </span>
                       </div>
                       <div className="text-right">
-                        <span className="px-2.5 py-1 rounded-full bg-destructive/15 text-destructive font-mono font-bold text-[11px] border border-destructive/30">
-                          ROOT ACCESS
+                        <span className="px-2.5 py-1 rounded bg-rose-950/80 text-rose-400 font-mono font-bold text-[11px] border border-rose-500/40 tracking-wider shadow-[0_0_10px_rgba(244,63,94,0.2)]">
+                          ROOT_CLEARANCE
                         </span>
-                        <p className="text-[10px] font-mono text-muted-foreground mt-1">
-                          ID: ADM-2026-ROOT-01
+                        <p className="text-[10px] font-mono text-emerald-500/70 mt-1">
+                          SYS.NODE: ADM-2026-ROOT-01
                         </p>
                       </div>
                     </div>
 
                     {/* Name & Title */}
                     <div>
-                      <h2 className="text-2xl font-black tracking-tight text-foreground">
+                      <div className="text-[10px] font-mono text-emerald-400 tracking-widest uppercase mb-1">// IDENT_MATRIX</div>
+                      <h2 className="text-2xl font-black tracking-tight text-emerald-100 font-mono">
                         {adminProfile.name}
                       </h2>
-                      <p className="text-xs font-semibold text-primary mt-0.5">
+                      <p className="text-xs font-mono font-semibold text-emerald-400 mt-1">
                         {adminProfile.title}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                      <p className="text-xs font-mono text-slate-400 mt-3 leading-relaxed bg-[#06080e]/60 p-3 rounded-lg border border-emerald-500/15">
                         {adminProfile.bio}
                       </p>
                     </div>
 
                     {/* Security Clearance Details */}
-                    <div className="space-y-2 p-3.5 rounded-xl bg-secondary/50 border border-border/60 text-xs font-mono">
+                    <div className="space-y-2 p-3.5 rounded-xl bg-[#06080e]/90 border border-emerald-500/25 text-xs font-mono">
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Clearance:</span>
+                        <span className="text-slate-400">CLEARANCE_TIER:</span>
                         <span className="text-emerald-400 font-bold">{adminProfile.securityLevel}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Session Guard:</span>
-                        <span className="text-primary font-bold">AES-256-GCM Active</span>
+                        <span className="text-slate-400">HARDWARE_CIPHER:</span>
+                        <span className="text-cyan-400 font-bold">AES-256-GCM / QUAD-RUN</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Timeout Policy:</span>
-                        <span className="text-foreground font-bold">{adminProfile.sessionTimeout}</span>
+                        <span className="text-slate-400">SESSION_EXPIRY:</span>
+                        <span className="text-amber-400 font-bold">{adminProfile.sessionTimeout}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Theme Skin:</span>
-                        <span className="text-purple-400 font-bold uppercase">{adminProfile.themeColor}</span>
+                        <span className="text-slate-400">THEME_SKIN:</span>
+                        <span className="text-emerald-400 font-bold uppercase">{adminProfile.themeColor}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Card Footer */}
-                  <div className="pt-6 border-t border-border/40 mt-6 flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-muted-foreground">
-                      FINGERPRINT: SHA256:7e9a:2026:nx42
+                  <div className="pt-6 border-t border-emerald-500/20 mt-6 flex items-center justify-between">
+                    <span className="text-[9px] font-mono text-emerald-500/60 tracking-wider">
+                      SHA256:7E9A:2026:NX42
                     </span>
                     <Button
                       variant="destructive"
                       size="sm"
                       onClick={handleLockAdmin}
-                      className="h-7 text-xs font-bold gap-1 shadow-sm"
+                      className="h-8 text-xs font-mono font-bold gap-1.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)]"
                     >
-                      <span>🔒</span> Lock Session
+                      <span>🔒</span> TERMINATE_SESSION
                     </Button>
                   </div>
                 </AdminTiltCard>
@@ -4688,64 +4834,74 @@ export default function AdminPortalPage() {
               {/* Right Column: Settings & Security Controls (7 cols) */}
               <div className="lg:col-span-7 space-y-6">
                 {/* Form 1: Admin Profile Details */}
-                <Card className="border-border/80 bg-card/75 backdrop-blur-md">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-bold flex items-center gap-2">
+                <div className="relative rounded-2xl bg-[#0b101a]/95 border border-emerald-500/25 p-5 md:p-6 backdrop-blur-xl shadow-xl">
+                  <div className="absolute top-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">┌</div>
+                  <div className="absolute top-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┐</div>
+                  <div className="absolute bottom-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">└</div>
+                  <div className="absolute bottom-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┘</div>
+
+                  <div className="pb-4 border-b border-emerald-500/20">
+                    <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest mb-1">// SYSTEM_CONFIG // IDENTITY</div>
+                    <h3 className="text-base font-bold font-mono text-emerald-100 flex items-center gap-2">
                       <span>👤</span> Master Profile Settings
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      Update your administrator identity across the CodeArena platform
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
+                    </h3>
+                    <p className="text-xs font-mono text-slate-400 mt-0.5">
+                      Configure your tactical administrative credentials and identity telemetry
+                    </p>
+                  </div>
+
+                  <div className="pt-4">
                     <form onSubmit={handleSaveAdminProfile} className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <Label className="text-xs font-bold">Display Name</Label>
+                          <Label className="text-xs font-mono font-bold text-emerald-300">DISPLAY_NAME</Label>
                           <Input
                             value={adminProfile.name}
                             onChange={(e) => setAdminProfile({ ...adminProfile, name: e.target.value })}
-                            placeholder="Admin Name"
-                            className="h-9 text-xs"
+                            placeholder="Nexus Root Operator"
+                            className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
                             required
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs font-bold">Admin Email</Label>
+                          <Label className="text-xs font-mono font-bold text-emerald-300">COMMAND_EMAIL</Label>
                           <Input
                             type="email"
                             value={adminProfile.email}
                             onChange={(e) => setAdminProfile({ ...adminProfile, email: e.target.value })}
                             placeholder="admin@codearena.dev"
-                            className="h-9 text-xs"
+                            className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
                             required
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-bold">Title / Designation</Label>
+                        <Label className="text-xs font-mono font-bold text-emerald-300">TITLE // DESIGNATION</Label>
                         <Input
                           value={adminProfile.title}
                           onChange={(e) => setAdminProfile({ ...adminProfile, title: e.target.value })}
-                          placeholder="Chief System Architect & Judge"
-                          className="h-9 text-xs"
+                          placeholder="Chief System Architect & Root Judge"
+                          className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
                         />
                       </div>
 
                       {/* Avatar Picker */}
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-bold">Admin Avatar Icon</Label>
+                        <Label className="text-xs font-mono font-bold text-emerald-300">CYBER_AVATAR_SIGIL</Label>
                         <div className="flex flex-wrap gap-2">
                           {["🛡️", "⚡", "🚀", "👑", "🧬", "🛸", "🎯", "🔮", "🤖", "🔥"].map((emoji) => (
                             <button
                               key={emoji}
                               type="button"
-                              onClick={() => setAdminProfile({ ...adminProfile, avatar: emoji })}
-                              className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all ${
+                              onClick={() => {
+                                playCyberSound("click");
+                                setAdminProfile({ ...adminProfile, avatar: emoji });
+                              }}
+                              className={`w-10 h-10 rounded-xl text-lg flex items-center justify-center border transition-all ${
                                 adminProfile.avatar === emoji
-                                  ? "border-primary bg-primary/20 scale-110 shadow-md"
-                                  : "border-border/80 hover:bg-secondary/60"
+                                  ? "border-emerald-400 bg-emerald-500/20 scale-110 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                                  : "border-emerald-500/20 bg-[#06080e]/60 hover:border-emerald-500/40 hover:bg-[#06080e]"
                               }`}
                             >
                               {emoji}
@@ -4755,43 +4911,50 @@ export default function AdminPortalPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-bold">Bio & Statement</Label>
+                        <Label className="text-xs font-mono font-bold text-emerald-300">BIO & ARCHITECT_DIRECTIVE</Label>
                         <textarea
                           rows={3}
                           value={adminProfile.bio}
                           onChange={(e) => setAdminProfile({ ...adminProfile, bio: e.target.value })}
-                          placeholder="Describe administrative responsibilities..."
-                          className="w-full rounded-md bg-secondary/80 p-3 text-xs border border-border focus:outline-none"
+                          placeholder="Describe administrative responsibilities and system directives..."
+                          className="w-full rounded-md bg-[#06080e] p-3 text-xs font-mono text-emerald-100 border border-emerald-500/30 placeholder-emerald-800/60 focus:border-emerald-400 focus:outline-none"
                         />
                       </div>
 
-                      <div className="flex justify-end">
-                        <Button type="submit" size="sm" className="h-9 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 shadow-md">
-                          <span>💾</span> Save Profile Changes
+                      <div className="flex justify-end pt-2">
+                        <Button type="submit" size="sm" className="h-9 px-4 text-xs font-mono font-bold bg-emerald-500 hover:bg-emerald-400 text-black gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                          <span>💾</span> COMMIT_PROFILE_CHANGES
                         </Button>
                       </div>
                     </form>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {/* Form 2: Passcode & Master Access Key Management */}
-                <Card className="border-border/80 bg-card/75 backdrop-blur-md">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-bold flex items-center gap-2">
+                <div className="relative rounded-2xl bg-[#0b101a]/95 border border-emerald-500/25 p-5 md:p-6 backdrop-blur-xl shadow-xl">
+                  <div className="absolute top-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">┌</div>
+                  <div className="absolute top-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┐</div>
+                  <div className="absolute bottom-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">└</div>
+                  <div className="absolute bottom-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┘</div>
+
+                  <div className="pb-4 border-b border-emerald-500/20">
+                    <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-1">// SECURITY_CIPHER // HARDWARE_KEY</div>
+                    <h3 className="text-base font-bold font-mono text-emerald-100 flex items-center gap-2">
                       <span>🔑</span> Passcode & Security Authorization
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      Update the master administrator passcode for elevated portal authentication
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
+                    </h3>
+                    <p className="text-xs font-mono text-slate-400 mt-0.5">
+                      Rotate root access passcodes and set hardware session timeout policies
+                    </p>
+                  </div>
+
+                  <div className="pt-4">
                     <form onSubmit={handleChangePasscode} className="space-y-4">
                       {passcodeUpdateMsg && (
                         <p
-                          className={`text-xs p-2.5 rounded-lg border font-semibold animate-in fade-in ${
+                          className={`text-xs p-3 rounded-lg border font-mono font-bold animate-in fade-in ${
                             passcodeUpdateMsg.type === "success"
-                              ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
-                              : "bg-destructive/15 border-destructive/30 text-destructive"
+                              ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                              : "bg-rose-950/80 border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)]"
                           }`}
                         >
                           {passcodeUpdateMsg.text}
@@ -4800,29 +4963,29 @@ export default function AdminPortalPage() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <Label className="text-xs font-bold">New Admin Passcode</Label>
+                          <Label className="text-xs font-mono font-bold text-emerald-300">NEW_PASSCODE</Label>
                           <Input
                             type="password"
                             value={newPasscodeVal}
                             onChange={(e) => setNewPasscodeVal(e.target.value)}
                             placeholder="Min 6 characters"
-                            className="h-9 text-xs font-mono"
+                            className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs font-bold">Confirm Passcode</Label>
+                          <Label className="text-xs font-mono font-bold text-emerald-300">CONFIRM_PASSCODE</Label>
                           <Input
                             type="password"
                             value={confirmPasscodeVal}
                             onChange={(e) => setConfirmPasscodeVal(e.target.value)}
                             placeholder="Re-enter new passcode"
-                            className="h-9 text-xs font-mono"
+                            className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-bold">Session Auto-Lock Timeout</Label>
+                        <Label className="text-xs font-mono font-bold text-emerald-300">SESSION_AUTO_LOCK_TIMEOUT</Label>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {[
                             { label: "15 Minutes", val: "15m" },
@@ -4834,14 +4997,15 @@ export default function AdminPortalPage() {
                               key={t.val}
                               type="button"
                               onClick={() => {
+                                playCyberSound("click");
                                 const updated = { ...adminProfile, sessionTimeout: t.val };
                                 setAdminProfile(updated);
                                 localStorage.setItem("codearena_admin_profile", JSON.stringify(updated));
                               }}
-                              className={`p-2 rounded-lg text-xs font-medium border text-center transition-all ${
+                              className={`p-2.5 rounded-lg text-xs font-mono border text-center transition-all ${
                                 adminProfile.sessionTimeout === t.val
-                                  ? "bg-primary/15 border-primary text-primary font-bold shadow-sm"
-                                  : "border-border/80 hover:bg-secondary/60 text-muted-foreground"
+                                  ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 font-bold shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                                  : "border-emerald-500/20 bg-[#06080e]/60 hover:bg-[#06080e] text-slate-400 hover:text-emerald-200"
                               }`}
                             >
                               {t.label}
@@ -4850,59 +5014,67 @@ export default function AdminPortalPage() {
                         </div>
                       </div>
 
-                      <div className="flex justify-end">
-                        <Button type="submit" size="sm" variant="outline" className="h-9 text-xs font-bold gap-1.5 border-primary/40 text-primary hover:bg-primary/10">
-                          <span>🔐</span> Update Master Passcode
+                      <div className="flex justify-end pt-2">
+                        <Button type="submit" size="sm" variant="outline" className="h-9 px-4 text-xs font-mono font-bold gap-1.5 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/15">
+                          <span>🔐</span> ROTATE_ROOT_PASSCODE
                         </Button>
                       </div>
                     </form>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
-                {/* Form 3: 2026 HUD Visual Theme Skins */}
-                <Card className="border-border/80 bg-card/75 backdrop-blur-md">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-bold flex items-center gap-2">
+                {/* Form 3: 2026 HUD Visual Theme Presets */}
+                <div className="relative rounded-2xl bg-[#0b101a]/95 border border-emerald-500/25 p-5 md:p-6 backdrop-blur-xl shadow-xl">
+                  <div className="absolute top-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">┌</div>
+                  <div className="absolute top-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┐</div>
+                  <div className="absolute bottom-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">└</div>
+                  <div className="absolute bottom-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┘</div>
+
+                  <div className="pb-4 border-b border-emerald-500/20">
+                    <div className="text-[10px] font-mono text-amber-400 uppercase tracking-widest mb-1">// DISPLAY_MATRIX // THEME_CORE</div>
+                    <h3 className="text-base font-bold font-mono text-emerald-100 flex items-center gap-2">
                       <span>🎨</span> 2026 Nexus HUD Theme Presets
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      Select your interactive 3D accent sheen and aesthetic tone
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
+                    </h3>
+                    <p className="text-xs font-mono text-slate-400 mt-0.5">
+                      Select holographic telemetry accent sheath and optical resonance
+                    </p>
+                  </div>
+
+                  <div className="pt-4">
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {[
-                        { id: "purple", name: "Nexus Violet", color: "#a855f7" },
-                        { id: "cyan", name: "Cyberpunk Cyan", color: "#06b6d4" },
-                        { id: "emerald", name: "Matrix Emerald", color: "#10b981" },
-                        { id: "amber", name: "Solar Amber", color: "#f59e0b" },
-                        { id: "rose", name: "Crimson Protocol", color: "#f43f5e" },
-                        { id: "indigo", name: "Deep Cobalt", color: "#6366f1" },
+                        { id: "emerald", name: "Matrix Emerald", color: "#10b981", accent: "text-emerald-400" },
+                        { id: "cyan", name: "Cyberpunk Cyan", color: "#06b6d4", accent: "text-cyan-400" },
+                        { id: "amber", name: "Solar Amber", color: "#f59e0b", accent: "text-amber-400" },
+                        { id: "rose", name: "Crimson Protocol", color: "#f43f5e", accent: "text-rose-400" },
+                        { id: "purple", name: "Nexus Violet", color: "#a855f7", accent: "text-purple-400" },
+                        { id: "indigo", name: "Deep Cobalt", color: "#6366f1", accent: "text-indigo-400" },
                       ].map((t) => (
                         <button
                           key={t.id}
                           type="button"
                           onClick={() => {
+                            playCyberSound("click");
                             const updated = { ...adminProfile, themeColor: t.id as any };
                             setAdminProfile(updated);
                             localStorage.setItem("codearena_admin_profile", JSON.stringify(updated));
                           }}
-                          className={`p-3 rounded-xl border text-left transition-all flex items-center gap-2.5 ${
+                          className={`p-3 rounded-xl border font-mono text-left transition-all flex items-center gap-2.5 ${
                             adminProfile.themeColor === t.id
-                              ? "border-primary bg-primary/15 shadow-md font-bold text-foreground"
-                              : "border-border/80 hover:bg-secondary/60 text-muted-foreground"
+                              ? "border-emerald-400 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.2)] font-bold text-emerald-100"
+                              : "border-emerald-500/20 bg-[#06080e]/60 hover:bg-[#06080e] text-slate-400 hover:text-emerald-200"
                           }`}
                         >
                           <span
-                            className="w-4 h-4 rounded-full border border-white/20 shadow-sm"
+                            className="w-4 h-4 rounded-full border border-white/30 shadow-sm"
                             style={{ backgroundColor: t.color }}
                           />
                           <span className="text-xs">{t.name}</span>
                         </button>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
             </div>
           </TabsContent>
@@ -4911,3 +5083,4 @@ export default function AdminPortalPage() {
     </div>
   );
 }
+
