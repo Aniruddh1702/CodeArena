@@ -49,6 +49,27 @@ const AVAILABLE_TOPICS = [
   "Recursion",
 ];
 
+function parseCustomArgs(raw: string): any[] {
+  const trimmed = (raw || "").trim();
+  if (!trimmed) return [];
+  const cleaned = trimmed.replace(/[a-zA-Z0-9_]+\s*=\s*/g, "");
+  try {
+    return JSON.parse(`[${cleaned}]`);
+  } catch (e) {}
+  try {
+    const single = JSON.parse(cleaned);
+    return Array.isArray(single) ? [single] : [single];
+  } catch (e) {}
+  try {
+    const fn = new Function(`return [${cleaned}];`);
+    return fn();
+  } catch (e) {}
+  try {
+    return JSON.parse(`[${trimmed}]`);
+  } catch (e) {}
+  return [trimmed];
+}
+
 const DEFAULT_SAMPLE_JSON = [
   {
     "title": "Palindrome Number",
@@ -244,9 +265,15 @@ export default function AdminPortalPage() {
     try {
       await fetch("/api/admin/users", { method: "DELETE" });
       setAllUsersList([]);
-      localStorage.removeItem("codearena_accounts");
-      localStorage.removeItem("codearena_active_account_id");
-      setUserRoleFeedback("All users cleared from the server and database for a fresh start.");
+      const active = getActiveAccount();
+      if (active && (active.role === "SUPER_ADMIN" || active.role === "ADMIN")) {
+        localStorage.setItem("codearena_accounts", JSON.stringify([active]));
+        localStorage.setItem("codearena_active_account_id", active.id);
+      } else {
+        localStorage.removeItem("codearena_accounts");
+        localStorage.removeItem("codearena_active_account_id");
+      }
+      setUserRoleFeedback("All student accounts cleared from the server and database for a fresh start.");
       setTimeout(() => setUserRoleFeedback(null), 4000);
       loadUsers();
     } catch (e) {
@@ -436,7 +463,7 @@ export default function AdminPortalPage() {
 
       const effectiveOption = forceStartNow 
         ? "now" 
-        : (contestFormData.startTimeOption === "now" ? "1hour" : contestFormData.startTimeOption);
+        : contestFormData.startTimeOption;
 
       const timing = getComputedContestTiming(
         effectiveOption,
@@ -735,33 +762,36 @@ export default function AdminPortalPage() {
   const handleEditQuestion = (p: ProblemDefinition) => {
     setEditingSlug(p.slug);
     setFormData({
-      title: p.title,
-      slug: p.slug,
-      difficulty: p.difficulty,
-      topics: p.topics.map((t) => t.name),
+      title: p.title || "",
+      slug: p.slug || "",
+      difficulty: p.difficulty || "EASY",
+      topics: Array.isArray(p.topics) ? p.topics.map((t: any) => typeof t === "string" ? t : t.name) : ["Arrays"],
       customTopicInput: "",
       methodName: p.methodName || "solution",
-      description: p.description,
-      constraintsText: p.constraints?.join("\n") || "",
-      codeJs: p.starterCode.javascript,
-      codePy: p.starterCode.python,
-      codeCpp: p.starterCode.cpp,
-      codeJava: p.starterCode.java,
+      description: p.description || "",
+      constraintsText: Array.isArray(p.constraints) ? p.constraints.join("\n") : "",
+      codeJs: p.starterCode?.javascript || "",
+      codePy: p.starterCode?.python || "",
+      codeCpp: p.starterCode?.cpp || "",
+      codeJava: p.starterCode?.java || "",
     });
 
+    const publicCases = Array.isArray(p.publicTestCases) ? p.publicTestCases : [];
+    const hiddenCases = Array.isArray(p.hiddenTestCases) ? p.hiddenTestCases : [];
+
     const cases = [
-      ...p.publicTestCases.map((tc) => ({
-        input: tc.input,
-        output: tc.output,
-        argsStr: JSON.stringify(tc.args),
-        expectedStr: JSON.stringify(tc.expected),
+      ...publicCases.map((tc) => ({
+        input: tc.input || "",
+        output: tc.output || "",
+        argsStr: JSON.stringify(tc.args || []),
+        expectedStr: JSON.stringify(tc.expected ?? tc.output ?? ""),
         isPublic: true,
       })),
-      ...p.hiddenTestCases.map((tc) => ({
-        input: tc.input,
-        output: tc.output,
-        argsStr: JSON.stringify(tc.args),
-        expectedStr: JSON.stringify(tc.expected),
+      ...hiddenCases.map((tc) => ({
+        input: tc.input || "",
+        output: tc.output || "",
+        argsStr: JSON.stringify(tc.args || []),
+        expectedStr: JSON.stringify(tc.expected ?? tc.output ?? ""),
         isPublic: false,
       })),
     ];
@@ -827,6 +857,14 @@ export default function AdminPortalPage() {
     const cleanSlug = formData.slug.trim() || formData.title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const cleanMethod = formData.methodName.trim() || "solution";
 
+    // Clean up old slug if slug was renamed during edit
+    if (editingSlug && editingSlug !== cleanSlug) {
+      deleteCustomProblem(editingSlug);
+      try {
+        fetch(`/api/admin/questions?slug=${encodeURIComponent(editingSlug)}`, { method: "DELETE" }).catch(() => {});
+      } catch (e) {}
+    }
+
     // Validate and parse test cases
     const parsedPublicCases: TestCase[] = [];
     const parsedHiddenCases: TestCase[] = [];
@@ -840,15 +878,21 @@ export default function AdminPortalPage() {
         parsedArgs = JSON.parse(tc.argsStr);
         if (!Array.isArray(parsedArgs)) parsedArgs = [parsedArgs];
       } catch (err) {
-        setFormFeedback({ type: "error", message: `Test Case #${i + 1}: Invalid Arguments JSON format.` });
-        return;
+        parsedArgs = parseCustomArgs(tc.argsStr || tc.input || "");
+        if (parsedArgs.length === 0) {
+          setFormFeedback({ type: "error", message: `Test Case #${i + 1}: Invalid Arguments format. Please enter arguments like [1, 2] or num1, num2.` });
+          return;
+        }
       }
 
       try {
         parsedExpected = JSON.parse(tc.expectedStr);
       } catch (err) {
-        // Fallback to raw string if valid JSON primitive
-        parsedExpected = tc.expectedStr;
+        try {
+          parsedExpected = JSON.parse(tc.output);
+        } catch (e) {
+          parsedExpected = tc.expectedStr || tc.output || null;
+        }
       }
 
       const caseObj: TestCase = {
@@ -1141,19 +1185,47 @@ export default function AdminPortalPage() {
           ? q.difficulty.toUpperCase()
           : "MEDIUM") as any;
 
-        const publicCases = (q.publicTestCases || q.testCases || []).map((tc: any, tcIdx: number) => ({
-          input: tc.input || `Test ${tcIdx + 1}`,
-          output: String(tc.output ?? tc.expected ?? ""),
-          args: Array.isArray(tc.args) ? tc.args : [tc.input],
-          expected: tc.expected !== undefined ? tc.expected : tc.output,
-        }));
+        const publicCases = (q.publicTestCases || q.testCases || []).map((tc: any, tcIdx: number) => {
+          let parsedExpected = tc.expected;
+          if (parsedExpected === undefined && tc.output !== undefined) {
+            try {
+              parsedExpected = JSON.parse(tc.output);
+            } catch (e) {
+              parsedExpected = tc.output;
+            }
+          }
+          let parsedArgs = tc.args;
+          if (!Array.isArray(parsedArgs)) {
+            parsedArgs = parseCustomArgs(String(tc.input || ""));
+          }
+          return {
+            input: tc.input || `Test ${tcIdx + 1}`,
+            output: String(tc.output ?? tc.expected ?? ""),
+            args: parsedArgs,
+            expected: parsedExpected !== undefined ? parsedExpected : tc.output,
+          };
+        });
 
-        const hiddenCases = (q.hiddenTestCases || []).map((tc: any, tcIdx: number) => ({
-          input: tc.input || `Hidden ${tcIdx + 1}`,
-          output: String(tc.output ?? tc.expected ?? ""),
-          args: Array.isArray(tc.args) ? tc.args : [tc.input],
-          expected: tc.expected !== undefined ? tc.expected : tc.output,
-        }));
+        const hiddenCases = (q.hiddenTestCases || []).map((tc: any, tcIdx: number) => {
+          let parsedExpected = tc.expected;
+          if (parsedExpected === undefined && tc.output !== undefined) {
+            try {
+              parsedExpected = JSON.parse(tc.output);
+            } catch (e) {
+              parsedExpected = tc.output;
+            }
+          }
+          let parsedArgs = tc.args;
+          if (!Array.isArray(parsedArgs)) {
+            parsedArgs = parseCustomArgs(String(tc.input || ""));
+          }
+          return {
+            input: tc.input || `Hidden ${tcIdx + 1}`,
+            output: String(tc.output ?? tc.expected ?? ""),
+            args: parsedArgs,
+            expected: parsedExpected !== undefined ? parsedExpected : tc.output,
+          };
+        });
 
         const problemDef: ProblemDefinition = {
           id: q.id || `custom_${Date.now()}_${i}`,
