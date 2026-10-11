@@ -161,6 +161,15 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const target = searchParams.get("username") || searchParams.get("userId") || searchParams.get("email");
+
+    if (target) {
+      const { deleteUserFromRegistry } = await import("@/lib/userActivity");
+      deleteUserFromRegistry(target);
+      return NextResponse.json({ success: true, message: `User ${target} deleted successfully.` });
+    }
+
     const { clearUserRegistry } = await import("@/lib/userActivity");
     clearUserRegistry();
 
@@ -173,7 +182,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true, message: "All users cleared successfully for a fresh start." });
   } catch (err: any) {
     return NextResponse.json(
-      { success: false, message: err.message || "Failed to clear users" },
+      { success: false, message: err.message || "Failed to delete user(s)" },
       { status: 500 }
     );
   }

@@ -99,8 +99,10 @@ function ProblemsContent() {
     };
 
     window.addEventListener("codearena_problems_updated", handleProblemsUpdated);
+    window.addEventListener("storage", handleProblemsUpdated);
     return () => {
       window.removeEventListener("codearena_problems_updated", handleProblemsUpdated);
+      window.removeEventListener("storage", handleProblemsUpdated);
     };
   }, []);
 

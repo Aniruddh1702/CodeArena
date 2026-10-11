@@ -172,17 +172,39 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
       }
     }
 
-    // Interval for clock and standings
-    const interval = setInterval(() => {
+    const syncContestState = () => {
       setNow(Date.now());
       const updated = getContestById(contestId);
       if (updated) {
         setContest(updated);
+        if (updated.problems) {
+          setAllProblemsMap((prev) => {
+            let changed = false;
+            const nextMap = { ...prev };
+            updated.problems.forEach((p) => {
+              if (p.problemDef && (!nextMap[p.problemSlug] || nextMap[p.problemSlug] !== p.problemDef)) {
+                nextMap[p.problemSlug] = p.problemDef;
+                changed = true;
+              }
+            });
+            return changed ? nextMap : prev;
+          });
+        }
         setStandings(getContestStandings(updated.id));
       }
-    }, 1000);
+    };
 
-    return () => clearInterval(interval);
+    // Interval for clock and standings
+    const interval = setInterval(syncContestState, 1000);
+
+    window.addEventListener("codearena_contests_updated", syncContestState);
+    window.addEventListener("storage", syncContestState);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("codearena_contests_updated", syncContestState);
+      window.removeEventListener("storage", syncContestState);
+    };
   }, [contestId, router]);
 
   // Update starter code when problem or language changes
@@ -250,6 +272,10 @@ function parseCustomArgs(raw: string): any[] {
   // Run Code on Public Test Cases (Real Multi-Language Execution)
   const handleRunCode = async () => {
     if (!activeProblemDef) return;
+    if (currentUser?.status === "BANNED" || currentUser?.isBanned) {
+      alert("Your account has been suspended by an Administrator. Code execution is disabled.");
+      return;
+    }
     setIsRunning(true);
     setConsoleBottomTab("result");
     clearEditorMarkers();
@@ -363,6 +389,10 @@ function parseCustomArgs(raw: string): any[] {
     if (!currentUser) {
       alert("Please log in to submit contest solutions!");
       router.push(`/login?redirect=/contests/${contestId}`);
+      return;
+    }
+    if (currentUser.status === "BANNED" || currentUser.isBanned) {
+      alert("Your account has been suspended by an Administrator. Contest submissions are disabled.");
       return;
     }
 

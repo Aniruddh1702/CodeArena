@@ -75,6 +75,24 @@ export function clearUserRegistry(): void {
   } catch (e) {}
 }
 
+export function deleteUserFromRegistry(identifier: string): boolean {
+  const map = getUserRegistry();
+  const idLower = identifier.toLowerCase().trim();
+  let found = false;
+
+  for (const [k, u] of Array.from(map.entries())) {
+    if (k === idLower || (u.username && u.username.toLowerCase() === idLower) || (u.email && u.email.toLowerCase() === idLower) || u.id === identifier) {
+      map.delete(k);
+      found = true;
+    }
+  }
+
+  if (found) {
+    saveUsersToFile(map);
+  }
+  return found;
+}
+
 export function recordUserLoginEvent(user: Partial<PlatformUserRecord> & { username: string; email?: string }): PlatformUserRecord {
   const map = getUserRegistry();
   const unameKey = user.username.toLowerCase();

@@ -71,6 +71,10 @@ export default function ContestsPage() {
       router.push("/login?redirect=/contests");
       return;
     }
+    if (currentUser.status === "BANNED" || currentUser.isBanned) {
+      alert("Your account has been suspended by an Administrator. Contest registrations are disabled.");
+      return;
+    }
     registerUserForContest(contestId, currentUser.email);
     setContests(getContests());
   };

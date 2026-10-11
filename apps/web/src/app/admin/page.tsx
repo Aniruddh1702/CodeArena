@@ -28,7 +28,7 @@ import {
   ContestProblem,
   ContestSubmission,
 } from "@/lib/contests-data";
-import { getActiveAccount, getAllAccounts, getUserStats } from "@/lib/auth-session";
+import { getActiveAccount, getAllAccounts, getUserStats, banUser, unbanUser, deleteUserAccount } from "@/lib/auth-session";
 
 const AVAILABLE_TOPICS = [
   "Arrays",
@@ -557,6 +557,49 @@ export default function AdminPortalPage() {
       prev.map((u) => (u.username.toLowerCase() === username.toLowerCase() ? { ...u, role: nextRole } : u))
     );
     setUserRoleFeedback(`Successfully updated @${username} to ${nextRole}`);
+    setTimeout(() => setUserRoleFeedback(null), 3500);
+  };
+
+  const handleToggleBanUser = async (username: string, currentStatus?: string) => {
+    const isBanned = currentStatus === "BANNED" || currentStatus === "SUSPENDED";
+    const nextStatus = isBanned ? "ACTIVE" : "BANNED";
+
+    try {
+      await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, status: nextStatus }),
+      });
+    } catch (e) {}
+
+    if (isBanned) {
+      unbanUser(username);
+      setUserRoleFeedback(`Unbanned user @${username}. Student session restored.`);
+    } else {
+      banUser(username);
+      setUserRoleFeedback(`Banned user @${username}. Student session suspended.`);
+    }
+
+    setAllUsersList((prev) =>
+      prev.map((u) => (u.username.toLowerCase() === username.toLowerCase() ? { ...u, status: nextStatus, isBanned: !isBanned } : u))
+    );
+    setTimeout(() => setUserRoleFeedback(null), 3500);
+  };
+
+  const handleDeleteSingleUser = async (username: string) => {
+    if (!confirm(`Are you sure you want to permanently delete user @${username}? This removes their profile and session.`)) {
+      return;
+    }
+
+    try {
+      await fetch(`/api/admin/users?username=${encodeURIComponent(username)}`, {
+        method: "DELETE",
+      });
+    } catch (e) {}
+
+    deleteUserAccount(username);
+    setAllUsersList((prev) => prev.filter((u) => u.username.toLowerCase() !== username.toLowerCase()));
+    setUserRoleFeedback(`Deleted user @${username} permanently.`);
     setTimeout(() => setUserRoleFeedback(null), 3500);
   };
 
@@ -3935,12 +3978,19 @@ export default function AdminPortalPage() {
                                 </td>
                                 <td className="px-5 py-3.5">
                                   <div className="space-y-0.5">
-                                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-md ${
-                                      isOnline ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" : "bg-white/[0.04] text-slate-400 border border-white/10"
-                                    }`}>
-                                      <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
-                                      {isOnline ? "ONLINE NOW" : "LOGGED IN"}
-                                    </span>
+                                    {u.status === "BANNED" || u.isBanned ? (
+                                      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 backdrop-blur-md">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                                        BANNED / SUSPENDED
+                                      </span>
+                                    ) : (
+                                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-md ${
+                                        isOnline ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" : "bg-white/[0.04] text-slate-400 border border-white/10"
+                                      }`}>
+                                        <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
+                                        {isOnline ? "ONLINE NOW" : "LOGGED IN"}
+                                      </span>
+                                    )}
                                     {u.lastLoginAt && (
                                       <p className="text-[10px] text-slate-400 font-mono">
                                         {new Date(u.lastLoginAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(u.lastLoginAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
@@ -3969,18 +4019,43 @@ export default function AdminPortalPage() {
                                   {u.score}
                                 </td>
                                 <td className="px-5 py-3.5 text-right">
-                                  <Button
-                                    size="sm"
-                                    variant={isSuper ? "destructive" : "outline"}
-                                    onClick={() => handleToggleUserRole(u.username, u.role)}
-                                    className={`h-7 text-[11px] font-mono rounded-lg backdrop-blur-md ${
-                                      isSuper
-                                        ? "bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30"
-                                        : "border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
-                                    }`}
-                                  >
-                                    {isSuper ? "Revoke Admin" : "Make Super Admin"}
-                                  </Button>
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <Button
+                                      size="sm"
+                                      variant={isSuper ? "destructive" : "outline"}
+                                      onClick={() => handleToggleUserRole(u.username, u.role)}
+                                      className={`h-7 text-[11px] font-mono rounded-lg backdrop-blur-md ${
+                                        isSuper
+                                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30"
+                                          : "border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
+                                      }`}
+                                    >
+                                      {isSuper ? "Revoke Admin" : "Make Super Admin"}
+                                    </Button>
+                                    {!isSuper && (
+                                      <Button
+                                        size="sm"
+                                        variant={u.status === "BANNED" || u.isBanned ? "outline" : "destructive"}
+                                        onClick={() => handleToggleBanUser(u.username, u.status)}
+                                        className={`h-7 text-[11px] font-mono rounded-lg backdrop-blur-md ${
+                                          u.status === "BANNED" || u.isBanned
+                                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30"
+                                            : "bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30"
+                                        }`}
+                                      >
+                                        {u.status === "BANNED" || u.isBanned ? "Unban" : "Ban"}
+                                      </Button>
+                                    )}
+                                    {!isSuper && (
+                                      <button
+                                        onClick={() => handleDeleteSingleUser(u.username)}
+                                        className="h-7 w-7 flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
+                                        title="Permanently Delete User"
+                                      >
+                                        🗑️
+                                      </button>
+                                    )}
+                                  </div>
                                 </td>
                               </tr>
                             );

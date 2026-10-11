@@ -25,20 +25,103 @@ interface SavedSubmission {
 }
 
 function parseCustomArgs(raw: string): any[] {
-  const trimmed = raw.trim();
+  const trimmed = (raw || "").trim();
   if (!trimmed) return [];
+
+  // Try direct JSON parse first
   try {
-    return JSON.parse(`[${trimmed}]`);
+    const direct = JSON.parse(trimmed);
+    if (Array.isArray(direct)) return direct;
+    return [direct];
   } catch (e) {}
-  try {
-    const single = JSON.parse(trimmed);
-    return Array.isArray(single) ? [single] : [single];
-  } catch (e) {}
-  try {
-    const fn = new Function(`return [${trimmed}];`);
-    return fn();
-  } catch (e) {}
-  return [trimmed];
+
+  // Split into top-level arguments respecting quotes, brackets, braces, and parens
+  const parts: string[] = [];
+  let current = "";
+  let depthBracket = 0;
+  let depthBrace = 0;
+  let depthParen = 0;
+  let inQuote: string | null = null;
+  let escape = false;
+
+  for (let i = 0; i < trimmed.length; i++) {
+    const char = trimmed[i];
+    if (escape) {
+      current += char;
+      escape = false;
+      continue;
+    }
+    if (char === "\\") {
+      current += char;
+      escape = true;
+      continue;
+    }
+    if (inQuote) {
+      current += char;
+      if (char === inQuote) {
+        inQuote = null;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      inQuote = char;
+      current += char;
+      continue;
+    }
+    if (char === "[") { depthBracket++; current += char; continue; }
+    if (char === "]") { depthBracket = Math.max(0, depthBracket - 1); current += char; continue; }
+    if (char === "{") { depthBrace++; current += char; continue; }
+    if (char === "}") { depthBrace = Math.max(0, depthBrace - 1); current += char; continue; }
+    if (char === "(") { depthParen++; current += char; continue; }
+    if (char === ")") { depthParen = Math.max(0, depthParen - 1); current += char; continue; }
+
+    if (char === "," && depthBracket === 0 && depthBrace === 0 && depthParen === 0) {
+      if (current.trim()) {
+        parts.push(current.trim());
+      }
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  if (current.trim()) {
+    parts.push(current.trim());
+  }
+
+  if (parts.length === 0) return [trimmed];
+
+  const results: any[] = [];
+  for (const part of parts) {
+    let valStr = part.replace(/^[a-zA-Z0-9_$]+\s*=\s*/, "").trim();
+
+    if (valStr === "True") valStr = "true";
+    else if (valStr === "False") valStr = "false";
+    else if (valStr === "None") valStr = "null";
+
+    let parsed = false;
+    try {
+      results.push(JSON.parse(valStr));
+      parsed = true;
+    } catch (e) {}
+
+    if (!parsed) {
+      try {
+        const fn = new Function(`return (${valStr});`);
+        results.push(fn());
+        parsed = true;
+      } catch (e) {}
+    }
+
+    if (!parsed) {
+      if ((valStr.startsWith('"') && valStr.endsWith('"')) || (valStr.startsWith("'") && valStr.endsWith("'"))) {
+        results.push(valStr.slice(1, -1));
+      } else {
+        results.push(valStr);
+      }
+    }
+  }
+
+  return results;
 }
 
 export default function ProblemWorkspace({ params }: { params: { slug: string } }) {
@@ -312,9 +395,20 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         setHasRun(false);
       };
 
+      const handleProblemRefresh = () => {
+        const p = getProblem(params.slug);
+        if (p) {
+          setQuestion(p);
+        }
+      };
+
       window.addEventListener("codearena_account_changed", handleAccountChange);
+      window.addEventListener("codearena_problems_updated", handleProblemRefresh);
+      window.addEventListener("storage", handleProblemRefresh);
       return () => {
         window.removeEventListener("codearena_account_changed", handleAccountChange);
+        window.removeEventListener("codearena_problems_updated", handleProblemRefresh);
+        window.removeEventListener("storage", handleProblemRefresh);
       };
     }
   }, [params.slug, router]);
@@ -324,6 +418,10 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     const activeAcc = getActiveAccount();
     if (!activeAcc) {
       router.push(`/login?redirect=/problems/${params.slug}`);
+      return;
+    }
+    if (activeAcc.status === "BANNED" || activeAcc.isBanned) {
+      alert("Your account has been suspended by an Administrator. Code execution and submissions are disabled.");
       return;
     }
 
@@ -441,6 +539,10 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     const activeAcc = getActiveAccount();
     if (!activeAcc) {
       router.push(`/login?redirect=/problems/${params.slug}`);
+      return;
+    }
+    if (activeAcc.status === "BANNED" || activeAcc.isBanned) {
+      alert("Your account has been suspended by an Administrator. Code execution and submissions are disabled.");
       return;
     }
 

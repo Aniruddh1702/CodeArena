@@ -9,6 +9,8 @@ export interface UserAccount {
   name: string;
   password?: string;
   role: string;
+  status?: "ACTIVE" | "ONLINE" | "SUSPENDED" | "BANNED";
+  isBanned?: boolean;
   avatarUrl?: string;
   token: string;
   college?: string;
@@ -517,5 +519,82 @@ export function saveUserAssessment(userId: string, record: UserAssessmentRecord)
   } catch (e) {
     console.error("Failed to save user assessment:", e);
   }
+}
+
+export function banUser(identifier: string): boolean {
+  if (typeof window === "undefined") return false;
+  const accounts = getAllAccounts();
+  const idLower = identifier.toLowerCase().trim();
+  let changed = false;
+
+  const updated = accounts.map((acc) => {
+    if (acc.id.toLowerCase() === idLower || acc.username.toLowerCase() === idLower || acc.email.toLowerCase() === idLower) {
+      changed = true;
+      return { ...acc, status: "BANNED" as const, isBanned: true };
+    }
+    return acc;
+  });
+
+  if (changed) {
+    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(updated));
+    const active = getActiveAccount();
+    if (active && (active.id.toLowerCase() === idLower || active.username.toLowerCase() === idLower || active.email.toLowerCase() === idLower)) {
+      localStorage.setItem("user", JSON.stringify({ ...active, status: "BANNED", isBanned: true }));
+    }
+    window.dispatchEvent(new CustomEvent("codearena_account_changed", { detail: { banned: identifier } }));
+  }
+  return changed;
+}
+
+export function unbanUser(identifier: string): boolean {
+  if (typeof window === "undefined") return false;
+  const accounts = getAllAccounts();
+  const idLower = identifier.toLowerCase().trim();
+  let changed = false;
+
+  const updated = accounts.map((acc) => {
+    if (acc.id.toLowerCase() === idLower || acc.username.toLowerCase() === idLower || acc.email.toLowerCase() === idLower) {
+      changed = true;
+      return { ...acc, status: "ACTIVE" as const, isBanned: false };
+    }
+    return acc;
+  });
+
+  if (changed) {
+    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(updated));
+    const active = getActiveAccount();
+    if (active && (active.id.toLowerCase() === idLower || active.username.toLowerCase() === idLower || active.email.toLowerCase() === idLower)) {
+      localStorage.setItem("user", JSON.stringify({ ...active, status: "ACTIVE", isBanned: false }));
+    }
+    window.dispatchEvent(new CustomEvent("codearena_account_changed", { detail: { unbanned: identifier } }));
+  }
+  return changed;
+}
+
+export function deleteUserAccount(identifier: string): boolean {
+  if (typeof window === "undefined") return false;
+  const accounts = getAllAccounts();
+  const idLower = identifier.toLowerCase().trim();
+
+  const remaining = accounts.filter((acc) => {
+    return !(acc.id.toLowerCase() === idLower || acc.username.toLowerCase() === idLower || acc.email.toLowerCase() === idLower);
+  });
+
+  if (remaining.length !== accounts.length) {
+    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(remaining));
+    const activeId = localStorage.getItem(ACTIVE_ACCOUNT_ID_KEY);
+    if (activeId && (activeId.toLowerCase() === idLower || accounts.find(a => (a.id === activeId || a.username === activeId) && (a.username.toLowerCase() === idLower || a.email.toLowerCase() === idLower)))) {
+      if (remaining.length > 0) {
+        setActiveAccount(remaining[0].id);
+      } else {
+        localStorage.removeItem(ACTIVE_ACCOUNT_ID_KEY);
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+      }
+    }
+    window.dispatchEvent(new CustomEvent("codearena_account_changed", { detail: { deleted: identifier } }));
+    return true;
+  }
+  return false;
 }
 

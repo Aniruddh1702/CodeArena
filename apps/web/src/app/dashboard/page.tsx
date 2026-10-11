@@ -625,9 +625,19 @@ export default function DashboardPage() {
       fetchDashboard();
     };
 
+    const handleSync = () => {
+      fetchDashboard();
+    };
+
     window.addEventListener("codearena_account_changed", handleAccountChange);
+    window.addEventListener("codearena_contests_updated", handleSync);
+    window.addEventListener("codearena_problems_updated", handleSync);
+    window.addEventListener("storage", handleSync);
     return () => {
       window.removeEventListener("codearena_account_changed", handleAccountChange);
+      window.removeEventListener("codearena_contests_updated", handleSync);
+      window.removeEventListener("codearena_problems_updated", handleSync);
+      window.removeEventListener("storage", handleSync);
     };
   }, [router]);
 
