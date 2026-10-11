@@ -170,13 +170,13 @@ function AdminTiltCard({
   };
 
   const borderMap: Record<string, string> = {
-    emerald: "border-emerald-500/35 hover:border-emerald-400 hover:shadow-[0_0_35px_rgba(16,185,129,0.22)]",
-    cyan: "border-cyan-500/35 hover:border-cyan-400 hover:shadow-[0_0_35px_rgba(6,182,212,0.22)]",
-    amber: "border-amber-500/35 hover:border-amber-400 hover:shadow-[0_0_35px_rgba(245,158,11,0.22)]",
-    rose: "border-rose-500/35 hover:border-rose-400 hover:shadow-[0_0_35px_rgba(244,63,94,0.22)]",
-    indigo: "border-sky-500/35 hover:border-sky-400 hover:shadow-[0_0_35px_rgba(56,189,248,0.22)]",
-    purple: "border-emerald-500/35 hover:border-emerald-400 hover:shadow-[0_0_35px_rgba(16,185,129,0.22)]",
-    blue: "border-sky-500/35 hover:border-sky-400 hover:shadow-[0_0_35px_rgba(14,165,233,0.22)]",
+    emerald: "border-emerald-500/30 hover:border-emerald-400/60 hover:shadow-[0_8px_32px_rgba(16,185,129,0.25)]",
+    cyan: "border-cyan-500/30 hover:border-cyan-400/60 hover:shadow-[0_8px_32px_rgba(6,182,212,0.25)]",
+    amber: "border-amber-500/30 hover:border-amber-400/60 hover:shadow-[0_8px_32px_rgba(245,158,11,0.25)]",
+    rose: "border-rose-500/30 hover:border-rose-400/60 hover:shadow-[0_8px_32px_rgba(244,63,94,0.25)]",
+    indigo: "border-indigo-500/30 hover:border-indigo-400/60 hover:shadow-[0_8px_32px_rgba(99,102,241,0.25)]",
+    purple: "border-purple-500/30 hover:border-purple-400/60 hover:shadow-[0_8px_32px_rgba(168,85,247,0.25)]",
+    blue: "border-sky-500/30 hover:border-sky-400/60 hover:shadow-[0_8px_32px_rgba(14,165,233,0.25)]",
   };
 
   return (
@@ -191,19 +191,14 @@ function AdminTiltCard({
           transition: sheen.opacity ? "transform 0.08s ease-out" : "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)",
           transformStyle: "preserve-3d",
         }}
-        className={`relative rounded-xl border bg-[#0b101a]/95 backdrop-blur-2xl shadow-[0_12px_35px_rgba(0,0,0,0.6)] transition-all duration-300 overflow-hidden ${borderMap[glowColor] || borderMap.emerald} ${className}`}
+        className={`relative rounded-2xl border border-white/10 border-t-white/25 bg-slate-950/40 backdrop-blur-2xl shadow-[0_16px_40px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.12)] transition-all duration-300 overflow-hidden ${borderMap[glowColor] || borderMap.emerald} ${className}`}
       >
-        {/* Subtle Tech Corner Brackets */}
-        <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-emerald-400/50 pointer-events-none z-30" />
-        <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-emerald-400/50 pointer-events-none z-30" />
-        <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-emerald-400/50 pointer-events-none z-30" />
-        <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-emerald-400/50 pointer-events-none z-30" />
+        {/* Subtle Frosted Specular Sheen */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-transparent z-10" />
 
-        {/* Scanline Texture Overlay */}
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px)] [background-size:100%_4px] z-10 opacity-70" />
-
+        {/* Dynamic Glass Refraction Light Orb */}
         <div
-          className="pointer-events-none absolute inset-0 rounded-xl transition-opacity duration-300 z-10"
+          className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 z-10"
           style={{
             opacity: sheen.opacity,
             background: `radial-gradient(circle 320px at ${sheen.x}% ${sheen.y}%, ${glowMap[glowColor] || glowMap.emerald}, transparent 75%)`,
@@ -1643,44 +1638,46 @@ export default function AdminPortalPage() {
   // Security Passcode Gate if not authorized (Classified Root Terminal)
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-[#04060a] text-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden font-mono selection:bg-emerald-500/30 selection:text-emerald-200">
-        {/* Ambient Cyber Grid & Radar Rings */}
-        <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(#103020_1px,transparent_1px)] [background-size:20px_20px] opacity-40 z-0" />
-        <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-emerald-950/20 via-transparent to-cyan-950/20 z-0" />
+      <div className="min-h-screen bg-[#070b16] text-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden font-mono selection:bg-cyan-500/30 selection:text-cyan-200">
+        {/* Glassmorphic Ambient Luminous Orbs */}
+        <div className="fixed -top-32 -left-32 w-96 h-96 rounded-full bg-cyan-500/25 blur-[120px] pointer-events-none z-0" />
+        <div className="fixed -bottom-32 -right-32 w-96 h-96 rounded-full bg-purple-600/25 blur-[120px] pointer-events-none z-0" />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none z-0" />
+        <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:24px_24px] opacity-40 z-0" />
 
         <div className="w-full max-w-lg space-y-5 relative z-10">
-          {/* Mainframe Terminal Window */}
-          <div className="rounded-xl border border-emerald-500/30 bg-[#090e18]/95 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden">
+          {/* Frosted Glass Terminal Window */}
+          <div className="rounded-3xl border border-white/15 border-t-white/30 bg-slate-900/40 backdrop-blur-3xl shadow-[0_24px_60px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.2)] overflow-hidden">
             {/* Terminal Header Bar */}
-            <div className="p-3 bg-[#0c1424] border-b border-emerald-500/20 flex items-center justify-between">
+            <div className="p-3.5 bg-white/[0.04] border-b border-white/10 backdrop-blur-xl flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-                <span className="text-[11px] font-mono font-bold tracking-wider text-emerald-400 ml-2">
-                  [CLASSIFIED // ROOT GATEWAY v2026.4]
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                <span className="text-[11px] font-mono font-bold tracking-wider text-cyan-300 ml-2">
+                  [FROSTED_GLASS // ROOT_GATEWAY v2026.4]
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                <span>PORT 443 // SECURE</span>
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-300 font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                <span>SECURE // AES-256</span>
               </div>
             </div>
 
             {/* Terminal Output Banner */}
-            <div className="p-5 space-y-4">
-              <div className="space-y-1.5 p-3 rounded-lg bg-[#060a12] border border-[#162338] text-[11px] text-emerald-400/90 leading-relaxed font-mono">
+            <div className="p-6 space-y-4">
+              <div className="space-y-1.5 p-3.5 rounded-xl bg-black/30 border border-white/10 backdrop-blur-xl text-[11px] text-cyan-300/90 leading-relaxed font-mono shadow-inner">
                 <div>&gt; HOST: CODEARENA_CORE_MAIN // 127.0.0.1</div>
-                <div>&gt; SECURITY_CLEARANCE: LEVEL 5 (ROOT AUTHORITY) REQUIRED</div>
-                <div>&gt; CHIP_SIGNATURE: HARDWARE_TOKEN_VERIFIED</div>
-                <div className="text-emerald-300 font-bold">&gt; ENTER AUTHORIZATION MASTER KEY TO ENGAGE CONSOLE_</div>
+                <div>&gt; CLEARANCE: LEVEL 5 (ROOT AUTHORITY) REQUIRED</div>
+                <div>&gt; GLASS_AEROSPACE: HARDWARE TOKEN VERIFIED</div>
+                <div className="text-cyan-200 font-bold">&gt; ENTER AUTHORIZATION MASTER KEY TO ENGAGE CONSOLE_</div>
               </div>
 
               <form onSubmit={handleVerifyPasscode} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="passcode" className="text-[11px] font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center justify-between">
                     <span>Root Authorization Passcode</span>
-                    <span className="text-emerald-400 text-[10px] font-normal">AES-256 ENCRYPTED</span>
+                    <span className="text-cyan-400 text-[10px] font-normal">ENCRYPTED STREAM</span>
                   </Label>
                   <Input
                     id="passcode"
@@ -1693,12 +1690,12 @@ export default function AdminPortalPage() {
                     }}
                     required
                     autoFocus
-                    className="h-11 text-sm font-mono tracking-widest bg-[#060a12] border-emerald-500/40 text-emerald-300 placeholder:text-slate-600 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:shadow-[0_0_20px_rgba(16,185,129,0.3)] rounded-lg"
+                    className="h-11 text-sm font-mono tracking-widest bg-white/[0.05] border-white/15 text-white placeholder:text-slate-500 focus:border-cyan-400/80 focus:bg-white/[0.08] backdrop-blur-xl rounded-xl shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] transition-all"
                   />
                 </div>
 
                 {passcodeError && (
-                  <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs font-mono flex items-center gap-2 animate-in fade-in">
+                  <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-mono flex items-center gap-2 animate-in fade-in backdrop-blur-xl">
                     <span>⚠️</span>
                     <span>[ALERT] ACCESS_DENIED // {passcodeError}</span>
                   </div>
@@ -1708,37 +1705,39 @@ export default function AdminPortalPage() {
                   type="submit"
                   disabled={verifying || !passcode.trim()}
                   onClick={() => playCyberSound("blip")}
-                  className="w-full h-11 text-xs font-mono font-black tracking-widest uppercase bg-emerald-500 hover:bg-emerald-400 text-black shadow-[0_0_25px_rgba(16,185,129,0.4)] border border-emerald-300 rounded-lg transition-all"
+                  className="w-full h-11 text-xs font-mono font-black tracking-widest uppercase bg-gradient-to-r from-cyan-500/80 via-blue-500/80 to-purple-600/80 hover:from-cyan-400 hover:to-purple-500 text-white shadow-[0_0_25px_rgba(6,182,212,0.35)] border border-white/25 rounded-xl backdrop-blur-md transition-all"
                 >
                   {verifying ? "VERIFYING CRYPTOGRAPHIC KEY..." : "[AUTHENTICATE ROOT SESSION ↵]"}
                 </Button>
               </form>
 
-              <div className="pt-2 border-t border-[#162338] flex items-center justify-between text-[10px] text-slate-500 font-mono">
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400 font-mono">
                 <span>IDENTITY: SUPER-ADMINISTRATOR</span>
-                <span className="text-emerald-500/80">TOKEN: ACTIVE</span>
+                <span className="text-cyan-400">STATUS: READY</span>
               </div>
             </div>
           </div>
 
-          <div className="text-center text-[11px] text-slate-500 font-mono flex items-center justify-center gap-2">
+          <div className="text-center text-[11px] text-slate-400 font-mono flex items-center justify-center gap-2">
             <span>🛡️</span>
-            <span>CodeArena Classified Operations • Root Administrators Only</span>
+            <span>CodeArena Frosted Glass Operations • Root Administrators Only</span>
           </div>
         </div>
       </div>
     );
   }
 
-  // Full Admin Portal (Directly rendered for Admin - Cyber Terminal Theme)
+  // Full Admin Portal (Directly rendered for Admin - Glassmorphism Theme)
   return (
-    <div className="min-h-screen bg-[#06080e] text-slate-100 flex flex-col selection:bg-emerald-500/30 selection:text-emerald-200 relative overflow-x-hidden font-sans">
-      {/* Cyber Grid Background */}
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(#142636_1px,transparent_1px)] [background-size:24px_24px] opacity-40 z-0" />
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-emerald-950/15 via-transparent to-cyan-950/15 z-0" />
+    <div className="min-h-screen bg-[#070b16] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200 relative overflow-x-hidden font-sans">
+      {/* Glassmorphic Ambient Luminous Refraction Orbs */}
+      <div className="fixed -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-cyan-500/20 blur-[140px] pointer-events-none z-0" />
+      <div className="fixed top-1/4 -right-40 w-[650px] h-[650px] rounded-full bg-purple-600/20 blur-[150px] pointer-events-none z-0" />
+      <div className="fixed -bottom-40 left-1/3 w-[600px] h-[600px] rounded-full bg-emerald-500/15 blur-[150px] pointer-events-none z-0" />
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:24px_24px] opacity-40 z-0" />
 
-      {/* Top Admin Header */}
-      <header className="sticky top-0 z-50 border-b bg-[#080c14]/95 backdrop-blur-xl border-emerald-500/20 shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+      {/* Top Floating Frosted Glass Admin Header */}
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/40 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
@@ -1746,14 +1745,14 @@ export default function AdminPortalPage() {
               onClick={() => playCyberSound("blip")}
               className="font-extrabold text-xl tracking-tight text-white flex items-center gap-2.5"
             >
-              <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center text-black font-black text-base shadow-[0_0_20px_rgba(16,185,129,0.5)] border border-emerald-300">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-cyan-400/80 via-blue-500/80 to-purple-600/80 flex items-center justify-center text-white font-black text-base shadow-[0_0_20px_rgba(6,182,212,0.4)] border border-white/30 backdrop-blur-md">
                 ⚡
               </div>
               <div className="flex flex-col">
                 <div className="font-mono font-black text-sm sm:text-base tracking-widest text-slate-100 flex items-center gap-1.5">
-                  NEXUS<span className="text-emerald-400 font-bold">//MAINFRAME</span>
+                  NEXUS<span className="text-cyan-400 font-bold">//AERO.GLASS</span>
                 </div>
-                <span className="text-[9px] font-mono tracking-widest text-emerald-400/80 uppercase">
+                <span className="text-[9px] font-mono tracking-widest text-cyan-400/80 uppercase">
                   ROOT CONSOLE • 2026.4
                 </span>
               </div>
@@ -1778,10 +1777,10 @@ export default function AdminPortalPage() {
                   playCyberSound("blip");
                   if (tab.action) tab.action();
                 }}
-                className={`transition-all px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1.5 ${
+                className={`transition-all px-2.5 py-1.5 rounded-xl text-[11px] flex items-center gap-1.5 ${
                   activeTab === tab.id
-                    ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.25)] font-bold"
-                    : "text-slate-400 hover:text-slate-100 hover:bg-[#0f172a] border border-transparent"
+                    ? "bg-white/15 text-white border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.12),inset_0_1px_1px_rgba(255,255,255,0.25)] font-bold backdrop-blur-xl"
+                    : "text-slate-300 hover:text-white hover:bg-white/[0.06] border border-transparent backdrop-blur-md"
                 }`}
               >
                 <span>{tab.icon}</span>
@@ -1792,8 +1791,8 @@ export default function AdminPortalPage() {
 
           <div className="flex items-center gap-2.5">
             {/* Live Digital Clock */}
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-md bg-[#0d1422] border border-emerald-500/30 text-emerald-400 font-mono text-[11px] shadow-inner">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping opacity-75" />
+            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-xl bg-white/[0.04] backdrop-blur-xl border border-white/10 text-cyan-300 font-mono text-[11px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping opacity-75" />
               <span>{clockTime || "2026.10.11 // 17:05:00"}</span>
             </div>
 
@@ -1803,7 +1802,7 @@ export default function AdminPortalPage() {
                 setSfxEnabled(!sfxEnabled);
                 if (!sfxEnabled) playCyberSound("blip");
               }}
-              className="hidden sm:flex px-2 py-1 rounded-md bg-[#0d1422] border border-[#1e2a3f] hover:border-emerald-500/50 text-[10px] font-mono text-slate-300 items-center gap-1 transition-colors"
+              className="hidden sm:flex px-2 py-1 rounded-xl bg-white/[0.04] backdrop-blur-xl border border-white/10 hover:border-white/20 text-[10px] font-mono text-slate-300 items-center gap-1 transition-colors"
               title="Toggle Cyber Sound Effects"
             >
               <span>{sfxEnabled ? "🔊 ON" : "🔈 MUTED"}</span>
@@ -1815,18 +1814,18 @@ export default function AdminPortalPage() {
                 setActiveTab("profile");
                 playCyberSound("blip");
               }}
-              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border transition-all text-xs font-mono font-bold ${
+              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all text-xs font-mono font-bold backdrop-blur-xl ${
                 activeTab === "profile"
-                  ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                  : "bg-[#0c121e] hover:bg-[#111928] border-emerald-500/30 text-slate-200"
+                  ? "bg-white/20 border-white/40 text-white shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                  : "bg-white/[0.04] hover:bg-white/[0.08] border-white/10 text-slate-200"
               }`}
               title="Root Operator Profile & Vault"
             >
               <span className="text-sm">{adminProfile.avatar || "⚡"}</span>
-              <span className="hidden sm:inline text-[11px] text-emerald-400 font-mono tracking-wider">
+              <span className="hidden sm:inline text-[11px] text-cyan-300 font-mono tracking-wider">
                 {adminProfile.name.split(" ")[0].toUpperCase()}
               </span>
-              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] border border-emerald-500/40">
+              <span className="px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 text-[9px] border border-cyan-500/40">
                 ROOT
               </span>
             </button>
@@ -1839,7 +1838,7 @@ export default function AdminPortalPage() {
                 playCyberSound("lock");
                 handleLockAdmin();
               }}
-              className="h-8 text-xs font-mono font-bold bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-300 gap-1.5 shadow-[0_0_15px_rgba(244,63,94,0.2)]"
+              className="h-8 text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/40 text-rose-200 gap-1.5 shadow-[0_0_15px_rgba(244,63,94,0.25)] backdrop-blur-xl rounded-xl"
               title="Terminate Root Session"
             >
               <span>🔒</span> <span className="hidden sm:inline">[LOCK]</span>
@@ -1858,11 +1857,11 @@ export default function AdminPortalPage() {
           }}
           className="space-y-6"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4 border-emerald-500/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4 border-white/10">
             <div>
               <h1 className="text-2xl sm:text-3xl font-mono font-black tracking-wide text-slate-100 flex items-center gap-2.5">
-                {activeTab === "overview" && <span className="text-emerald-400">⚡ // NEXUS_COMMAND_CENTER [TELEMETRY_HUD]</span>}
-                {activeTab === "profile" && <span className="text-emerald-400">🛡️ // ROOT_OPERATOR_VAULT [SECURITY_CLEARANCE]</span>}
+                {activeTab === "overview" && <span className="text-cyan-400">⚡ // NEXUS_COMMAND_CENTER [AERO_HUD]</span>}
+                {activeTab === "profile" && <span className="text-cyan-400">🛡️ // ROOT_OPERATOR_VAULT [SECURITY_CLEARANCE]</span>}
                 {activeTab === "questions" && <span className="text-cyan-400">📚 // PROBLEM_BANK_MATRIX [CONTENT_STUDIO]</span>}
                 {activeTab === "contests" && <span className="text-amber-400">🏆 // TOURNAMENT_ORCHESTRATOR [LIVE_ARENA]</span>}
                 {activeTab === "create" && <span className="text-emerald-400">➕ // ALGORITHM_AUTHORING_LAB [DEV_STUDIO]</span>}
@@ -1882,16 +1881,16 @@ export default function AdminPortalPage() {
               </p>
             </div>
 
-            {/* Tactical Quick Dock Buttons */}
+            {/* Tactical Frosted Glass Quick Dock Buttons */}
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant={activeTab === "overview" ? "default" : "outline"}
                 size="sm"
                 onClick={() => { setActiveTab("overview"); playCyberSound("blip"); }}
-                className={`h-8 text-xs font-mono font-bold gap-1.5 ${
+                className={`h-8 text-xs font-mono font-bold gap-1.5 rounded-xl transition-all ${
                   activeTab === "overview"
-                    ? "bg-emerald-500 hover:bg-emerald-400 text-black border border-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
-                    : "bg-[#0b121e] border-emerald-500/30 text-emerald-300 hover:bg-[#111c2e]"
+                    ? "bg-white/20 hover:bg-white/25 text-white border border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.2)] backdrop-blur-xl"
+                    : "bg-white/[0.04] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.08] backdrop-blur-md"
                 }`}
               >
                 <span>⚡</span> OVERVIEW
@@ -1900,10 +1899,10 @@ export default function AdminPortalPage() {
                 variant={activeTab === "questions" ? "default" : "outline"}
                 size="sm"
                 onClick={() => { setActiveTab("questions"); playCyberSound("blip"); }}
-                className={`h-8 text-xs font-mono font-bold gap-1.5 ${
+                className={`h-8 text-xs font-mono font-bold gap-1.5 rounded-xl transition-all ${
                   activeTab === "questions"
-                    ? "bg-cyan-500 hover:bg-cyan-400 text-black border border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.4)]"
-                    : "bg-[#0b121e] border-cyan-500/30 text-cyan-300 hover:bg-[#111c2e]"
+                    ? "bg-cyan-500/25 hover:bg-cyan-500/35 text-cyan-200 border border-cyan-400/50 shadow-[0_0_20px_rgba(6,182,212,0.3)] backdrop-blur-xl"
+                    : "bg-white/[0.04] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.08] backdrop-blur-md"
                 }`}
               >
                 <span>📚</span> PROBLEMS ({allQuestions.length})
@@ -1912,10 +1911,10 @@ export default function AdminPortalPage() {
                 variant={activeTab === "contests" ? "default" : "outline"}
                 size="sm"
                 onClick={() => { setActiveTab("contests"); loadContests(); playCyberSound("blip"); }}
-                className={`h-8 text-xs font-mono font-bold gap-1.5 ${
+                className={`h-8 text-xs font-mono font-bold gap-1.5 rounded-xl transition-all ${
                   activeTab === "contests"
-                    ? "bg-amber-500 hover:bg-amber-400 text-black border border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
-                    : "bg-[#0b121e] border-amber-500/30 text-amber-300 hover:bg-[#111c2e]"
+                    ? "bg-amber-500/25 hover:bg-amber-500/35 text-amber-200 border border-amber-400/50 shadow-[0_0_20px_rgba(245,158,11,0.3)] backdrop-blur-xl"
+                    : "bg-white/[0.04] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.08] backdrop-blur-md"
                 }`}
               >
                 <span>🏆</span> CONTESTS ({contestsList.length})
@@ -1927,7 +1926,7 @@ export default function AdminPortalPage() {
                   setActiveTab("create");
                   playCyberSound("blip");
                 }}
-                className="h-8 text-xs font-mono font-bold bg-emerald-500 hover:bg-emerald-400 text-black border border-emerald-300 gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.35)]"
+                className="h-8 text-xs font-mono font-bold bg-gradient-to-r from-emerald-500/80 to-cyan-500/80 hover:from-emerald-400 hover:to-cyan-400 text-black border border-white/30 gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.3)] backdrop-blur-md rounded-xl"
               >
                 <span>➕</span> CREATE
               </Button>
@@ -1935,7 +1934,7 @@ export default function AdminPortalPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => { setActiveTab("import"); playCyberSound("blip"); }}
-                className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#0b121e] border-cyan-500/30 text-cyan-300 hover:bg-[#111c2e]"
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-white/[0.04] border-white/10 text-cyan-300 hover:bg-white/[0.08] backdrop-blur-md rounded-xl"
               >
                 <span>📁</span> IMPORT
               </Button>
@@ -1943,7 +1942,7 @@ export default function AdminPortalPage() {
                 variant={activeTab === "users" ? "default" : "outline"}
                 size="sm"
                 onClick={() => { setActiveTab("users"); loadUsers(); playCyberSound("blip"); }}
-                className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#0b121e] border-sky-500/30 text-sky-300 hover:bg-[#111c2e]"
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-white/[0.04] border-white/10 text-sky-300 hover:bg-white/[0.08] backdrop-blur-md rounded-xl"
               >
                 <span>👥</span> USERS ({allUsersList.length})
               </Button>
@@ -1951,7 +1950,7 @@ export default function AdminPortalPage() {
                 variant={activeTab === "profile" ? "default" : "outline"}
                 size="sm"
                 onClick={() => { setActiveTab("profile"); playCyberSound("blip"); }}
-                className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#0b121e] border-emerald-500/30 text-emerald-300 hover:bg-[#111c2e]"
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-white/[0.04] border-white/10 text-emerald-300 hover:bg-white/[0.08] backdrop-blur-md rounded-xl"
               >
                 <span>🛡️</span> ROOT VAULT
               </Button>
@@ -1959,7 +1958,7 @@ export default function AdminPortalPage() {
                 variant="secondary"
                 size="sm"
                 onClick={() => { handleExportJson(); playCyberSound("success"); }}
-                className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#141d2f] hover:bg-[#1b273e] text-slate-200 border border-[#22324f]"
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 border border-white/15 backdrop-blur-md rounded-xl"
                 title="Download complete JSON backup of all problems"
               >
                 <span>📥</span> EXPORT JSON
@@ -1967,30 +1966,27 @@ export default function AdminPortalPage() {
             </div>
           </div>
 
-          {/* TAB 0: 2026 NEXUS OVERVIEW & COMMAND CENTER (Cyber Terminal Theme) */}
+          {/* TAB 0: 2026 NEXUS OVERVIEW & COMMAND CENTER (Glassmorphism Theme) */}
           <TabsContent value="overview" className="space-y-6 m-0 focus-visible:outline-none">
             {/* Live Telemetry Status Ticker */}
-            <div className="relative rounded-xl border border-emerald-500/30 bg-gradient-to-r from-[#09111c] via-[#0b1726] to-[#07131b] backdrop-blur-xl p-4 md:p-5 overflow-hidden shadow-[0_0_35px_rgba(16,185,129,0.08)]">
-              {/* Corner Tech Notches */}
-              <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-emerald-400 pointer-events-none" />
-              <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-emerald-400 pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-emerald-400 pointer-events-none" />
-              <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-emerald-400 pointer-events-none" />
+            <div className="relative rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 backdrop-blur-2xl p-5 md:p-6 overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.12)]">
+              {/* Subtle Ambient Refraction Sheen */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-purple-500/10 z-0" />
 
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="relative flex items-center justify-center w-11 h-11 rounded-lg bg-[#0e1b2b] border border-emerald-500/40 text-xl shadow-inner text-emerald-400 font-mono">
+                <div className="flex items-center gap-3.5">
+                  <div className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 text-2xl shadow-[0_0_20px_rgba(6,182,212,0.3)] text-cyan-300 font-mono backdrop-blur-xl">
                     <span>⚡</span>
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping opacity-75" />
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping opacity-75" />
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-sm md:text-base font-mono font-black tracking-widest uppercase text-slate-100">
+                      <h2 className="text-sm md:text-base font-mono font-black tracking-widest uppercase text-white">
                         NEXUS // REALTIME TELEMETRY MATRIX
                       </h2>
-                      <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px] font-bold">
-                        ACTIVE • KERNEL 2026.4
+                      <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 font-mono text-[10px] font-bold backdrop-blur-md">
+                        ACTIVE • AERO.GLASS 2026.4
                       </span>
                     </div>
                     <p className="text-xs font-mono text-slate-400 mt-0.5">
@@ -2000,10 +1996,10 @@ export default function AdminPortalPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 font-mono">
-                  <div className="px-3 py-1.5 rounded-lg bg-[#0c1424] border border-[#1b2b44] text-[11px] font-mono flex items-center gap-2">
+                  <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-[11px] font-mono flex items-center gap-2 backdrop-blur-md shadow-inner">
                     <span className="text-slate-400">OPERATOR:</span>
-                    <span className="font-bold text-emerald-300">{adminProfile.name.toUpperCase()}</span>
-                    <span className="text-emerald-400 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 font-bold border border-emerald-500/30">
+                    <span className="font-bold text-cyan-300">{adminProfile.name.toUpperCase()}</span>
+                    <span className="text-cyan-300 text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-500/20 font-bold border border-cyan-400/30">
                       ROOT
                     </span>
                   </div>
@@ -2014,7 +2010,7 @@ export default function AdminPortalPage() {
                       playCyberSound("blip");
                       handleRunHealthDiagnostic();
                     }}
-                    className="h-8 text-xs font-mono font-bold gap-1.5 bg-[#0b1424] border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15"
+                    className="h-8 text-xs font-mono font-bold gap-1.5 bg-white/[0.04] border-white/15 text-cyan-300 hover:bg-white/[0.08] backdrop-blur-md rounded-xl"
                   >
                     <span>🩺</span> [PING_KERNEL]
                   </Button>
@@ -2025,7 +2021,7 @@ export default function AdminPortalPage() {
                       setActiveTab("create");
                       playCyberSound("blip");
                     }}
-                    className="h-8 text-xs font-mono font-black bg-emerald-500 hover:bg-emerald-400 text-black border border-emerald-300 gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.35)]"
+                    className="h-8 text-xs font-mono font-black bg-gradient-to-r from-emerald-500/80 to-cyan-500/80 hover:from-emerald-400 hover:to-cyan-400 text-black border border-white/30 gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.3)] backdrop-blur-md rounded-xl"
                   >
                     <span>➕</span> [NEW_PROBLEM]
                   </Button>
@@ -2033,7 +2029,7 @@ export default function AdminPortalPage() {
               </div>
             </div>
 
-            {/* 4 Core Telemetry Metric 3D Tilt Cards */}
+            {/* 4 Core Telemetry Metric Glass Tilt Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Telemetry Card 1: Problems Repository */}
               <AdminTiltCard glowColor="emerald" className="p-5 flex flex-col justify-between">
@@ -2042,7 +2038,7 @@ export default function AdminPortalPage() {
                     <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
                       // 01: REPOSITORY_MATRIX
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-sm backdrop-blur-md">
                       📚
                     </div>
                   </div>
@@ -2057,7 +2053,7 @@ export default function AdminPortalPage() {
 
                   {/* Difficulty Distribution Bar */}
                   <div className="space-y-1.5 pt-1">
-                    <div className="h-2 w-full rounded bg-[#0d1422] border border-[#1b2a42] overflow-hidden flex">
+                    <div className="h-2 w-full rounded-full bg-white/[0.06] border border-white/10 overflow-hidden flex">
                       <div
                         style={{
                           width: `${allQuestions.length ? (allQuestions.filter((q) => q.difficulty === "EASY").length / allQuestions.length) * 100 : 0}%`,
@@ -2094,7 +2090,7 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#1a283e] flex items-center justify-between font-mono">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between font-mono">
                   <span className="text-[10px] text-slate-400">
                     {customSlugs.size} Custom Ideations
                   </span>
@@ -2117,7 +2113,7 @@ export default function AdminPortalPage() {
                     <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
                       // 02: TOURNAMENTS_ARENA
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-sm backdrop-blur-md">
                       🏆
                     </div>
                   </div>
@@ -2125,7 +2121,7 @@ export default function AdminPortalPage() {
                     <div className="text-3xl font-black tracking-tight text-white flex items-center gap-2">
                       {contestsList.length}
                       {contestsList.some((c) => c.status === "LIVE") && (
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/50 animate-pulse font-mono font-bold">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/50 animate-pulse font-mono font-bold">
                           ● LIVE_NOW
                         </span>
                       )}
@@ -2136,20 +2132,20 @@ export default function AdminPortalPage() {
                   </div>
 
                   <div className="grid grid-cols-3 gap-1.5 py-1">
-                    <div className="p-1.5 rounded bg-[#0d1422] border border-[#1b2a42] text-center">
+                    <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-center backdrop-blur-md">
                       <div className="text-xs font-bold text-rose-400">
                         {contestsList.filter((c) => c.status === "LIVE").length}
                       </div>
                       <div className="text-[9px] text-slate-400">Live</div>
                     </div>
-                    <div className="p-1.5 rounded bg-[#0d1422] border border-[#1b2a42] text-center">
+                    <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-center backdrop-blur-md">
                       <div className="text-xs font-bold text-amber-400">
                         {contestsList.filter((c) => c.status === "UPCOMING").length}
                       </div>
                       <div className="text-[9px] text-slate-400">Upcoming</div>
                     </div>
-                    <div className="p-1.5 rounded bg-[#0d1422] border border-[#1b2a42] text-center">
-                      <div className="text-xs font-bold text-slate-400">
+                    <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-center backdrop-blur-md">
+                      <div className="text-xs font-bold text-slate-300">
                         {contestsList.filter((c) => c.status === "ENDED").length}
                       </div>
                       <div className="text-[9px] text-slate-400">Ended</div>
@@ -2157,7 +2153,7 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#1a283e] flex items-center justify-between font-mono">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between font-mono">
                   <span className="text-[10px] text-slate-400">
                     {contestsList.reduce((acc, c) => acc + (c.participantsCount || 0), 0)} Registrations
                   </span>
@@ -2181,7 +2177,7 @@ export default function AdminPortalPage() {
                     <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-widest">
                       // 03: COMPETITOR_ROSTER
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center text-sm backdrop-blur-md">
                       👥
                     </div>
                   </div>
@@ -2214,7 +2210,7 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#1a283e] flex items-center justify-between font-mono">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between font-mono">
                   <span className="text-[10px] text-slate-400">
                     {allUsersList.filter((u) => u.role === "ADMIN" || u.role === "SUPER_ADMIN").length || 1} Admins
                   </span>
@@ -2238,14 +2234,14 @@ export default function AdminPortalPage() {
                     <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
                       // 04: QUAD_EXECUTION_FABRIC
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-sm backdrop-blur-md">
                       🎛️
                     </div>
                   </div>
                   <div>
                     <div className="text-3xl font-black tracking-tight text-white flex items-center gap-1.5">
                       <span>4 / 4</span>
-                      <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40">
+                      <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/30">
                         OPERATIONAL
                       </span>
                     </div>
@@ -2274,7 +2270,7 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#1a283e] flex items-center justify-between font-mono">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between font-mono">
                   <span className="text-[10px] text-emerald-400 font-bold">
                     Zero Leaks
                   </span>
@@ -2599,14 +2595,14 @@ export default function AdminPortalPage() {
             )}
 
             {/* Filter, Search, and Reordering Toolbar */}
-            <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#0b101a]/95 border border-cyan-500/25 shadow-xl backdrop-blur-md">
+            <div className="flex flex-col gap-3 p-4 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
               <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
                 <div className="w-full md:w-80">
                   <Input
                     placeholder="Search by title, slug, or topic..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-9 text-xs font-mono bg-[#06080e] border-cyan-500/30 text-cyan-200 placeholder-cyan-900/60 focus:border-cyan-400"
+                    className="h-9 text-xs font-mono bg-white/[0.04] border-white/10 text-cyan-200 placeholder-slate-500 focus:border-cyan-400/60 focus:bg-white/[0.08] backdrop-blur-md transition-all shadow-inner"
                   />
                 </div>
 
@@ -2615,33 +2611,33 @@ export default function AdminPortalPage() {
                   <select
                     value={difficultyFilter}
                     onChange={(e) => setDifficultyFilter(e.target.value)}
-                    className="h-9 text-xs font-mono rounded-md bg-[#06080e] text-cyan-200 px-3 py-1 border border-cyan-500/30 font-medium focus:border-cyan-400 focus:outline-none"
+                    className="h-9 text-xs font-mono rounded-xl bg-white/[0.04] text-cyan-200 px-3 py-1 border border-white/10 font-medium focus:border-cyan-400 focus:outline-none backdrop-blur-md transition-all"
                   >
-                    <option value="ALL">All Difficulties</option>
-                    <option value="EASY">Easy</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HARD">Hard</option>
+                    <option value="ALL" className="bg-slate-900 text-slate-200">All Difficulties</option>
+                    <option value="EASY" className="bg-slate-900 text-emerald-400">Easy</option>
+                    <option value="MEDIUM" className="bg-slate-900 text-amber-400">Medium</option>
+                    <option value="HARD" className="bg-slate-900 text-rose-400">Hard</option>
                   </select>
 
                   <select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className="h-9 text-xs font-mono rounded-md bg-[#06080e] text-cyan-200 px-3 py-1 border border-cyan-500/30 font-medium focus:border-cyan-400 focus:outline-none"
+                    className="h-9 text-xs font-mono rounded-xl bg-white/[0.04] text-cyan-200 px-3 py-1 border border-white/10 font-medium focus:border-cyan-400 focus:outline-none backdrop-blur-md transition-all"
                   >
-                    <option value="ALL">All Sources</option>
-                    <option value="CUSTOM">Custom Admin Only ({customSlugs.size})</option>
-                    <option value="BUILT_IN">Built-in Only ({allQuestions.length - customSlugs.size})</option>
+                    <option value="ALL" className="bg-slate-900 text-slate-200">All Sources</option>
+                    <option value="CUSTOM" className="bg-slate-900 text-cyan-300">Custom Admin Only ({customSlugs.size})</option>
+                    <option value="BUILT_IN" className="bg-slate-900 text-slate-400">Built-in Only ({allQuestions.length - customSlugs.size})</option>
                   </select>
                 </div>
               </div>
 
               {/* Order Tools Row */}
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-cyan-500/15 text-xs font-mono">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-xs font-mono">
                 <div className="flex items-center gap-2 text-slate-400 text-[11px]">
                   <span className="text-cyan-400 font-bold">⠿ DRAG & REORDER:</span>
                   <span>Grab drag handles to reorder question sequence in real-time.</span>
                   {isCustomOrderActive && (
-                    <span className="px-2 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-500/30 text-[10px] font-bold">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-bold backdrop-blur-md">
                       CUSTOM_ORDER_ACTIVE
                     </span>
                   )}
@@ -2652,7 +2648,7 @@ export default function AdminPortalPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => { handleSortByDifficulty(); playCyberSound("blip"); }}
-                    className="h-7 text-[11px] font-mono font-bold gap-1 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10"
+                    className="h-7 text-[11px] font-mono font-bold gap-1 rounded-lg border-white/10 border-t-white/20 bg-white/[0.04] text-cyan-300 hover:bg-cyan-500/15 backdrop-blur-md transition-all shadow-sm"
                     title="Strictly arrange 50 Easy -> 50 Medium -> 50 Hard"
                   >
                     <span>🎯</span> TIER_BY_DIFFICULTY (50E → 50M → 50H)
@@ -2661,7 +2657,7 @@ export default function AdminPortalPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => { handleResetToDefaultOrder(); playCyberSound("blip"); }}
-                    className="h-7 text-[11px] font-mono text-slate-400 hover:text-cyan-300 gap-1 hover:bg-[#06080e]"
+                    className="h-7 text-[11px] font-mono text-slate-400 hover:text-cyan-300 gap-1 hover:bg-white/[0.05] rounded-lg transition-all"
                     title="Reset to factory default sequence"
                   >
                     <span>🔄</span> RESET_ORDER
@@ -2671,26 +2667,26 @@ export default function AdminPortalPage() {
             </div>
 
             {/* Questions Table */}
-            <div className="rounded-xl border border-cyan-500/25 bg-[#0b101a]/95 overflow-hidden shadow-xl backdrop-blur-md">
+            <div className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 overflow-hidden shadow-[0_16px_50px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#06080e] text-cyan-400/80 uppercase tracking-wider font-mono text-[10px] border-b border-cyan-500/20">
+                  <thead className="bg-white/[0.03] text-slate-300 uppercase tracking-wider font-mono text-[10px] border-b border-white/10">
                     <tr>
-                      <th className="py-3 px-3 text-center w-12">#</th>
-                      <th className="py-3 px-2 text-center w-14">Order</th>
-                      <th className="py-3 px-4">Title & Slug</th>
-                      <th className="py-3 px-4">Difficulty</th>
-                      <th className="py-3 px-4">Topics</th>
-                      <th className="py-3 px-4">Method Name</th>
-                      <th className="py-3 px-4">Test Cases</th>
-                      <th className="py-3 px-4">Source</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
+                      <th className="py-3.5 px-3 text-center w-12 text-slate-400">#</th>
+                      <th className="py-3.5 px-2 text-center w-14 text-slate-400">Order</th>
+                      <th className="py-3.5 px-4">Title & Slug</th>
+                      <th className="py-3.5 px-4">Difficulty</th>
+                      <th className="py-3.5 px-4">Topics</th>
+                      <th className="py-3.5 px-4">Method Name</th>
+                      <th className="py-3.5 px-4">Test Cases</th>
+                      <th className="py-3.5 px-4">Source</th>
+                      <th className="py-3.5 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-cyan-500/10 font-mono">
+                  <tbody className="divide-y divide-white/[0.06] font-mono">
                     {filteredQuestions.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="py-8 text-center text-slate-500 font-mono">
+                        <td colSpan={9} className="py-10 text-center text-slate-400 font-mono">
                           // NO QUESTIONS MATCHED THE ACTIVE TELEMETRY FILTER //
                         </td>
                       </tr>
@@ -2712,10 +2708,10 @@ export default function AdminPortalPage() {
                             onDragEnd={handleDragEnd}
                             className={`transition-all ${
                               isBeingDragged
-                                ? "opacity-30 bg-cyan-950/60 scale-[0.99]"
+                                ? "opacity-30 bg-cyan-500/10 scale-[0.99]"
                                 : isTargeted
-                                ? "bg-cyan-950/40 border-y-2 border-cyan-400"
-                                : "hover:bg-cyan-950/20"
+                                ? "bg-cyan-500/15 border-y-2 border-cyan-400"
+                                : "hover:bg-white/[0.04]"
                             }`}
                           >
                             {/* Sequence Number */}
@@ -2737,7 +2733,7 @@ export default function AdminPortalPage() {
                                     type="button"
                                     onClick={() => handleMoveQuestion(q.slug, "UP")}
                                     disabled={idx === 0}
-                                    className="text-[9px] text-slate-500 hover:text-cyan-300 disabled:opacity-20 px-1 py-0.2 rounded hover:bg-[#06080e]"
+                                    className="text-[9px] text-slate-500 hover:text-cyan-300 disabled:opacity-20 px-1 py-0.2 rounded hover:bg-white/[0.08]"
                                     title="Move up"
                                   >
                                     ▲
@@ -2746,7 +2742,7 @@ export default function AdminPortalPage() {
                                     type="button"
                                     onClick={() => handleMoveQuestion(q.slug, "DOWN")}
                                     disabled={idx === filteredQuestions.length - 1}
-                                    className="text-[9px] text-slate-500 hover:text-cyan-300 disabled:opacity-20 px-1 py-0.2 rounded hover:bg-[#06080e]"
+                                    className="text-[9px] text-slate-500 hover:text-cyan-300 disabled:opacity-20 px-1 py-0.2 rounded hover:bg-white/[0.08]"
                                     title="Move down"
                                   >
                                     ▼
@@ -2760,18 +2756,18 @@ export default function AdminPortalPage() {
                               <div className="text-slate-100 text-xs font-bold flex items-center gap-1.5">
                                 <span>{q.title}</span>
                               </div>
-                              <div className="text-[11px] text-cyan-500/70 font-mono mt-0.5">{q.slug}</div>
+                              <div className="text-[11px] text-cyan-400/80 font-mono mt-0.5">{q.slug}</div>
                             </td>
 
                             {/* Difficulty */}
                             <td className="py-3.5 px-4">
                               <span
-                                className={`px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
+                                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border font-mono backdrop-blur-md ${
                                   q.difficulty === "EASY"
-                                    ? "bg-emerald-950/60 text-emerald-400 border-emerald-500/30"
+                                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
                                     : q.difficulty === "MEDIUM"
-                                    ? "bg-amber-950/60 text-amber-400 border-amber-500/30"
-                                    : "bg-rose-950/60 text-rose-400 border-rose-500/30"
+                                    ? "bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+                                    : "bg-rose-500/10 text-rose-400 border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.15)]"
                                 }`}
                               >
                                 {q.difficulty}
@@ -2782,18 +2778,18 @@ export default function AdminPortalPage() {
                             <td className="py-3.5 px-4">
                               <div className="flex flex-wrap gap-1 max-w-xs font-mono">
                                 {q.topics?.slice(0, 3).map((t, tIdx) => (
-                                  <span key={tIdx} className="px-1.5 py-0.5 rounded bg-[#06080e] text-[10px] text-slate-300 border border-cyan-500/20">
+                                  <span key={tIdx} className="px-2 py-0.5 rounded-md bg-white/[0.04] text-[10px] text-slate-300 border border-white/10 backdrop-blur-sm">
                                     {t.name}
                                   </span>
                                 ))}
                                 {q.topics && q.topics.length > 3 && (
-                                  <span className="text-[10px] text-cyan-400/70 font-mono">+{q.topics.length - 3}</span>
+                                  <span className="text-[10px] text-cyan-400/70 font-mono self-center">+{q.topics.length - 3}</span>
                                 )}
                               </div>
                             </td>
 
                             {/* Method Name */}
-                            <td className="py-3.5 px-4 font-mono text-[11px] text-cyan-400">
+                            <td className="py-3.5 px-4 font-mono text-[11px] text-cyan-300">
                               {q.methodName || "solution"}()
                             </td>
 
@@ -2805,11 +2801,11 @@ export default function AdminPortalPage() {
                             {/* Source */}
                             <td className="py-3.5 px-4">
                               {isCustom ? (
-                                <span className="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 text-[10px] font-mono font-bold border border-emerald-500/40">
+                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-500/30 backdrop-blur-sm">
                                   ADMIN_CUSTOM
                                 </span>
                               ) : (
-                                <span className="px-2 py-0.5 rounded bg-[#06080e] text-slate-400 text-[10px] font-mono border border-slate-700">
+                                <span className="px-2 py-0.5 rounded-full bg-white/[0.04] text-slate-400 text-[10px] font-mono border border-white/10 backdrop-blur-sm">
                                   BUILT_IN
                                 </span>
                               )}
@@ -2822,13 +2818,13 @@ export default function AdminPortalPage() {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => { handleEditQuestion(q); playCyberSound("blip"); }}
-                                  className="h-7 px-2.5 text-[11px] font-mono border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/15"
+                                  className="h-7 px-2.5 text-[11px] font-mono rounded-lg border-white/10 bg-white/[0.04] text-cyan-300 hover:bg-cyan-500/20 backdrop-blur-md transition-all shadow-sm"
                                 >
                                   EDIT
                                 </Button>
 
                                 <Link href={`/problems/${q.slug}`} target="_blank">
-                                  <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px] font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/30">
+                                  <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px] font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/15 rounded-lg transition-all">
                                     ▶ IDE
                                   </Button>
                                 </Link>
@@ -2838,7 +2834,7 @@ export default function AdminPortalPage() {
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => { handleDelete(q.slug); playCyberSound("alert"); }}
-                                    className="h-7 px-2 text-[11px] font-mono text-rose-400 hover:bg-rose-950/40 hover:text-rose-300"
+                                    className="h-7 px-2 text-[11px] font-mono text-rose-400 hover:bg-rose-500/20 hover:text-rose-300 rounded-lg transition-all"
                                   >
                                     ✕
                                   </Button>
@@ -2857,8 +2853,8 @@ export default function AdminPortalPage() {
 
           {/* TAB 2: MANUAL QUESTION CREATOR / EDITOR */}
           <TabsContent value="create" className="space-y-6 m-0 focus-visible:outline-none">
-            <Card className="shadow-2xl border-emerald-500/25 bg-[#0b101a]/95 text-slate-100 backdrop-blur-md">
-              <CardHeader className="flex flex-row items-center justify-between border-b border-emerald-500/20 pb-4">
+            <Card className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 shadow-[0_16px_50px_rgba(0,0,0,0.4)] backdrop-blur-2xl text-slate-100 overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 pb-5 bg-white/[0.02]">
                 <div>
                   <div className="text-[10px] font-mono text-emerald-400 tracking-widest uppercase mb-0.5">// CONTENT_STUDIO // LAB</div>
                   <CardTitle className="text-xl font-mono font-bold text-slate-100">
@@ -2869,7 +2865,7 @@ export default function AdminPortalPage() {
                   </CardDescription>
                 </div>
                 {editingSlug && (
-                  <Button variant="outline" size="sm" onClick={() => { handleResetForm(); playCyberSound("blip"); }} className="text-xs font-mono h-8 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10">
+                  <Button variant="outline" size="sm" onClick={() => { handleResetForm(); playCyberSound("blip"); }} className="text-xs font-mono h-8 rounded-lg border-emerald-500/30 bg-white/[0.04] text-emerald-300 hover:bg-emerald-500/10 backdrop-blur-md">
                     Cancel Edit (Create New)
                   </Button>
                 )}
@@ -2880,40 +2876,40 @@ export default function AdminPortalPage() {
                   {/* Basic Metadata */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="title" className="text-xs font-bold">Problem Title *</Label>
+                      <Label htmlFor="title" className="text-xs font-mono text-slate-300 font-bold">Problem Title *</Label>
                       <Input
                         id="title"
                         placeholder="e.g. Valid Palindrome"
                         value={formData.title}
                         onChange={(e) => handleTitleChange(e.target.value)}
                         required
-                        className="h-9 text-xs"
+                        className="h-9 text-xs bg-white/[0.04] border-white/10 text-white placeholder-slate-500 focus:border-emerald-400/60 focus:bg-white/[0.08] backdrop-blur-md rounded-xl transition-all"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="slug" className="text-xs font-bold">Problem Slug (URL identifier) *</Label>
+                      <Label htmlFor="slug" className="text-xs font-mono text-slate-300 font-bold">Problem Slug (URL identifier) *</Label>
                       <Input
                         id="slug"
                         placeholder="e.g. valid-palindrome"
                         value={formData.slug}
                         onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                         required
-                        className="h-9 text-xs font-mono"
+                        className="h-9 text-xs font-mono bg-white/[0.04] border-white/10 text-emerald-300 placeholder-slate-500 focus:border-emerald-400/60 focus:bg-white/[0.08] backdrop-blur-md rounded-xl transition-all"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="difficulty" className="text-xs font-bold">Difficulty</Label>
+                      <Label htmlFor="difficulty" className="text-xs font-mono text-slate-300 font-bold">Difficulty</Label>
                       <select
                         id="difficulty"
                         value={formData.difficulty}
                         onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
-                        className="w-full h-9 text-xs rounded-md bg-secondary px-3 py-1 border border-border font-medium"
+                        className="w-full h-9 text-xs rounded-xl bg-white/[0.04] text-slate-200 px-3 py-1 border border-white/10 font-medium focus:border-emerald-400 focus:outline-none backdrop-blur-md transition-all"
                       >
-                        <option value="EASY">Easy</option>
-                        <option value="MEDIUM">Medium</option>
-                        <option value="HARD">Hard</option>
+                        <option value="EASY" className="bg-slate-900 text-emerald-400">Easy</option>
+                        <option value="MEDIUM" className="bg-slate-900 text-amber-400">Medium</option>
+                        <option value="HARD" className="bg-slate-900 text-rose-400">Hard</option>
                       </select>
                     </div>
                   </div>
@@ -2921,7 +2917,7 @@ export default function AdminPortalPage() {
                   {/* Method Name & Topics */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="methodName" className="text-xs font-bold">
+                      <Label htmlFor="methodName" className="text-xs font-mono text-slate-300 font-bold">
                         Target Method Name *
                       </Label>
                       <Input
@@ -2930,13 +2926,13 @@ export default function AdminPortalPage() {
                         value={formData.methodName}
                         onChange={(e) => setFormData({ ...formData, methodName: e.target.value })}
                         required
-                        className="h-9 text-xs font-mono"
+                        className="h-9 text-xs font-mono bg-white/[0.04] border-white/10 text-cyan-300 placeholder-slate-500 focus:border-cyan-400/60 focus:bg-white/[0.08] backdrop-blur-md rounded-xl transition-all"
                       />
-                      <p className="text-[10px] text-muted-foreground">The function name called during test evaluation.</p>
+                      <p className="text-[10px] text-slate-400 font-mono">The function name called during test evaluation.</p>
                     </div>
 
                     <div className="md:col-span-2 space-y-1.5">
-                      <Label className="text-xs font-bold">Topics & Categories</Label>
+                      <Label className="text-xs font-mono text-slate-300 font-bold">Topics & Categories</Label>
                       <div className="flex flex-wrap gap-1.5 mb-2">
                         {AVAILABLE_TOPICS.map((topic) => {
                           const selected = formData.topics.includes(topic);
@@ -2945,10 +2941,10 @@ export default function AdminPortalPage() {
                               key={topic}
                               type="button"
                               onClick={() => toggleTopic(topic)}
-                              className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium transition-all backdrop-blur-md ${
                                 selected
-                                  ? "bg-primary text-primary-foreground shadow-sm"
-                                  : "bg-secondary text-muted-foreground hover:text-foreground"
+                                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                                  : "bg-white/[0.04] text-slate-400 border border-white/10 hover:border-white/20 hover:text-slate-200"
                               }`}
                             >
                               {selected ? "✓ " : ""}{topic}
@@ -2962,9 +2958,9 @@ export default function AdminPortalPage() {
                           placeholder="Add custom topic..."
                           value={formData.customTopicInput}
                           onChange={(e) => setFormData({ ...formData, customTopicInput: e.target.value })}
-                          className="h-8 text-xs max-w-xs"
+                          className="h-8 text-xs max-w-xs bg-white/[0.04] border-white/10 text-white placeholder-slate-500 focus:border-emerald-400/60 rounded-lg backdrop-blur-md"
                         />
-                        <Button type="button" size="sm" variant="outline" onClick={handleAddCustomTopic} className="h-8 text-xs">
+                        <Button type="button" size="sm" variant="outline" onClick={handleAddCustomTopic} className="h-8 text-xs font-mono rounded-lg border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] backdrop-blur-md">
                           Add Topic
                         </Button>
                       </div>
@@ -2974,36 +2970,36 @@ export default function AdminPortalPage() {
                   {/* Description & Constraints */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="description" className="text-xs font-bold">Problem Description (Markdown supported)</Label>
+                      <Label htmlFor="description" className="text-xs font-mono text-slate-300 font-bold">Problem Description (Markdown supported)</Label>
                       <textarea
                         id="description"
                         rows={6}
                         placeholder="Explain the problem statement, parameters, return format, and edge cases..."
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full rounded-md bg-secondary/50 p-3 text-xs border border-border font-sans focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="w-full rounded-xl bg-white/[0.04] p-3 text-xs border border-white/10 font-sans text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:bg-white/[0.08] backdrop-blur-md transition-all"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="constraints" className="text-xs font-bold">Constraints (1 per line)</Label>
+                      <Label htmlFor="constraints" className="text-xs font-mono text-slate-300 font-bold">Constraints (1 per line)</Label>
                       <textarea
                         id="constraints"
                         rows={6}
                         placeholder="e.g.&#10;1 <= nums.length <= 10^5&#10;-10^9 <= nums[i] <= 10^9"
                         value={formData.constraintsText}
                         onChange={(e) => setFormData({ ...formData, constraintsText: e.target.value })}
-                        className="w-full rounded-md bg-secondary/50 p-3 text-xs border border-border font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="w-full rounded-xl bg-white/[0.04] p-3 text-xs border border-white/10 font-mono text-emerald-300 placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:bg-white/[0.08] backdrop-blur-md transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Test Cases Builder */}
-                  <div className="space-y-3 p-4 rounded-xl bg-secondary/30 border border-border/80">
+                  <div className="space-y-3 p-4 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-sm font-bold text-foreground">Test Cases Builder ({testCases.length})</h3>
-                        <p className="text-[11px] text-muted-foreground">Define inputs, JSON arguments, and expected outputs for automatic evaluation.</p>
+                        <h3 className="text-sm font-bold font-mono text-slate-100">Test Cases Builder ({testCases.length})</h3>
+                        <p className="text-[11px] font-mono text-slate-400">Define inputs, JSON arguments, and expected outputs for automatic evaluation.</p>
                       </div>
                       <Button
                         type="button"
@@ -3015,7 +3011,7 @@ export default function AdminPortalPage() {
                             { input: "", output: "", argsStr: "[]", expectedStr: '""', isPublic: true },
                           ]);
                         }}
-                        className="h-8 text-xs font-semibold gap-1"
+                        className="h-8 text-xs font-mono font-semibold gap-1 rounded-lg border-white/10 bg-white/[0.04] text-emerald-300 hover:bg-emerald-500/15 backdrop-blur-md shadow-sm"
                       >
                         <span>➕</span> Add Test Case
                       </Button>
@@ -3023,11 +3019,11 @@ export default function AdminPortalPage() {
 
                     <div className="space-y-3">
                       {testCases.map((tc, idx) => (
-                        <div key={idx} className="p-3 rounded-lg bg-card border border-border/70 space-y-2">
+                        <div key={idx} className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5 backdrop-blur-md">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-primary font-mono">Case #{idx + 1}</span>
+                            <span className="text-xs font-bold text-cyan-400 font-mono">Case #{idx + 1}</span>
                             <div className="flex items-center gap-3">
-                              <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
+                              <label className="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer font-mono">
                                 <input
                                   type="checkbox"
                                   checked={tc.isPublic}
@@ -3036,7 +3032,7 @@ export default function AdminPortalPage() {
                                     updated[idx].isPublic = e.target.checked;
                                     setTestCases(updated);
                                   }}
-                                  className="rounded"
+                                  className="rounded border-white/20 bg-white/10 text-cyan-500 focus:ring-0"
                                 />
                                 <span>Public Example</span>
                               </label>
@@ -3047,7 +3043,7 @@ export default function AdminPortalPage() {
                                   onClick={() => {
                                     setTestCases(testCases.filter((_, i) => i !== idx));
                                   }}
-                                  className="text-xs text-destructive hover:underline"
+                                  className="text-xs font-mono text-rose-400 hover:text-rose-300 hover:underline"
                                 >
                                   Remove
                                 </button>
@@ -3057,7 +3053,7 @@ export default function AdminPortalPage() {
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
-                              <Label className="text-[11px] text-muted-foreground">Display Input</Label>
+                              <Label className="text-[11px] font-mono text-slate-400">Display Input</Label>
                               <Input
                                 placeholder='e.g. nums = [2,7,11,15], target = 9'
                                 value={tc.input}
@@ -3066,12 +3062,12 @@ export default function AdminPortalPage() {
                                   updated[idx].input = e.target.value;
                                   setTestCases(updated);
                                 }}
-                                className="h-8 text-xs font-mono"
+                                className="h-8 text-xs font-mono bg-white/[0.04] border-white/10 text-white rounded-lg focus:border-cyan-400/60"
                               />
                             </div>
 
                             <div>
-                              <Label className="text-[11px] text-muted-foreground">Arguments JSON array [arg1, arg2, ...] *</Label>
+                              <Label className="text-[11px] font-mono text-slate-400">Arguments JSON array [arg1, arg2, ...] *</Label>
                               <Input
                                 placeholder='e.g. [[2,7,11,15], 9]'
                                 value={tc.argsStr}
@@ -3080,12 +3076,12 @@ export default function AdminPortalPage() {
                                   updated[idx].argsStr = e.target.value;
                                   setTestCases(updated);
                                 }}
-                                className="h-8 text-xs font-mono"
+                                className="h-8 text-xs font-mono bg-white/[0.04] border-white/10 text-cyan-300 rounded-lg focus:border-cyan-400/60"
                               />
                             </div>
 
                             <div>
-                              <Label className="text-[11px] text-muted-foreground">Display Output</Label>
+                              <Label className="text-[11px] font-mono text-slate-400">Display Output</Label>
                               <Input
                                 placeholder='e.g. [0, 1]'
                                 value={tc.output}
@@ -3094,12 +3090,12 @@ export default function AdminPortalPage() {
                                   updated[idx].output = e.target.value;
                                   setTestCases(updated);
                                 }}
-                                className="h-8 text-xs font-mono"
+                                className="h-8 text-xs font-mono bg-white/[0.04] border-white/10 text-white rounded-lg focus:border-cyan-400/60"
                               />
                             </div>
 
                             <div>
-                              <Label className="text-[11px] text-muted-foreground">Expected Return Value JSON *</Label>
+                              <Label className="text-[11px] font-mono text-slate-400">Expected Return Value JSON *</Label>
                               <Input
                                 placeholder='e.g. [0, 1] or true or 42'
                                 value={tc.expectedStr}
@@ -3108,7 +3104,7 @@ export default function AdminPortalPage() {
                                   updated[idx].expectedStr = e.target.value;
                                   setTestCases(updated);
                                 }}
-                                className="h-8 text-xs font-mono"
+                                className="h-8 text-xs font-mono bg-white/[0.04] border-white/10 text-emerald-300 rounded-lg focus:border-emerald-400/60"
                               />
                             </div>
                           </div>
@@ -3120,7 +3116,7 @@ export default function AdminPortalPage() {
                   {/* Starter Code Multi-Language Tabs */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Starter Code Templates</Label>
+                      <Label className="text-xs font-mono text-slate-300 font-bold">Starter Code Templates</Label>
                       <Button
                         type="button"
                         size="sm"
@@ -3135,18 +3131,18 @@ export default function AdminPortalPage() {
                             codeJava: t.codeJava,
                           });
                         }}
-                        className="h-7 text-[11px]"
+                        className="h-7 text-[11px] font-mono rounded-lg border-white/10 bg-white/[0.04] text-cyan-300 hover:bg-cyan-500/15 backdrop-blur-md"
                       >
                         🪄 Regenerate Templates
                       </Button>
                     </div>
 
                     <Tabs defaultValue="js" className="w-full">
-                      <TabsList className="bg-secondary/60 h-8">
-                        <TabsTrigger value="js" className="text-xs py-1">JavaScript</TabsTrigger>
-                        <TabsTrigger value="py" className="text-xs py-1">Python 3</TabsTrigger>
-                        <TabsTrigger value="cpp" className="text-xs py-1">C++</TabsTrigger>
-                        <TabsTrigger value="java" className="text-xs py-1">Java</TabsTrigger>
+                      <TabsList className="bg-white/[0.04] border border-white/10 h-8 rounded-xl p-1 backdrop-blur-md">
+                        <TabsTrigger value="js" className="text-xs py-1 rounded-lg data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:shadow-sm">JavaScript</TabsTrigger>
+                        <TabsTrigger value="py" className="text-xs py-1 rounded-lg data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:shadow-sm">Python 3</TabsTrigger>
+                        <TabsTrigger value="cpp" className="text-xs py-1 rounded-lg data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:shadow-sm">C++</TabsTrigger>
+                        <TabsTrigger value="java" className="text-xs py-1 rounded-lg data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:shadow-sm">Java</TabsTrigger>
                       </TabsList>
 
                       <TabsContent value="js" className="m-0 pt-2">
@@ -3154,7 +3150,7 @@ export default function AdminPortalPage() {
                           rows={6}
                           value={formData.codeJs}
                           onChange={(e) => setFormData({ ...formData, codeJs: e.target.value })}
-                          className="w-full rounded-md bg-secondary/80 p-3 text-xs font-mono border border-border focus:outline-none"
+                          className="w-full rounded-xl bg-slate-950/60 p-3 text-xs font-mono border border-white/10 text-emerald-300 focus:outline-none focus:border-cyan-400 backdrop-blur-md"
                         />
                       </TabsContent>
 
@@ -3163,7 +3159,7 @@ export default function AdminPortalPage() {
                           rows={6}
                           value={formData.codePy}
                           onChange={(e) => setFormData({ ...formData, codePy: e.target.value })}
-                          className="w-full rounded-md bg-secondary/80 p-3 text-xs font-mono border border-border focus:outline-none"
+                          className="w-full rounded-xl bg-slate-950/60 p-3 text-xs font-mono border border-white/10 text-emerald-300 focus:outline-none focus:border-cyan-400 backdrop-blur-md"
                         />
                       </TabsContent>
 
@@ -3172,7 +3168,7 @@ export default function AdminPortalPage() {
                           rows={6}
                           value={formData.codeCpp}
                           onChange={(e) => setFormData({ ...formData, codeCpp: e.target.value })}
-                          className="w-full rounded-md bg-secondary/80 p-3 text-xs font-mono border border-border focus:outline-none"
+                          className="w-full rounded-xl bg-slate-950/60 p-3 text-xs font-mono border border-white/10 text-emerald-300 focus:outline-none focus:border-cyan-400 backdrop-blur-md"
                         />
                       </TabsContent>
 
@@ -3181,7 +3177,7 @@ export default function AdminPortalPage() {
                           rows={6}
                           value={formData.codeJava}
                           onChange={(e) => setFormData({ ...formData, codeJava: e.target.value })}
-                          className="w-full rounded-md bg-secondary/80 p-3 text-xs font-mono border border-border focus:outline-none"
+                          className="w-full rounded-xl bg-slate-950/60 p-3 text-xs font-mono border border-white/10 text-emerald-300 focus:outline-none focus:border-cyan-400 backdrop-blur-md"
                         />
                       </TabsContent>
                     </Tabs>
@@ -3190,16 +3186,16 @@ export default function AdminPortalPage() {
                   {/* Feedback Messages */}
                   {formFeedback && (
                     <div
-                      className={`p-3 rounded-xl border text-xs font-medium flex items-center gap-2 ${
+                      className={`p-3 rounded-xl border text-xs font-mono font-medium flex items-center gap-2 backdrop-blur-md ${
                         formFeedback.type === "success"
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                          : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                          : "bg-rose-500/10 border-rose-500/30 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)]"
                       }`}
                     >
                       <span>{formFeedback.type === "success" ? "✓" : "⚠️"}</span>
                       <span>{formFeedback.message}</span>
                       {formFeedback.type === "success" && (
-                        <Link href={`/problems/${formData.slug || autoGenerateTemplates(formData.title).slug}`} target="_blank" className="underline ml-auto font-bold">
+                        <Link href={`/problems/${formData.slug || autoGenerateTemplates(formData.title).slug}`} target="_blank" className="underline ml-auto font-bold text-emerald-300 hover:text-emerald-200">
                           Open in IDE &rarr;
                         </Link>
                       )}
@@ -3208,10 +3204,10 @@ export default function AdminPortalPage() {
 
                   {/* Submit Button */}
                   <div className="flex items-center gap-3 pt-2">
-                    <Button type="submit" className="h-10 px-8 text-xs font-mono font-bold bg-emerald-500 hover:bg-emerald-400 text-black shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                    <Button type="submit" className="h-10 px-8 text-xs font-mono font-bold bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] rounded-xl transition-all">
                       {editingSlug ? "SAVE_CHANGES" : "CREATE & PUBLISH QUESTION"}
                     </Button>
-                    <Button type="button" variant="outline" onClick={() => { handleResetForm(); playCyberSound("blip"); }} className="h-10 text-xs font-mono border-emerald-500/30 text-slate-300 hover:bg-emerald-500/10">
+                    <Button type="button" variant="outline" onClick={() => { handleResetForm(); playCyberSound("blip"); }} className="h-10 text-xs font-mono border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] rounded-xl backdrop-blur-md">
                       RESET_FORM
                     </Button>
                   </div>
@@ -3222,14 +3218,14 @@ export default function AdminPortalPage() {
 
           {/* TAB 3: SECURED DRAG & DROP FILE IMPORTER (.JSON, .PDF, .MD, .TXT) */}
           <TabsContent value="import" className="space-y-6 m-0 focus-visible:outline-none">
-            <Card className="shadow-2xl border-cyan-500/25 bg-[#0b101a]/95 text-slate-100 overflow-hidden backdrop-blur-md">
-              <CardHeader className="border-b border-cyan-500/20 pb-5 bg-gradient-to-r from-[#0b101a] via-[#0e1726] to-[#0b101a]">
+            <Card className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 shadow-[0_16px_50px_rgba(0,0,0,0.4)] backdrop-blur-2xl text-slate-100 overflow-hidden">
+              <CardHeader className="border-b border-white/10 pb-5 bg-white/[0.02]">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 text-base">🛡️</span>
+                      <span className="p-1.5 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 text-base">🛡️</span>
                       <CardTitle className="text-xl font-mono font-bold tracking-tight text-slate-100">Secured Question & Document Importer</CardTitle>
-                      <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
+                      <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold backdrop-blur-md">
                         Anti-Crash Sandboxed
                       </span>
                     </div>
@@ -3243,7 +3239,7 @@ export default function AdminPortalPage() {
                         variant="outline"
                         size="sm"
                         onClick={handleClearImportedFile}
-                        className="h-8 text-xs font-semibold gap-1.5 text-rose-400 border-rose-500/30 hover:bg-rose-500/10"
+                        className="h-8 text-xs font-mono font-semibold gap-1.5 text-rose-400 border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 rounded-lg backdrop-blur-md"
                       >
                         ✕ Clear File
                       </Button>
@@ -3252,7 +3248,7 @@ export default function AdminPortalPage() {
                       variant="outline"
                       size="sm"
                       onClick={handleDownloadTemplate}
-                      className="h-8 text-xs font-semibold gap-1.5 shadow-sm"
+                      className="h-8 text-xs font-mono font-semibold gap-1.5 rounded-lg border-white/10 bg-white/[0.04] text-cyan-300 hover:bg-cyan-500/15 backdrop-blur-md shadow-sm"
                     >
                       <span>📥</span> Download JSON Template
                     </Button>
@@ -3260,19 +3256,19 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* Whitelisted Formats & Security Badge */}
-                <div className="mt-4 pt-4 border-t border-border/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="mt-4 pt-4 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">Secured Formats:</span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span className="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Secured Formats:</span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20 backdrop-blur-md">
                       📄 .JSON <span className="text-[10px] font-normal opacity-80">(Standard Schema)</span>
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-rose-500/10 text-rose-300 border border-rose-500/20 backdrop-blur-md">
                       📑 .PDF <span className="text-[10px] font-normal opacity-80">(Problem Sheets)</span>
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 backdrop-blur-md">
                       📝 .MD <span className="text-[10px] font-normal opacity-80">(Markdown Specs)</span>
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-slate-500/10 text-slate-300 border border-slate-500/20">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-white/[0.04] text-slate-300 border border-white/10 backdrop-blur-md">
                       📃 .TXT <span className="text-[10px] font-normal opacity-80">(Raw Text)</span>
                     </span>
                   </div>
@@ -3288,24 +3284,24 @@ export default function AdminPortalPage() {
               <CardContent className="pt-6 space-y-6">
                 {/* Active Loaded File Card */}
                 {loadedFileInfo && (
-                  <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-all ${
+                  <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-all backdrop-blur-md ${
                     loadedFileInfo.valid
-                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                      : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                      : "bg-rose-500/10 border-rose-500/30 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.15)]"
                   }`}>
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-lg bg-background/60 flex items-center justify-center text-xl shrink-0 shadow-inner">
+                      <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-xl shrink-0 shadow-inner">
                         {loadedFileInfo.format === "JSON" ? "📄" : loadedFileInfo.format === "PDF" ? "📑" : loadedFileInfo.format === "MARKDOWN" ? "📝" : "📃"}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-xs font-bold text-foreground truncate">{loadedFileInfo.name}</p>
-                          <span className="text-[10px] font-mono uppercase px-2 py-0.2 rounded bg-secondary border border-border font-bold">
+                          <p className="text-xs font-bold text-white truncate font-mono">{loadedFileInfo.name}</p>
+                          <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/10 font-bold">
                             {loadedFileInfo.format}
                           </span>
                         </div>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">
-                          Size: <span className="font-mono">{loadedFileInfo.size}</span> • {loadedFileInfo.valid ? "✓ Validated & Cleaned" : "⛔ Security Rejected"}
+                        <p className="text-[11px] text-slate-400 mt-0.5 font-mono">
+                          Size: <span className="text-slate-300">{loadedFileInfo.size}</span> • {loadedFileInfo.valid ? "✓ Validated & Cleaned" : "⛔ Security Rejected"}
                         </p>
                       </div>
                     </div>
@@ -3314,7 +3310,7 @@ export default function AdminPortalPage() {
                       variant="ghost"
                       size="sm"
                       onClick={handleClearImportedFile}
-                      className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground"
+                      className="h-8 px-2.5 text-xs font-mono text-slate-400 hover:text-white hover:bg-white/[0.06] rounded-lg"
                     >
                       Remove
                     </Button>
@@ -3330,10 +3326,10 @@ export default function AdminPortalPage() {
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all relative overflow-hidden ${
+                  className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all relative overflow-hidden backdrop-blur-md ${
                     isDragging
-                      ? "border-primary bg-primary/10 scale-[1.01] shadow-lg ring-4 ring-primary/20"
-                      : "border-border/80 hover:border-primary/50 hover:bg-secondary/40"
+                      ? "border-cyan-400 bg-cyan-500/15 scale-[1.01] shadow-[0_0_25px_rgba(6,182,212,0.3)] ring-4 ring-cyan-500/20"
+                      : "border-white/15 bg-white/[0.02] hover:border-cyan-400/50 hover:bg-white/[0.04]"
                   }`}
                 >
                   <input
@@ -3343,13 +3339,13 @@ export default function AdminPortalPage() {
                     accept=".json,.pdf,.txt,.md,application/json,application/pdf,text/markdown,text/plain"
                     className="hidden"
                   />
-                  <div className="mx-auto w-16 h-16 rounded-2xl bg-secondary/80 flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
+                  <div className="mx-auto w-16 h-16 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
                     {isDragging ? "📥" : "📂"}
                   </div>
-                  <h3 className="text-sm font-bold text-foreground">
-                    Drop your secured <span className="text-amber-400">.JSON</span>, <span className="text-rose-400">.PDF</span>, or <span className="text-sky-400">.MD</span> file here, or <span className="text-primary underline">browse</span>
+                  <h3 className="text-sm font-bold text-white font-mono">
+                    Drop your secured <span className="text-amber-400">.JSON</span>, <span className="text-rose-400">.PDF</span>, or <span className="text-cyan-400">.MD</span> file here, or <span className="text-cyan-400 underline">browse</span>
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1 max-w-lg mx-auto">
+                  <p className="text-xs text-slate-400 font-mono mt-1 max-w-lg mx-auto">
                     Automatic multi-format problem parsing with test case generation and algorithmic scaffolding.
                   </p>
                 </div>
@@ -3357,7 +3353,7 @@ export default function AdminPortalPage() {
                 {/* Direct Paste / Raw Content Editor */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="jsonText" className="text-xs font-bold flex items-center gap-1.5">
+                    <Label htmlFor="jsonText" className="text-xs font-bold font-mono text-slate-300 flex items-center gap-1.5">
                       <span>⌨️</span> Direct Text / JSON / Markdown Parser
                     </Label>
                     <div className="flex items-center gap-3">
@@ -3368,7 +3364,7 @@ export default function AdminPortalPage() {
                           setImportJsonText(sample);
                           parseAndValidateJson(sample);
                         }}
-                        className="text-[11px] text-primary hover:underline font-semibold"
+                        className="text-[11px] font-mono text-cyan-400 hover:text-cyan-300 hover:underline font-semibold"
                       >
                         Paste Sample JSON
                       </button>
@@ -3380,7 +3376,7 @@ export default function AdminPortalPage() {
                             setParsedImportItems([]);
                             setImportFeedback(null);
                           }}
-                          className="text-[11px] text-muted-foreground hover:text-foreground"
+                          className="text-[11px] font-mono text-slate-400 hover:text-white"
                         >
                           Clear Text
                         </button>
@@ -3405,17 +3401,17 @@ export default function AdminPortalPage() {
                         setImportFeedback(null);
                       }
                     }}
-                    className="w-full rounded-xl bg-secondary/40 p-3 text-xs font-mono border border-border/80 focus:outline-none focus:border-primary transition-colors"
+                    className="w-full rounded-xl bg-white/[0.04] p-3 text-xs font-mono border border-white/10 text-cyan-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:bg-white/[0.08] backdrop-blur-md transition-all shadow-inner"
                   />
                 </div>
 
                 {/* Feedback Notification Banner */}
                 {importFeedback && (
                   <div
-                    className={`p-3.5 rounded-xl border text-xs font-medium flex items-start gap-3 animate-in fade-in duration-200 ${
+                    className={`p-3.5 rounded-xl border text-xs font-mono font-medium flex items-start gap-3 backdrop-blur-md animate-in fade-in duration-200 ${
                       importFeedback.type === "success"
-                        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                        : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+                        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                        : "bg-rose-500/10 border-rose-500/30 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)]"
                     }`}
                   >
                     <span className="text-sm mt-0.5">{importFeedback.type === "success" ? "✓" : "⚠️"}</span>
@@ -3425,13 +3421,13 @@ export default function AdminPortalPage() {
 
                 {/* Parsed Preview Table & Publish Action */}
                 {parsedImportItems.length > 0 && (
-                  <div className="space-y-4 pt-2 border-t border-border/80">
+                  <div className="space-y-4 pt-2 border-t border-white/[0.06]">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div>
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                        <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2">
                           <span>📋</span> Verified Questions Ready to Import ({parsedImportItems.length})
                         </h4>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                        <p className="text-[11px] font-mono text-slate-400 mt-0.5">
                           Review parsed questions, test case counts, and scaffolding before committing to the database.
                         </p>
                       </div>
@@ -3443,90 +3439,90 @@ export default function AdminPortalPage() {
                             setParsedImportItems([]);
                             setImportFeedback(null);
                           }}
-                          className="h-9 text-xs"
+                          className="h-9 text-xs font-mono border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] rounded-lg backdrop-blur-md"
                         >
                           Discard
                         </Button>
                         <Button
                           onClick={handleExecuteImport}
-                          className="h-9 px-6 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md gap-1.5"
+                          className="h-9 px-6 text-xs font-mono font-bold bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] rounded-lg gap-1.5 transition-all"
                         >
                           <span>🚀</span> Import & Publish All ({parsedImportItems.length})
                         </Button>
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-border/80 bg-card overflow-hidden shadow-sm">
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden shadow-xl backdrop-blur-2xl">
                       <div className="overflow-x-auto">
                         <table className="w-full text-xs text-left">
-                          <thead className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-mono border-b border-border">
+                          <thead className="bg-white/[0.03] text-slate-300 uppercase text-[10px] font-mono border-b border-white/10">
                             <tr>
-                              <th className="py-3 px-3 w-10 text-center">#</th>
-                              <th className="py-3 px-3">Question Title</th>
-                              <th className="py-3 px-3">Slug</th>
-                              <th className="py-3 px-3">Difficulty</th>
-                              <th className="py-3 px-3">Topics</th>
-                              <th className="py-3 px-3">Method Signature</th>
-                              <th className="py-3 px-3">Test Cases</th>
-                              <th className="py-3 px-3 text-right">Action</th>
+                              <th className="py-3.5 px-3 w-10 text-center text-slate-400">#</th>
+                              <th className="py-3.5 px-3">Question Title</th>
+                              <th className="py-3.5 px-3">Slug</th>
+                              <th className="py-3.5 px-3">Difficulty</th>
+                              <th className="py-3.5 px-3">Topics</th>
+                              <th className="py-3.5 px-3">Method Signature</th>
+                              <th className="py-3.5 px-3">Test Cases</th>
+                              <th className="py-3.5 px-3 text-right">Action</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-border/60">
+                          <tbody className="divide-y divide-white/[0.06] font-mono">
                             {parsedImportItems.map((item, i) => (
-                              <tr key={i} className="hover:bg-secondary/30 transition-colors">
-                                <td className="py-3 px-3 font-mono text-[10px] text-center text-muted-foreground">
+                              <tr key={i} className="hover:bg-white/[0.04] transition-colors">
+                                <td className="py-3.5 px-3 font-mono text-[10px] text-center text-slate-400">
                                   {i + 1}
                                 </td>
-                                <td className="py-3 px-3 font-bold text-foreground">
+                                <td className="py-3.5 px-3 font-bold text-slate-100">
                                   {item.title}
                                 </td>
-                                <td className="py-3 px-3 font-mono text-[11px] text-muted-foreground">
+                                <td className="py-3.5 px-3 font-mono text-[11px] text-cyan-400/80">
                                   {item.slug}
                                 </td>
-                                <td className="py-3 px-3">
+                                <td className="py-3.5 px-3">
                                   <span
-                                    className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold border backdrop-blur-md ${
                                       item.difficulty === "EASY"
-                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                                         : item.difficulty === "MEDIUM"
-                                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                        : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                                        ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                                        : "bg-rose-500/10 text-rose-400 border-rose-500/30"
                                     }`}
                                   >
                                     {item.difficulty}
                                   </span>
                                 </td>
-                                <td className="py-3 px-3">
+                                <td className="py-3.5 px-3">
                                   <div className="flex flex-wrap gap-1">
                                     {item.topics.slice(0, 2).map((t, tIdx) => (
-                                      <span key={tIdx} className="px-1.5 py-0.2 rounded text-[10px] bg-secondary text-muted-foreground border border-border">
+                                      <span key={tIdx} className="px-2 py-0.5 rounded-md text-[10px] bg-white/[0.04] text-slate-300 border border-white/10">
                                         {t.name}
                                       </span>
                                     ))}
                                     {item.topics.length > 2 && (
-                                      <span className="text-[10px] text-muted-foreground font-mono">
+                                      <span className="text-[10px] text-cyan-400/70 font-mono self-center">
                                         +{item.topics.length - 2}
                                       </span>
                                     )}
                                   </div>
                                 </td>
-                                <td className="py-3 px-3 font-mono text-primary text-[11px]">
+                                <td className="py-3.5 px-3 font-mono text-cyan-300 text-[11px]">
                                   {item.methodName}()
                                 </td>
-                                <td className="py-3 px-3 font-mono text-[11px]">
+                                <td className="py-3.5 px-3 font-mono text-[11px]">
                                   <span className="text-emerald-400 font-bold">{item.publicTestCases?.length || 0} public</span>
                                   {item.hiddenTestCases && item.hiddenTestCases.length > 0 && (
-                                    <span className="text-muted-foreground ml-1.5">
+                                    <span className="text-slate-400 ml-1.5">
                                       + {item.hiddenTestCases.length} hidden
                                     </span>
                                   )}
                                 </td>
-                                <td className="py-3 px-3 text-right">
+                                <td className="py-3.5 px-3 text-right">
                                   <button
                                     type="button"
                                     onClick={() => handleRemoveParsedItem(i)}
                                     title="Remove from import queue"
-                                    className="p-1 rounded text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 transition-colors"
                                   >
                                     ✕
                                   </button>
@@ -3546,71 +3542,55 @@ export default function AdminPortalPage() {
           {/* TAB 4: SYSTEM HEALTH & STATS */}
           <TabsContent value="system" className="space-y-6 m-0 focus-visible:outline-none">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-[#0b101a]/95 shadow-xl border-emerald-500/25 text-slate-100 backdrop-blur-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-mono text-emerald-400">// TOTAL_QUESTIONS</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-mono font-black text-slate-100">{allQuestions.length}</div>
-                  <p className="text-[11px] font-mono text-slate-400 mt-1">Available in practice bank</p>
-                </CardContent>
-              </Card>
+              <AdminTiltCard className="p-5 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
+                <div className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider mb-2">// TOTAL_QUESTIONS</div>
+                <div className="text-3xl font-mono font-black text-white">{allQuestions.length}</div>
+                <p className="text-[11px] font-mono text-slate-400 mt-1">Available in practice bank</p>
+              </AdminTiltCard>
 
-              <Card className="bg-[#0b101a]/95 shadow-xl border-cyan-500/25 text-slate-100 backdrop-blur-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-mono text-cyan-400">// CUSTOM_ADMIN_QUESTIONS</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-mono font-black text-cyan-400">{customSlugs.size}</div>
-                  <p className="text-[11px] font-mono text-slate-400 mt-1">Created / imported by root</p>
-                </CardContent>
-              </Card>
+              <AdminTiltCard className="p-5 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
+                <div className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider mb-2">// CUSTOM_ADMIN_QUESTIONS</div>
+                <div className="text-3xl font-mono font-black text-cyan-300">{customSlugs.size}</div>
+                <p className="text-[11px] font-mono text-slate-400 mt-1">Created / imported by root</p>
+              </AdminTiltCard>
 
-              <Card className="bg-[#0b101a]/95 shadow-xl border-amber-500/25 text-slate-100 backdrop-blur-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-mono text-amber-400">// BUILT_IN_QUESTIONS</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-mono font-black text-amber-400">{allQuestions.length - customSlugs.size}</div>
-                  <p className="text-[11px] font-mono text-slate-400 mt-1">Factory curated set</p>
-                </CardContent>
-              </Card>
+              <AdminTiltCard className="p-5 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
+                <div className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider mb-2">// BUILT_IN_QUESTIONS</div>
+                <div className="text-3xl font-mono font-black text-amber-300">{allQuestions.length - customSlugs.size}</div>
+                <p className="text-[11px] font-mono text-slate-400 mt-1">Factory curated set</p>
+              </AdminTiltCard>
 
-              <Card className="bg-[#0b101a]/95 shadow-xl border-emerald-500/25 text-slate-100 backdrop-blur-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-mono text-emerald-400">// CONNECTED_ACCOUNTS</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-mono font-black text-emerald-400">{getAllAccounts().length}</div>
-                  <p className="text-[11px] font-mono text-slate-400 mt-1">Logged in on this browser</p>
-                </CardContent>
-              </Card>
+              <AdminTiltCard className="p-5 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
+                <div className="text-[10px] font-mono text-purple-400 font-bold uppercase tracking-wider mb-2">// CONNECTED_ACCOUNTS</div>
+                <div className="text-3xl font-mono font-black text-purple-300">{getAllAccounts().length}</div>
+                <p className="text-[11px] font-mono text-slate-400 mt-1">Logged in on this browser</p>
+              </AdminTiltCard>
             </div>
 
-            <Card className="shadow-2xl border-emerald-500/25 bg-[#0b101a]/95 text-slate-100 backdrop-blur-md">
-              <CardHeader className="border-b border-emerald-500/20 pb-4">
+            <Card className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 shadow-[0_16px_50px_rgba(0,0,0,0.4)] backdrop-blur-2xl text-slate-100 overflow-hidden">
+              <CardHeader className="border-b border-white/10 pb-5 bg-white/[0.02]">
                 <CardTitle className="text-lg font-mono font-bold text-slate-100">Maintenance & Kernel Operations</CardTitle>
                 <CardDescription className="text-xs font-mono text-slate-400">
                   Tools to manage local storage caches and platform data integrity.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-[#06080e] border border-emerald-500/20">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-md">
                   <div>
                     <h4 className="text-xs font-mono font-bold text-slate-100">Export All Platform Data</h4>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                    <p className="text-[11px] font-mono text-slate-400 mt-0.5">
                       Download full JSON archive of all built-in and custom questions with complete test suites.
                     </p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={handleExportJson} className="h-8 text-xs shrink-0">
+                  <Button variant="outline" size="sm" onClick={handleExportJson} className="h-8 text-xs font-mono rounded-lg border-white/10 bg-white/[0.04] text-cyan-300 hover:bg-cyan-500/15 backdrop-blur-md shrink-0">
                     Export Backup (.json)
                   </Button>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-secondary/40 border border-border">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-md">
                   <div>
-                    <h4 className="text-xs font-bold text-foreground">Reset Custom Questions</h4>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                    <h4 className="text-xs font-mono font-bold text-slate-100">Reset Custom Questions</h4>
+                    <p className="text-[11px] font-mono text-slate-400 mt-0.5">
                       Clear all custom questions created in admin and revert strictly to default factory questions.
                     </p>
                   </div>
@@ -3624,7 +3604,7 @@ export default function AdminPortalPage() {
                         alert("Custom questions reset to factory defaults.");
                       }
                     }}
-                    className="h-8 text-xs shrink-0"
+                    className="h-8 text-xs font-mono rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30 backdrop-blur-md shrink-0"
                   >
                     Reset to Factory
                   </Button>
@@ -3635,11 +3615,11 @@ export default function AdminPortalPage() {
 
           {/* TAB 5: USER MANAGEMENT */}
           <TabsContent value="users" className="space-y-6 m-0 focus-visible:outline-none">
-            <Card className="bg-[#0b101a]/95 backdrop-blur-md border-sky-500/25 shadow-2xl overflow-hidden text-slate-100">
-              <CardHeader className="border-b border-sky-500/20 pb-4 bg-gradient-to-r from-[#0b101a] via-[#081726] to-[#0b101a]">
+            <Card className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 shadow-[0_16px_50px_rgba(0,0,0,0.4)] backdrop-blur-2xl text-slate-100 overflow-hidden">
+              <CardHeader className="border-b border-white/10 pb-4 bg-white/[0.02]">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <div className="text-[10px] font-mono text-sky-400 tracking-widest uppercase mb-0.5">// PLATFORM_REGISTRY // ACCESS_CONTROL</div>
+                    <div className="text-[10px] font-mono text-cyan-400 tracking-widest uppercase mb-0.5">// PLATFORM_REGISTRY // ACCESS_CONTROL</div>
                     <CardTitle className="text-xl font-mono font-bold flex items-center gap-2 text-slate-100">
                       <span>👥</span> Platform User Accounts & Access Controls
                     </CardTitle>
@@ -3652,13 +3632,13 @@ export default function AdminPortalPage() {
                       placeholder="Search by username or name..."
                       value={userSearchQuery}
                       onChange={(e) => setUserSearchQuery(e.target.value)}
-                      className="h-8 text-xs font-mono w-64 bg-[#06080e] border-sky-500/30 text-sky-200 placeholder-sky-900/60 focus:border-sky-400"
+                      className="h-8 text-xs font-mono w-64 bg-white/[0.04] border-white/10 text-cyan-200 placeholder-slate-500 focus:border-cyan-400/60 rounded-xl backdrop-blur-md"
                     />
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => { loadUsers(); playCyberSound("blip"); }}
-                      className="h-8 text-xs font-mono font-semibold gap-1 border-sky-500/30 text-sky-300 hover:bg-sky-500/10"
+                      className="h-8 text-xs font-mono font-semibold gap-1 rounded-lg border-white/10 bg-white/[0.04] text-cyan-300 hover:bg-cyan-500/15 backdrop-blur-md"
                     >
                       <span>🔄</span> REFRESH
                     </Button>
@@ -3666,7 +3646,7 @@ export default function AdminPortalPage() {
                       variant="destructive"
                       size="sm"
                       onClick={() => { handleClearAllUsers(); playCyberSound("alert"); }}
-                      className="h-8 text-xs font-mono font-semibold gap-1 bg-rose-950/80 border border-rose-500/30 text-rose-300 hover:bg-rose-900"
+                      className="h-8 text-xs font-mono font-semibold gap-1 rounded-lg bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:bg-rose-500/30 backdrop-blur-md"
                     >
                       <span>🗑️</span> CLEAR_ALL_USERS
                     </Button>
@@ -3675,34 +3655,34 @@ export default function AdminPortalPage() {
               </CardHeader>
               <CardContent className="p-0">
                 {userRoleFeedback && (
-                  <div className="m-4 p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-2">
+                  <div className="m-4 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-semibold flex items-center gap-2 backdrop-blur-md">
                     <span>✅</span>
                     <span>{userRoleFeedback}</span>
                   </div>
                 )}
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-muted/40 border-b border-border/60 text-xs uppercase tracking-wider text-muted-foreground">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-white/[0.03] border-b border-white/10 text-[10px] uppercase font-mono tracking-wider text-slate-400">
                       <tr>
                         <th className="px-5 py-3.5 font-bold">Student / User</th>
                         <th className="px-5 py-3.5 font-bold">Login Status & Activity</th>
                         <th className="px-5 py-3.5 font-bold hidden sm:table-cell">College / Org</th>
                         <th className="px-5 py-3.5 font-bold">Role</th>
                         <th className="px-5 py-3.5 font-bold text-right">Solved</th>
-                        <th className="px-5 py-3.5 font-bold text-right text-primary">DSA Rating</th>
+                        <th className="px-5 py-3.5 font-bold text-right text-cyan-400">DSA Rating</th>
                         <th className="px-5 py-3.5 font-bold text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border/40">
+                    <tbody className="divide-y divide-white/[0.06] font-mono">
                       {loadingUsers ? (
                         <tr>
-                          <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground animate-pulse">
+                          <td colSpan={7} className="px-6 py-12 text-center text-slate-400 animate-pulse font-mono">
                             Loading platform users...
                           </td>
                         </tr>
                       ) : allUsersList.length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                          <td colSpan={7} className="px-6 py-12 text-center text-slate-400 font-mono">
                             No users registered yet.
                           </td>
                         </tr>
@@ -3722,51 +3702,51 @@ export default function AdminPortalPage() {
                             const isSuper = u.role === "SUPER_ADMIN";
                             const isOnline = u.status === "ONLINE" || (u.lastLoginAt && (Date.now() - new Date(u.lastLoginAt).getTime()) < 30 * 60 * 1000);
                             return (
-                              <tr key={u.userId || u.username} className="hover:bg-muted/20 transition-colors">
+                              <tr key={u.userId || u.username} className="hover:bg-white/[0.04] transition-colors">
                                 <td className="px-5 py-3.5">
                                   <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center font-bold text-xs text-primary-foreground">
+                                    <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-cyan-500/30 to-purple-500/30 border border-white/20 flex items-center justify-center font-bold text-xs text-white shadow-sm">
                                       {u.name ? u.name[0].toUpperCase() : "U"}
                                     </div>
                                     <div>
-                                      <p className="font-semibold text-foreground text-xs">{u.name}</p>
-                                      <p className="text-[11px] text-muted-foreground font-mono">@{u.username} • {u.email}</p>
+                                      <p className="font-semibold text-slate-100 text-xs">{u.name}</p>
+                                      <p className="text-[11px] text-slate-400 font-mono">@{u.username} • {u.email}</p>
                                     </div>
                                   </div>
                                 </td>
                                 <td className="px-5 py-3.5">
                                   <div className="space-y-0.5">
-                                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                      isOnline ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-secondary text-muted-foreground"
+                                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-md ${
+                                      isOnline ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" : "bg-white/[0.04] text-slate-400 border border-white/10"
                                     }`}>
-                                      <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-400 animate-pulse" : "bg-muted-foreground"}`} />
+                                      <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
                                       {isOnline ? "ONLINE NOW" : "LOGGED IN"}
                                     </span>
                                     {u.lastLoginAt && (
-                                      <p className="text-[10px] text-muted-foreground font-mono">
+                                      <p className="text-[10px] text-slate-400 font-mono">
                                         {new Date(u.lastLoginAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(u.lastLoginAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                                       </p>
                                     )}
                                   </div>
                                 </td>
-                                <td className="px-5 py-3.5 hidden sm:table-cell text-xs text-muted-foreground">
+                                <td className="px-5 py-3.5 hidden sm:table-cell text-xs text-slate-400">
                                   {u.org || "CodeArena Academy"}
                                 </td>
                                 <td className="px-5 py-3.5">
                                   <span
-                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border backdrop-blur-md ${
                                       isSuper
-                                        ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
-                                        : "bg-secondary text-secondary-foreground border-border"
+                                        ? "bg-rose-500/15 text-rose-300 border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.15)]"
+                                        : "bg-white/[0.04] text-slate-300 border border-white/10"
                                     }`}
                                   >
                                     {u.role}
                                   </span>
                                 </td>
-                                <td className="px-5 py-3.5 text-right font-mono text-xs font-semibold">
+                                <td className="px-5 py-3.5 text-right font-mono text-xs font-semibold text-slate-200">
                                   {u.problemsSolved}
                                 </td>
-                                <td className="px-5 py-3.5 text-right font-mono text-xs font-bold text-primary">
+                                <td className="px-5 py-3.5 text-right font-mono text-xs font-bold text-cyan-400">
                                   {u.score}
                                 </td>
                                 <td className="px-5 py-3.5 text-right">
@@ -3774,7 +3754,11 @@ export default function AdminPortalPage() {
                                     size="sm"
                                     variant={isSuper ? "destructive" : "outline"}
                                     onClick={() => handleToggleUserRole(u.username, u.role)}
-                                    className="h-7 text-[11px] font-semibold"
+                                    className={`h-7 text-[11px] font-mono rounded-lg backdrop-blur-md ${
+                                      isSuper
+                                        ? "bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30"
+                                        : "border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
+                                    }`}
                                   >
                                     {isSuper ? "Revoke Admin" : "Make Super Admin"}
                                   </Button>
@@ -3818,8 +3802,8 @@ export default function AdminPortalPage() {
 
               return (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-                  <div className="p-4 rounded-xl bg-[#0b101a]/95 border border-emerald-500/25 shadow-xl flex items-center gap-3 backdrop-blur-md">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg font-bold border border-emerald-500/20">
+                  <AdminTiltCard className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] flex items-center gap-3 backdrop-blur-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-lg font-bold border border-emerald-500/30">
                       🟢
                     </div>
                     <div>
@@ -3828,44 +3812,44 @@ export default function AdminPortalPage() {
                         {contestsList.filter(c => c.status === "LIVE").length} <span className="text-xs text-emerald-400 font-normal">Live</span> / {contestsList.filter(c => c.status === "UPCOMING").length} <span className="text-xs text-amber-400 font-normal">Up</span>
                       </p>
                     </div>
-                  </div>
+                  </AdminTiltCard>
 
-                  <div className="p-4 rounded-xl bg-[#0b101a]/95 border border-cyan-500/25 shadow-xl flex items-center gap-3 backdrop-blur-md">
-                    <div className="w-10 h-10 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-lg font-bold border border-cyan-500/20">
+                  <AdminTiltCard className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] flex items-center gap-3 backdrop-blur-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center text-lg font-bold border border-cyan-500/30">
                       👥
                     </div>
                     <div>
                       <p className="text-[11px] font-mono text-cyan-400 font-semibold uppercase">// TOTAL_ENROLLED</p>
                       <p className="text-xl font-mono font-black text-slate-100">{totalEnrolled} <span className="text-xs text-slate-400 font-normal">Students</span></p>
                     </div>
-                  </div>
+                  </AdminTiltCard>
 
-                  <div className="p-4 rounded-xl bg-[#0b101a]/95 border border-purple-500/25 shadow-xl flex items-center gap-3 backdrop-blur-md">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg font-bold border border-purple-500/20">
+                  <AdminTiltCard className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] flex items-center gap-3 backdrop-blur-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center text-lg font-bold border border-purple-500/30">
                       📝
                     </div>
                     <div>
                       <p className="text-[11px] font-mono text-purple-400 font-semibold uppercase">// SUBMISSIONS_TOTAL</p>
                       <p className="text-xl font-mono font-black text-slate-100">{totalSubs} <span className="text-xs text-slate-400 font-normal">Submits</span></p>
                     </div>
-                  </div>
+                  </AdminTiltCard>
 
-                  <div className="p-4 rounded-xl bg-[#0b101a]/95 border border-amber-500/25 shadow-xl flex items-center gap-3 backdrop-blur-md">
-                    <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold border border-amber-500/20">
+                  <AdminTiltCard className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.4)] flex items-center gap-3 backdrop-blur-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-lg font-bold border border-amber-500/30">
                       🏆
                     </div>
                     <div>
                       <p className="text-[11px] font-mono text-amber-400 font-semibold uppercase">// ACCEPTED_SOLVES</p>
                       <p className="text-xl font-mono font-black text-slate-100">{totalAc} <span className="text-xs text-amber-400 font-normal">({successRate}%)</span></p>
                     </div>
-                  </div>
+                  </AdminTiltCard>
                 </div>
               );
             })()}
 
             {/* Create & Launch Contest Builder */}
-            <Card className="border-amber-500/25 bg-[#0b101a]/95 shadow-2xl overflow-hidden text-slate-100 backdrop-blur-md">
-              <CardHeader className="bg-gradient-to-r from-[#0b101a] via-[#1a1408] to-[#0b101a] border-b border-amber-500/20 pb-4">
+            <Card className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 shadow-[0_16px_50px_rgba(0,0,0,0.4)] overflow-hidden text-slate-100 backdrop-blur-2xl">
+              <CardHeader className="bg-white/[0.02] border-b border-white/10 pb-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-[10px] font-mono text-amber-400 tracking-widest uppercase mb-0.5">// TOURNAMENT_ORCHESTRATOR // BUILDER</div>
@@ -3883,54 +3867,54 @@ export default function AdminPortalPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* Contest Title */}
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold">Contest Title *</Label>
+                    <Label className="text-xs font-mono text-slate-300 font-bold">Contest Title *</Label>
                     <Input
                       placeholder="e.g. CodeArena Weekly Battle #42"
                       value={contestFormData.title}
                       onChange={(e) => setContestFormData({ ...contestFormData, title: e.target.value })}
-                      className="h-9 text-xs"
+                      className="h-9 text-xs bg-white/[0.04] border-white/10 text-white placeholder-slate-500 rounded-xl focus:border-amber-400/60 backdrop-blur-md"
                     />
                   </div>
 
                   {/* Duration */}
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold">Duration (Minutes)</Label>
+                    <Label className="text-xs font-mono text-slate-300 font-bold">Duration (Minutes)</Label>
                     <select
                       value={contestFormData.durationMinutes}
                       onChange={(e) => setContestFormData({ ...contestFormData, durationMinutes: Number(e.target.value) })}
-                      className="w-full h-9 text-xs rounded-md bg-secondary px-3 py-1 border border-border font-medium"
+                      className="w-full h-9 text-xs rounded-xl bg-white/[0.04] text-slate-200 px-3 py-1 border border-white/10 font-medium focus:border-amber-400 focus:outline-none backdrop-blur-md"
                     >
-                      <option value={30}>30 Minutes (Sprint)</option>
-                      <option value={45}>45 Minutes</option>
-                      <option value={60}>60 Minutes (1 Hour Standard)</option>
-                      <option value={90}>90 Minutes (1.5 Hours)</option>
-                      <option value={120}>120 Minutes (2 Hours ICPC)</option>
-                      <option value={180}>180 Minutes (3 Hours)</option>
+                      <option value={30} className="bg-slate-900 text-slate-200">30 Minutes (Sprint)</option>
+                      <option value={45} className="bg-slate-900 text-slate-200">45 Minutes</option>
+                      <option value={60} className="bg-slate-900 text-slate-200">60 Minutes (1 Hour Standard)</option>
+                      <option value={90} className="bg-slate-900 text-slate-200">90 Minutes (1.5 Hours)</option>
+                      <option value={120} className="bg-slate-900 text-slate-200">120 Minutes (2 Hours ICPC)</option>
+                      <option value={180} className="bg-slate-900 text-slate-200">180 Minutes (3 Hours)</option>
                     </select>
                   </div>
 
                   {/* Contest Description */}
                   <div className="space-y-1.5 md:col-span-2">
-                    <Label className="text-xs font-bold">Description & Instructions</Label>
+                    <Label className="text-xs font-mono text-slate-300 font-bold">Description & Instructions</Label>
                     <Input
                       placeholder="Brief rules, topics covered, or description for contestants..."
                       value={contestFormData.description}
                       onChange={(e) => setContestFormData({ ...contestFormData, description: e.target.value })}
-                      className="h-9 text-xs"
+                      className="h-9 text-xs bg-white/[0.04] border-white/10 text-white placeholder-slate-500 rounded-xl focus:border-amber-400/60 backdrop-blur-md"
                     />
                   </div>
 
                   {/* Timing Option */}
                   <div className="space-y-2 md:col-span-2">
-                    <Label className="text-xs font-bold">Contest Start Time</Label>
+                    <Label className="text-xs font-mono text-slate-300 font-bold">Contest Start Time</Label>
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
                         onClick={() => setContestFormData({ ...contestFormData, startTimeOption: "now" })}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all backdrop-blur-md ${
                           contestFormData.startTimeOption === "now"
-                            ? "bg-emerald-600 text-white shadow-sm"
-                            : "bg-secondary text-muted-foreground hover:text-foreground border border-border"
+                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                            : "bg-white/[0.04] text-slate-400 border border-white/10 hover:border-white/20 hover:text-slate-200"
                         }`}
                       >
                         🟢 Start Immediately (Live Now)
@@ -3939,10 +3923,10 @@ export default function AdminPortalPage() {
                       <button
                         type="button"
                         onClick={() => setContestFormData({ ...contestFormData, startTimeOption: "15min" })}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all backdrop-blur-md ${
                           contestFormData.startTimeOption === "15min"
-                            ? "bg-blue-600 text-white shadow-sm"
-                            : "bg-secondary text-muted-foreground hover:text-foreground border border-border"
+                            ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.2)]"
+                            : "bg-white/[0.04] text-slate-400 border border-white/10 hover:border-white/20 hover:text-slate-200"
                         }`}
                       >
                         ⏱️ In 15 Minutes
@@ -3951,10 +3935,10 @@ export default function AdminPortalPage() {
                       <button
                         type="button"
                         onClick={() => setContestFormData({ ...contestFormData, startTimeOption: "1hour" })}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all backdrop-blur-md ${
                           contestFormData.startTimeOption === "1hour"
-                            ? "bg-blue-600 text-white shadow-sm"
-                            : "bg-secondary text-muted-foreground hover:text-foreground border border-border"
+                            ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.2)]"
+                            : "bg-white/[0.04] text-slate-400 border border-white/10 hover:border-white/20 hover:text-slate-200"
                         }`}
                       >
                         ⏱️ In 1 Hour
@@ -3963,10 +3947,10 @@ export default function AdminPortalPage() {
                       <button
                         type="button"
                         onClick={() => setContestFormData({ ...contestFormData, startTimeOption: "custom" })}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all backdrop-blur-md ${
                           contestFormData.startTimeOption === "custom"
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "bg-secondary text-muted-foreground hover:text-foreground border border-border"
+                            ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.2)]"
+                            : "bg-white/[0.04] text-slate-400 border border-white/10 hover:border-white/20 hover:text-slate-200"
                         }`}
                       >
                         📅 Custom Date & Time
@@ -3979,9 +3963,9 @@ export default function AdminPortalPage() {
                           type="datetime-local"
                           value={contestFormData.customStartTime || getFutureDateTimeLocalString(60)}
                           onChange={(e) => setContestFormData({ ...contestFormData, customStartTime: e.target.value })}
-                          className="h-9 text-xs"
+                          className="h-9 text-xs bg-white/[0.04] border-white/10 text-white rounded-xl backdrop-blur-md"
                         />
-                        <p className="text-[10px] text-muted-foreground">Select the future date & time when the contest should open for all students.</p>
+                        <p className="text-[10px] text-slate-400 font-mono">Select the future date & time when the contest should open for all students.</p>
                       </div>
                     )}
 
@@ -3994,26 +3978,26 @@ export default function AdminPortalPage() {
                       );
                       const isLive = preview.status === "LIVE";
                       return (
-                        <div className={`p-3 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-2 ${
+                        <div className={`p-3 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-2 backdrop-blur-md ${
                           isLive
-                            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                            : "bg-blue-500/10 border-blue-500/30 text-blue-300"
+                            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                            : "bg-cyan-500/10 border-cyan-500/30 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
                         }`}>
                           <div className="flex items-center gap-2">
                             <span className="text-base">{isLive ? "🟢" : "📅"}</span>
                             <div>
-                              <p className="font-bold text-foreground">
+                              <p className="font-bold font-mono text-slate-100">
                                 {isLive ? "Immediate Live Launch" : `Scheduled Start: ${preview.startFormatted}`}
                               </p>
-                              <p className="text-[11px] opacity-80">
+                              <p className="text-[11px] font-mono text-slate-400">
                                 Duration: {contestFormData.durationMinutes}m • Concludes at {preview.endFormatted}
                               </p>
                             </div>
                           </div>
-                          <span className={`text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded border ${
+                          <span className={`text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded-full border backdrop-blur-md ${
                             isLive
                               ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                              : "bg-blue-500/20 text-blue-200 border-blue-500/30"
+                              : "bg-cyan-500/20 text-cyan-200 border-cyan-500/30"
                           }`}>
                             {isLive ? "Status: LIVE NOW" : "Status: UPCOMING (SCHEDULED)"}
                           </span>
@@ -4024,13 +4008,13 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* Question Selector from 150 Question Bank */}
-                <div className="space-y-3 pt-2 border-t border-border/60">
+                <div className="space-y-3 pt-2 border-t border-white/[0.06]">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <Label className="text-xs font-bold">
+                      <Label className="text-xs font-mono text-slate-300 font-bold">
                         Select Contest Questions ({contestFormData.selectedProblems.length} selected)
                       </Label>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] font-mono text-slate-400">
                         Browse the 150 DSA questions below. Click to add/remove and adjust point values.
                       </p>
                     </div>
@@ -4041,7 +4025,7 @@ export default function AdminPortalPage() {
                         size="sm"
                         variant="outline"
                         onClick={handleAutoPickContestProblems}
-                        className="h-8 text-xs font-bold gap-1 bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500/20"
+                        className="h-8 text-xs font-mono font-bold gap-1 rounded-lg bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20 backdrop-blur-md"
                       >
                         <span>⚡</span> Auto-Pick 4 Problems
                       </Button>
@@ -4051,7 +4035,7 @@ export default function AdminPortalPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() => setContestFormData(prev => ({ ...prev, selectedProblems: [] }))}
-                          className="h-8 text-xs text-rose-400 hover:text-rose-300"
+                          className="h-8 text-xs font-mono text-rose-400 hover:text-rose-300"
                         >
                           Clear
                         </Button>
@@ -4060,39 +4044,39 @@ export default function AdminPortalPage() {
                         placeholder="Search 150 questions..."
                         value={contestProblemSearch}
                         onChange={(e) => setContestProblemSearch(e.target.value)}
-                        className="h-8 text-xs w-44"
+                        className="h-8 text-xs font-mono w-44 bg-white/[0.04] border-white/10 text-white rounded-lg"
                       />
                       <select
                         value={contestProblemDiffFilter}
                         onChange={(e) => setContestProblemDiffFilter(e.target.value)}
-                        className="h-8 text-xs rounded-md bg-secondary px-2 border border-border font-medium"
+                        className="h-8 text-xs font-mono rounded-lg bg-white/[0.04] text-slate-200 px-2 border border-white/10 font-medium"
                       >
-                        <option value="ALL">All Diff</option>
-                        <option value="EASY">Easy</option>
-                        <option value="MEDIUM">Medium</option>
-                        <option value="HARD">Hard</option>
+                        <option value="ALL" className="bg-slate-900 text-slate-200">All Diff</option>
+                        <option value="EASY" className="bg-slate-900 text-emerald-400">Easy</option>
+                        <option value="MEDIUM" className="bg-slate-900 text-amber-400">Medium</option>
+                        <option value="HARD" className="bg-slate-900 text-rose-400">Hard</option>
                       </select>
                     </div>
                   </div>
 
                   {/* Selected Problems summary bar */}
                   {contestFormData.selectedProblems.length > 0 && (
-                    <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
-                      <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
+                    <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 space-y-2 backdrop-blur-md">
+                      <span className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider">
                         Contest Problem Queue:
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {contestFormData.selectedProblems.map((p, idx) => (
                           <div
                             key={p.problemSlug}
-                            className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-card border border-border text-xs shadow-sm"
+                            className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/10 text-xs shadow-sm font-mono"
                           >
-                            <span className="font-mono font-bold text-primary">Q{idx + 1}</span>
-                            <span className="font-semibold">{p.title}</span>
-                            <span className={`text-[10px] font-bold px-1 rounded ${
-                              p.difficulty === "EASY" ? "bg-emerald-500/10 text-emerald-500" :
-                              p.difficulty === "MEDIUM" ? "bg-amber-500/10 text-amber-500" :
-                              "bg-rose-500/10 text-rose-500"
+                            <span className="font-mono font-bold text-amber-400">Q{idx + 1}</span>
+                            <span className="font-semibold text-slate-200">{p.title}</span>
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                              p.difficulty === "EASY" ? "bg-emerald-500/15 text-emerald-400" :
+                              p.difficulty === "MEDIUM" ? "bg-amber-500/15 text-amber-400" :
+                              "bg-rose-500/15 text-rose-400"
                             }`}>
                               {p.difficulty}
                             </span>
@@ -4104,14 +4088,14 @@ export default function AdminPortalPage() {
                                 step={50}
                                 value={p.points}
                                 onChange={(e) => handleUpdateContestProblemPoints(p.problemSlug, Number(e.target.value))}
-                                className="w-14 h-6 text-[11px] rounded bg-secondary px-1 border border-border text-center font-mono font-bold"
+                                className="w-14 h-6 text-[11px] rounded-md bg-white/[0.08] px-1 border border-white/10 text-center font-mono font-bold text-white"
                               />
-                              <span className="text-[10px] text-muted-foreground">pts</span>
+                              <span className="text-[10px] text-slate-400">pts</span>
                             </div>
                             <button
                               type="button"
                               onClick={() => handleToggleProblemInContest({ slug: p.problemSlug } as any)}
-                              className="text-muted-foreground hover:text-rose-500 font-bold ml-1"
+                              className="text-slate-400 hover:text-rose-400 font-bold ml-1"
                             >
                               ✕
                             </button>
@@ -4122,7 +4106,7 @@ export default function AdminPortalPage() {
                   )}
 
                   {/* Scrollable Question Picker Grid */}
-                  <div className="max-h-60 overflow-y-auto rounded-xl border border-border/80 bg-secondary/20 p-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                  <div className="max-h-60 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.02] p-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 backdrop-blur-md">
                     {allQuestions
                       .filter(q => {
                         if (contestProblemDiffFilter !== "ALL" && q.difficulty !== contestProblemDiffFilter) return false;
@@ -4138,27 +4122,27 @@ export default function AdminPortalPage() {
                           <div
                             key={prob.slug}
                             onClick={() => handleToggleProblemInContest(prob)}
-                            className={`p-2.5 rounded-lg border text-xs cursor-pointer transition-all flex items-center justify-between gap-2 ${
+                            className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-center justify-between gap-2 backdrop-blur-sm ${
                               isSelected
-                                ? "bg-primary/10 border-primary text-foreground shadow-sm"
-                                : "bg-card border-border/60 hover:border-border hover:bg-secondary/40 text-muted-foreground"
+                                ? "bg-amber-500/15 border-amber-400/60 text-white shadow-sm"
+                                : "bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.06] text-slate-300"
                             }`}
                           >
                             <div className="truncate space-y-0.5">
-                              <p className={`font-semibold truncate ${isSelected ? "text-primary" : "text-foreground"}`}>
+                              <p className={`font-semibold truncate ${isSelected ? "text-amber-300" : "text-slate-200"}`}>
                                 {prob.title}
                               </p>
-                              <span className={`text-[10px] font-bold px-1 rounded ${
-                                prob.difficulty === "EASY" ? "bg-emerald-500/10 text-emerald-500" :
-                                prob.difficulty === "MEDIUM" ? "bg-amber-500/10 text-amber-500" :
-                                "bg-rose-500/10 text-rose-500"
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full font-mono ${
+                                prob.difficulty === "EASY" ? "bg-emerald-500/15 text-emerald-400" :
+                                prob.difficulty === "MEDIUM" ? "bg-amber-500/15 text-amber-400" :
+                                "bg-rose-500/15 text-rose-400"
                               }`}>
                                 {prob.difficulty}
                               </span>
                             </div>
 
-                            <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${
-                              isSelected ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"
+                            <span className={`w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold ${
+                              isSelected ? "bg-amber-400 text-slate-950" : "border border-white/20 text-slate-400"
                             }`}>
                               {isSelected ? "✓" : "+"}
                             </span>
@@ -4169,12 +4153,12 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* Launch Action Buttons */}
-                <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-border/60">
+                <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-white/[0.06]">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleCreateContest(false)}
-                    className="h-9 text-xs font-bold gap-1.5"
+                    className="h-9 text-xs font-mono font-bold gap-1.5 rounded-xl border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] backdrop-blur-md"
                   >
                     <span>⏱️</span> Schedule Contest
                   </Button>
@@ -4182,7 +4166,7 @@ export default function AdminPortalPage() {
                   <Button
                     size="sm"
                     onClick={() => handleCreateContest(true)}
-                    className="h-9 text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-md shadow-emerald-600/20"
+                    className="h-9 text-xs font-mono font-bold bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.35)] rounded-xl transition-all"
                   >
                     <span>🚀</span> Create & Start Contest Now!
                   </Button>
@@ -4238,39 +4222,39 @@ export default function AdminPortalPage() {
                     return (
                       <Card
                         key={contest.id}
-                        className={`border transition-all overflow-hidden flex flex-col justify-between ${
+                        className={`rounded-2xl border transition-all overflow-hidden flex flex-col justify-between backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.4)] ${
                           isLive
-                            ? "border-emerald-500/50 bg-gradient-to-br from-card to-emerald-950/10 shadow-lg shadow-emerald-500/5"
+                            ? "border-emerald-500/40 border-t-emerald-400/50 bg-slate-900/40 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
                             : isUpcoming
-                            ? "border-blue-500/40"
-                            : "border-border/80 opacity-95"
+                            ? "border-cyan-500/30 border-t-cyan-400/40 bg-slate-900/40"
+                            : "border-white/10 border-t-white/20 bg-slate-900/30 opacity-90"
                         }`}
                       >
                         <div>
-                          <CardHeader className="pb-2 space-y-2">
+                          <CardHeader className="pb-3 space-y-2 bg-white/[0.02] border-b border-white/[0.06]">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 {isLive ? (
-                                  <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded font-black animate-pulse flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> LIVE NOW
+                                  <span className="text-[10px] bg-emerald-500 text-slate-950 px-2.5 py-0.5 rounded-full font-black animate-pulse flex items-center gap-1 shadow-sm">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> LIVE NOW
                                   </span>
                                 ) : isUpcoming ? (
-                                  <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold border border-blue-500/30">
+                                  <span className="text-[10px] bg-cyan-500/15 text-cyan-300 px-2.5 py-0.5 rounded-full font-bold border border-cyan-500/30 font-mono">
                                     UPCOMING
                                   </span>
                                 ) : (
-                                  <span className="text-[10px] bg-secondary text-muted-foreground px-2 py-0.5 rounded font-bold">
+                                  <span className="text-[10px] bg-white/[0.06] text-slate-400 px-2.5 py-0.5 rounded-full font-bold font-mono">
                                     ENDED
                                   </span>
                                 )}
-                                <span className="text-xs text-muted-foreground font-mono">
+                                <span className="text-xs text-slate-400 font-mono">
                                   ⏱️ {contest.durationMinutes}m duration
                                 </span>
                               </div>
 
                               <div className="flex items-center gap-1.5">
                                 <Link href={`/contests/${contest.id}`}>
-                                  <Button size="sm" variant="outline" className="h-7 text-[11px] font-semibold gap-1">
+                                  <Button size="sm" variant="outline" className="h-7 text-[11px] font-mono rounded-lg border-white/10 bg-white/[0.04] text-cyan-300 hover:bg-cyan-500/15 gap-1 backdrop-blur-md">
                                     <span>👁️</span> Arena
                                   </Button>
                                 </Link>
@@ -4279,40 +4263,40 @@ export default function AdminPortalPage() {
                                   size="sm"
                                   variant="destructive"
                                   onClick={() => handleDeleteContestItem(contest.id)}
-                                  className="h-7 text-[11px] font-semibold"
+                                  className="h-7 text-[11px] font-mono rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30 backdrop-blur-md"
                                 >
                                   Delete
                                 </Button>
                               </div>
                             </div>
 
-                            <CardTitle className="text-base font-bold">{contest.title}</CardTitle>
-                            <CardDescription className="text-xs line-clamp-1">{contest.description}</CardDescription>
+                            <CardTitle className="text-base font-bold font-mono text-slate-100">{contest.title}</CardTitle>
+                            <CardDescription className="text-xs font-mono text-slate-400 line-clamp-1">{contest.description}</CardDescription>
                           </CardHeader>
 
-                          <CardContent className="space-y-3 pt-1">
+                          <CardContent className="space-y-3 pt-3">
                             {/* Live Submissions & Participation Banner */}
-                            <div className="p-2.5 rounded-lg bg-secondary/60 border border-border/80 space-y-2">
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 backdrop-blur-md">
+                              <div className="flex items-center justify-between text-xs font-mono">
+                                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
                                   <span>📊</span> Contest Activity
                                 </span>
-                                <span className="text-[11px] font-mono text-muted-foreground">
+                                <span className="text-[11px] font-mono text-slate-400">
                                   {contestSubs.length} total submissions
                                 </span>
                               </div>
 
-                              <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                                <div className="p-1.5 rounded bg-background/80 border border-border/50">
-                                  <p className="text-[10px] text-muted-foreground font-medium">Enrolled</p>
-                                  <p className="font-black text-foreground">{enrolledCount}</p>
+                              <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
+                                <div className="p-2 rounded-lg bg-white/[0.04] border border-white/10">
+                                  <p className="text-[10px] text-slate-400 font-medium">Enrolled</p>
+                                  <p className="font-black text-slate-100">{enrolledCount}</p>
                                 </div>
-                                <div className="p-1.5 rounded bg-background/80 border border-border/50">
-                                  <p className="text-[10px] text-muted-foreground font-medium">Submissions</p>
-                                  <p className="font-black text-purple-400">{contestSubs.length} <span className="text-[9px] text-muted-foreground">({uniqueStudents} users)</span></p>
+                                <div className="p-2 rounded-lg bg-white/[0.04] border border-white/10">
+                                  <p className="text-[10px] text-slate-400 font-medium">Submissions</p>
+                                  <p className="font-black text-purple-400">{contestSubs.length} <span className="text-[9px] text-slate-400">({uniqueStudents} users)</span></p>
                                 </div>
-                                <div className="p-1.5 rounded bg-background/80 border border-border/50">
-                                  <p className="text-[10px] text-muted-foreground font-medium">Accepted</p>
+                                <div className="p-2 rounded-lg bg-white/[0.04] border border-white/10">
+                                  <p className="text-[10px] text-slate-400 font-medium">Accepted</p>
                                   <p className="font-black text-emerald-400">{acceptedSubs.length}</p>
                                 </div>
                               </div>
@@ -4324,40 +4308,40 @@ export default function AdminPortalPage() {
                                   setSubmissionFilterStatus("ALL");
                                   setSubmissionSearchQuery("");
                                 }}
-                                className="w-full h-7 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 shadow-sm"
+                                className="w-full h-8 text-xs font-mono font-bold rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-cyan-300 border border-white/10 gap-1.5 backdrop-blur-md transition-all shadow-sm"
                               >
                                 <span>🔍</span> View Student Submissions & Solutions ({contestSubs.length})
                               </Button>
                             </div>
 
                             {/* Problem list breakdown */}
-                            <div className="space-y-1 text-xs">
-                              <div className="flex items-center justify-between text-muted-foreground text-[11px] font-semibold">
+                            <div className="space-y-1 text-xs font-mono">
+                              <div className="flex items-center justify-between text-slate-400 text-[11px] font-semibold">
                                 <span>Questions ({contest.problems.length})</span>
-                                <span className="text-primary">{totalPoints} pts total</span>
+                                <span className="text-amber-400">{totalPoints} pts total</span>
                               </div>
                               <div className="flex flex-wrap gap-1.5">
                                 {contest.problems.map((p, idx) => (
                                   <span
                                     key={idx}
-                                    className="text-[10px] font-mono px-2 py-0.5 rounded bg-secondary border border-border"
+                                    className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-slate-300"
                                   >
-                                    <strong>Q{idx + 1}:</strong> {p.title} ({p.points}pts)
+                                    <strong className="text-cyan-400">Q{idx + 1}:</strong> {p.title} ({p.points}pts)
                                   </span>
                                 ))}
                               </div>
                             </div>
 
-                            <div className="text-[11px] text-muted-foreground space-y-0.5 font-mono pt-1">
-                              <p><strong className="text-foreground font-sans">Start Time:</strong> {new Date(contest.startTime).toLocaleString()}</p>
-                              <p><strong className="text-foreground font-sans">End Time:</strong> {new Date(contest.endTime).toLocaleString()}</p>
+                            <div className="text-[11px] text-slate-400 space-y-0.5 font-mono pt-1">
+                              <p><strong className="text-slate-300 font-sans">Start Time:</strong> {new Date(contest.startTime).toLocaleString()}</p>
+                              <p><strong className="text-slate-300 font-sans">End Time:</strong> {new Date(contest.endTime).toLocaleString()}</p>
                             </div>
                           </CardContent>
                         </div>
 
                         {/* Admin Action Bar */}
-                        <div className="p-4 pt-2 border-t border-border/60 flex items-center justify-between">
-                          <span className="text-xs font-mono text-muted-foreground">
+                        <div className="p-4 pt-2 border-t border-white/[0.06] flex items-center justify-between">
+                          <span className="text-xs font-mono text-slate-400">
                             👥 {enrolledCount} participants
                           </span>
 
@@ -4366,7 +4350,7 @@ export default function AdminPortalPage() {
                               <Button
                                 size="sm"
                                 onClick={() => handleStartContestNow(contest.id)}
-                                className="h-7 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1 shadow-sm"
+                                className="h-7 text-[11px] font-mono font-bold rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 gap-1 shadow-sm"
                               >
                                 <span>▶</span> Start Live Now
                               </Button>
@@ -4376,7 +4360,7 @@ export default function AdminPortalPage() {
                                 size="sm"
                                 variant="secondary"
                                 onClick={() => handleEndContestNow(contest.id)}
-                                className="h-7 text-[11px] font-bold text-rose-400 gap-1 border border-rose-500/30"
+                                className="h-7 text-[11px] font-mono font-bold rounded-lg text-rose-300 gap-1 border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 backdrop-blur-md"
                               >
                                 <span>⏹</span> Force End Contest
                               </Button>
@@ -4392,23 +4376,23 @@ export default function AdminPortalPage() {
 
             {/* MODAL 1: CONTEST SUBMISSIONS & STUDENT SOLUTIONS INSPECTOR */}
             {selectedContestForSubmissions && (
-              <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-                <div className="bg-card border border-border rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+              <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+                <div className="bg-slate-950/80 border border-white/15 rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-[0_25px_80px_rgba(0,0,0,0.7)] overflow-hidden my-auto backdrop-blur-2xl text-slate-100">
                   {/* Header */}
-                  <div className="p-5 border-b border-border flex items-start justify-between bg-secondary/30 gap-4">
+                  <div className="p-5 border-b border-white/10 flex items-start justify-between bg-white/[0.02] gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                        <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 backdrop-blur-md">
                           {selectedContestForSubmissions.status}
                         </span>
-                        <span className="text-xs text-muted-foreground font-mono">
+                        <span className="text-xs text-slate-400 font-mono">
                           ⏱️ {selectedContestForSubmissions.durationMinutes} mins
                         </span>
                       </div>
-                      <h3 className="text-xl font-black text-foreground">
+                      <h3 className="text-xl font-mono font-black text-white">
                         {selectedContestForSubmissions.title} — Submissions & Solutions
                       </h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-xs font-mono text-slate-400 mt-0.5">
                         Inspect real-time student submissions, execution metrics, and full code solutions.
                       </p>
                     </div>
@@ -4417,7 +4401,7 @@ export default function AdminPortalPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setSelectedContestForSubmissions(null)}
-                      className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground"
+                      className="h-8 w-8 p-0 rounded-full text-slate-400 hover:text-white hover:bg-white/[0.08]"
                     >
                       ✕
                     </Button>
@@ -4447,42 +4431,42 @@ export default function AdminPortalPage() {
                     });
 
                     return (
-                      <div className="flex-1 flex flex-col overflow-hidden">
+                      <div className="flex-1 flex flex-col overflow-hidden font-mono">
                         {/* Summary Badges */}
-                        <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-secondary/10 border-b border-border">
-                          <div className="p-2.5 rounded-lg bg-card border border-border/70 text-center">
-                            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Enrolled Students</span>
-                            <span className="text-lg font-black text-foreground">
+                        <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/[0.02] border-b border-white/10">
+                          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 text-center backdrop-blur-md">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block">Enrolled Students</span>
+                            <span className="text-lg font-black text-white">
                               {Math.max(selectedContestForSubmissions.participantsCount, (selectedContestForSubmissions.registeredUsers || []).length)}
                             </span>
                           </div>
 
-                          <div className="p-2.5 rounded-lg bg-card border border-border/70 text-center">
-                            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Total Submissions</span>
+                          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 text-center backdrop-blur-md">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Submissions</span>
                             <span className="text-lg font-black text-purple-400">{subs.length}</span>
-                            <span className="text-[10px] text-muted-foreground block">({uniqueStudents} active users)</span>
+                            <span className="text-[10px] text-slate-400 block">({uniqueStudents} active users)</span>
                           </div>
 
-                          <div className="p-2.5 rounded-lg bg-card border border-border/70 text-center">
-                            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Accepted Solves</span>
+                          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 text-center backdrop-blur-md">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block">Accepted Solves</span>
                             <span className="text-lg font-black text-emerald-400">{acceptedSubs.length}</span>
                           </div>
 
-                          <div className="p-2.5 rounded-lg bg-card border border-border/70 text-center">
-                            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Pass Rate</span>
+                          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 text-center backdrop-blur-md">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block">Pass Rate</span>
                             <span className="text-lg font-black text-amber-400">{passRate}%</span>
                           </div>
                         </div>
 
                         {/* Filter Bar */}
-                        <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-border bg-card">
+                        <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-white/10 bg-white/[0.01]">
                           {/* Search Input */}
                           <div className="w-full sm:w-80">
                             <Input
                               placeholder="Search by student name, email, or problem..."
                               value={submissionSearchQuery}
                               onChange={(e) => setSubmissionSearchQuery(e.target.value)}
-                              className="h-8 text-xs"
+                              className="h-8 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 rounded-xl"
                             />
                           </div>
 
@@ -4492,7 +4476,7 @@ export default function AdminPortalPage() {
                               size="sm"
                               variant={submissionFilterStatus === "ALL" ? "default" : "outline"}
                               onClick={() => setSubmissionFilterStatus("ALL")}
-                              className="h-8 text-xs font-semibold"
+                              className="h-8 text-xs font-mono rounded-lg"
                             >
                               All ({subs.length})
                             </Button>
@@ -4500,7 +4484,7 @@ export default function AdminPortalPage() {
                               size="sm"
                               variant={submissionFilterStatus === "ACCEPTED" ? "default" : "outline"}
                               onClick={() => setSubmissionFilterStatus("ACCEPTED")}
-                              className="h-8 text-xs font-semibold text-emerald-400 border-emerald-500/30"
+                              className="h-8 text-xs font-mono rounded-lg text-emerald-300 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20"
                             >
                               Accepted ({acceptedSubs.length})
                             </Button>
@@ -4508,7 +4492,7 @@ export default function AdminPortalPage() {
                               size="sm"
                               variant={submissionFilterStatus === "WRONG_ANSWER" ? "default" : "outline"}
                               onClick={() => setSubmissionFilterStatus("WRONG_ANSWER")}
-                              className="h-8 text-xs font-semibold text-rose-400 border-rose-500/30"
+                              className="h-8 text-xs font-mono rounded-lg text-rose-300 border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20"
                             >
                               Failed ({failedSubs.length})
                             </Button>
@@ -4518,62 +4502,62 @@ export default function AdminPortalPage() {
                         {/* Submissions List / Table */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-2">
                           {filteredSubs.length === 0 ? (
-                            <div className="p-12 text-center text-muted-foreground space-y-2">
+                            <div className="p-12 text-center text-slate-400 space-y-2 font-mono">
                               <span className="text-3xl block">📭</span>
                               <p className="text-sm font-semibold">No submissions found matching criteria</p>
                               <p className="text-xs">When students enter the arena and submit their code, their solutions will appear here in real-time.</p>
                             </div>
                           ) : (
-                            <div className="overflow-x-auto border border-border rounded-xl bg-card">
+                            <div className="overflow-x-auto border border-white/10 rounded-2xl bg-white/[0.02] backdrop-blur-md">
                               <table className="w-full text-left text-xs border-collapse">
                                 <thead>
-                                  <tr className="border-b border-border bg-secondary/40 text-muted-foreground font-semibold">
-                                    <th className="p-3">Student</th>
-                                    <th className="p-3">Problem Solved</th>
-                                    <th className="p-3">Language</th>
-                                    <th className="p-3">Verdict</th>
-                                    <th className="p-3">Score</th>
-                                    <th className="p-3">Runtime / Memory</th>
-                                    <th className="p-3">Submitted</th>
-                                    <th className="p-3 text-right">Action</th>
+                                  <tr className="border-b border-white/10 bg-white/[0.03] text-slate-300 font-semibold font-mono text-[10px] uppercase">
+                                    <th className="p-3.5">Student</th>
+                                    <th className="p-3.5">Problem Solved</th>
+                                    <th className="p-3.5">Language</th>
+                                    <th className="p-3.5">Verdict</th>
+                                    <th className="p-3.5">Score</th>
+                                    <th className="p-3.5">Runtime / Memory</th>
+                                    <th className="p-3.5">Submitted</th>
+                                    <th className="p-3.5 text-right">Action</th>
                                   </tr>
                                 </thead>
-                                <tbody className="divide-y divide-border">
+                                <tbody className="divide-y divide-white/[0.06] font-mono">
                                   {filteredSubs.map((sub) => {
                                     const isAc = sub.status === "ACCEPTED";
                                     return (
-                                      <tr key={sub.id} className="hover:bg-secondary/20 transition-colors">
+                                      <tr key={sub.id} className="hover:bg-white/[0.04] transition-colors">
                                         <td className="p-3 font-medium">
                                           <div className="flex items-center gap-2">
-                                            <div className="w-7 h-7 rounded-full bg-primary/20 text-primary font-black flex items-center justify-center text-xs">
+                                            <div className="w-7 h-7 rounded-full bg-white/[0.06] border border-white/15 text-white font-black flex items-center justify-center text-xs">
                                               {sub.userName.charAt(0).toUpperCase()}
                                             </div>
                                             <div>
-                                              <p className="font-bold text-foreground">{sub.userName}</p>
-                                              <p className="text-[10px] text-muted-foreground font-mono">{sub.userEmail}</p>
+                                              <p className="font-bold text-slate-100">{sub.userName}</p>
+                                              <p className="text-[10px] text-slate-400 font-mono">{sub.userEmail}</p>
                                             </div>
                                           </div>
                                         </td>
                                         <td className="p-3">
-                                          <span className="font-semibold text-foreground block">
+                                          <span className="font-semibold text-slate-100 block">
                                             {sub.problemTitle || sub.problemSlug}
                                           </span>
-                                          <span className="text-[10px] text-muted-foreground font-mono">
+                                          <span className="text-[10px] text-cyan-400/80 font-mono">
                                             {sub.problemSlug}
                                           </span>
                                         </td>
                                         <td className="p-3">
-                                          <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-secondary border border-border">
+                                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase font-bold bg-white/[0.06] border border-white/10 text-slate-300">
                                             {sub.language || "javascript"}
                                           </span>
                                         </td>
                                         <td className="p-3">
                                           {isAc ? (
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                                               <span>✓</span> ACCEPTED
                                             </span>
                                           ) : (
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
                                               <span>✗</span> {sub.status.replace("_", " ")}
                                             </span>
                                           )}
@@ -4582,20 +4566,20 @@ export default function AdminPortalPage() {
                                           {isAc ? (
                                             <span className="text-emerald-400">+{sub.score} pts</span>
                                           ) : (
-                                            <span className="text-muted-foreground">0 pts</span>
+                                            <span className="text-slate-500">0 pts</span>
                                           )}
                                         </td>
-                                        <td className="p-3 text-[11px] font-mono text-muted-foreground">
+                                        <td className="p-3 text-[11px] font-mono text-slate-400">
                                           {sub.runtime || "—"} / {sub.memory || "—"}
                                           {typeof sub.passedTestCases === "number" && sub.totalTestCases && (
-                                            <span className="block text-[10px] text-muted-foreground">
+                                            <span className="block text-[10px] text-slate-500">
                                               ({sub.passedTestCases}/{sub.totalTestCases} cases)
                                             </span>
                                           )}
                                         </td>
-                                        <td className="p-3 text-[11px] text-muted-foreground">
+                                        <td className="p-3 text-[11px] text-slate-400">
                                           {new Date(sub.submittedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                                          <span className="block text-[10px]">
+                                          <span className="block text-[10px] text-slate-500">
                                             {new Date(sub.submittedAt).toLocaleDateString()}
                                           </span>
                                         </td>
@@ -4606,7 +4590,7 @@ export default function AdminPortalPage() {
                                               setSelectedSubmissionForCode(sub);
                                               setCodeCopied(false);
                                             }}
-                                            className="h-7 text-[11px] font-bold bg-secondary hover:bg-secondary/80 text-foreground border border-border gap-1"
+                                            className="h-7 text-[11px] font-mono font-bold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-cyan-300 border border-white/10 gap-1 backdrop-blur-md"
                                           >
                                             <span>💻</span> View Solution
                                           </Button>
@@ -4624,15 +4608,15 @@ export default function AdminPortalPage() {
                   })()}
 
                   {/* Footer */}
-                  <div className="p-4 border-t border-border bg-secondary/20 flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Contest ID: <strong className="font-mono text-foreground">{selectedContestForSubmissions.id}</strong>
+                  <div className="p-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-between font-mono">
+                    <span className="text-xs text-slate-400">
+                      Contest ID: <strong className="font-mono text-cyan-300">{selectedContestForSubmissions.id}</strong>
                     </span>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => setSelectedContestForSubmissions(null)}
-                      className="h-8 text-xs font-semibold"
+                      className="h-8 text-xs font-mono font-semibold rounded-lg border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
                     >
                       Close Inspector
                     </Button>
@@ -4643,30 +4627,30 @@ export default function AdminPortalPage() {
 
             {/* MODAL 2: DETAILED SOLUTION CODE VIEWER */}
             {selectedSubmissionForCode && (
-              <div className="fixed inset-0 z-[60] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-                <div className="bg-[#0f172a] border border-border/80 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden my-auto text-slate-100">
+              <div className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+                <div className="bg-slate-950/85 border border-white/15 rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-[0_25px_80px_rgba(0,0,0,0.8)] overflow-hidden my-auto text-slate-100 backdrop-blur-2xl">
                   {/* Top Bar */}
-                  <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/80">
+                  <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-primary/20 text-primary flex items-center justify-center text-base font-black">
+                      <div className="w-9 h-9 rounded-xl bg-white/[0.06] border border-white/15 text-cyan-400 flex items-center justify-center text-base font-black">
                         💻
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-black text-sm text-white">
+                          <h4 className="font-black text-sm text-white font-mono">
                             {selectedSubmissionForCode.problemTitle || selectedSubmissionForCode.problemSlug}
                           </h4>
                           {selectedSubmissionForCode.status === "ACCEPTED" ? (
-                            <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold font-mono">
                               ✓ ACCEPTED (+{selectedSubmissionForCode.score} pts)
                             </span>
                           ) : (
-                            <span className="text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded font-bold">
+                            <span className="text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded-full font-bold font-mono">
                               ✗ {selectedSubmissionForCode.status.replace("_", " ")}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-slate-400 mt-0.5 font-mono">
                           Submitted by <strong className="text-slate-200">{selectedSubmissionForCode.userName}</strong> ({selectedSubmissionForCode.userEmail}) • {new Date(selectedSubmissionForCode.submittedAt).toLocaleString()}
                         </p>
                       </div>
@@ -4676,18 +4660,18 @@ export default function AdminPortalPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setSelectedSubmissionForCode(null)}
-                      className="h-8 w-8 p-0 rounded-full text-slate-400 hover:text-white"
+                      className="h-8 w-8 p-0 rounded-full text-slate-400 hover:text-white hover:bg-white/[0.08]"
                     >
                       ✕
                     </Button>
                   </div>
 
                   {/* Execution Metrics Bar */}
-                  <div className="px-4 py-2 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between text-xs font-mono text-slate-400">
+                  <div className="px-4 py-2 bg-white/[0.01] border-b border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
                     <div className="flex items-center gap-4">
                       <span><strong>Language:</strong> <span className="text-amber-400 uppercase">{selectedSubmissionForCode.language || "javascript"}</span></span>
                       <span><strong>Runtime:</strong> <span className="text-emerald-400">{selectedSubmissionForCode.runtime || "N/A"}</span></span>
-                      <span><strong>Memory:</strong> <span className="text-blue-400">{selectedSubmissionForCode.memory || "N/A"}</span></span>
+                      <span><strong>Memory:</strong> <span className="text-cyan-400">{selectedSubmissionForCode.memory || "N/A"}</span></span>
                     </div>
 
                     <Button
@@ -4699,7 +4683,7 @@ export default function AdminPortalPage() {
                           setTimeout(() => setCodeCopied(false), 2000);
                         }
                       }}
-                      className="h-7 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 gap-1.5"
+                      className="h-7 text-xs font-mono font-bold rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 border border-white/10 gap-1.5 backdrop-blur-md"
                     >
                       {codeCopied ? (
                         <>
@@ -4714,25 +4698,25 @@ export default function AdminPortalPage() {
                   </div>
 
                   {/* Code Editor Container */}
-                  <div className="flex-1 overflow-y-auto p-4 bg-[#090d16] font-mono text-xs leading-relaxed">
+                  <div className="flex-1 overflow-y-auto p-4 bg-slate-950/60 font-mono text-xs leading-relaxed">
                     {selectedSubmissionForCode.code ? (
                       <pre className="text-emerald-300 font-mono whitespace-pre-wrap select-text">
                         {selectedSubmissionForCode.code}
                       </pre>
                     ) : (
-                      <div className="p-8 text-center text-slate-500">
+                      <div className="p-8 text-center text-slate-500 font-mono">
                         <p>No source code recorded for this submission.</p>
                       </div>
                     )}
                   </div>
 
                   {/* Footer */}
-                  <div className="p-3 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                  <div className="p-3 bg-white/[0.02] border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
                     <span>Submission ID: <code className="text-slate-300">{selectedSubmissionForCode.id}</code></span>
                     <Button
                       size="sm"
                       onClick={() => setSelectedSubmissionForCode(null)}
-                      className="h-7 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white"
+                      className="h-7 text-xs font-mono font-semibold rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/10"
                     >
                       Done Viewing
                     </Button>
@@ -4757,23 +4741,23 @@ export default function AdminPortalPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               {/* Left Column: Tactical Cyber Identity HUD (5 cols) */}
               <div className="lg:col-span-5 space-y-4">
-                <AdminTiltCard glowColor={adminProfile.themeColor || "emerald"} className="p-6 md:p-8 flex flex-col justify-between">
+                <AdminTiltCard glowColor={adminProfile.themeColor || "emerald"} className="p-6 md:p-8 flex flex-col justify-between rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 shadow-[0_16px_50px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
                   <div className="space-y-6">
                     {/* Top Identity Banner */}
                     <div className="flex items-start justify-between">
                       <div className="relative">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-950/80 to-[#0b101a] border-2 border-emerald-500/50 flex items-center justify-center text-4xl shadow-[0_0_25px_rgba(16,185,129,0.25)]">
+                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/20 via-cyan-500/10 to-slate-900/40 border border-white/20 flex items-center justify-center text-4xl shadow-[0_0_25px_rgba(16,185,129,0.25)] backdrop-blur-md">
                           {adminProfile.avatar || "🛡️"}
                         </div>
-                        <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#06080e] flex items-center justify-center text-[10px] text-black font-black">
+                        <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-400 border-2 border-slate-900 flex items-center justify-center text-[10px] text-slate-950 font-black shadow-sm">
                           ✓
                         </span>
                       </div>
                       <div className="text-right">
-                        <span className="px-2.5 py-1 rounded bg-rose-950/80 text-rose-400 font-mono font-bold text-[11px] border border-rose-500/40 tracking-wider shadow-[0_0_10px_rgba(244,63,94,0.2)]">
+                        <span className="px-2.5 py-1 rounded-full bg-rose-500/15 text-rose-300 font-mono font-bold text-[11px] border border-rose-500/30 tracking-wider shadow-[0_0_12px_rgba(244,63,94,0.2)] backdrop-blur-md">
                           ROOT_CLEARANCE
                         </span>
-                        <p className="text-[10px] font-mono text-emerald-500/70 mt-1">
+                        <p className="text-[10px] font-mono text-emerald-400/80 mt-1">
                           SYS.NODE: ADM-2026-ROOT-01
                         </p>
                       </div>
@@ -4781,49 +4765,49 @@ export default function AdminPortalPage() {
 
                     {/* Name & Title */}
                     <div>
-                      <div className="text-[10px] font-mono text-emerald-400 tracking-widest uppercase mb-1">// IDENT_MATRIX</div>
-                      <h2 className="text-2xl font-black tracking-tight text-emerald-100 font-mono">
+                      <div className="text-[10px] font-mono text-cyan-400 tracking-widest uppercase mb-1">// IDENT_MATRIX</div>
+                      <h2 className="text-2xl font-black tracking-tight text-white font-mono">
                         {adminProfile.name}
                       </h2>
-                      <p className="text-xs font-mono font-semibold text-emerald-400 mt-1">
+                      <p className="text-xs font-mono font-semibold text-emerald-300 mt-1">
                         {adminProfile.title}
                       </p>
-                      <p className="text-xs font-mono text-slate-400 mt-3 leading-relaxed bg-[#06080e]/60 p-3 rounded-lg border border-emerald-500/15">
+                      <p className="text-xs font-mono text-slate-300 mt-3 leading-relaxed bg-white/[0.03] p-3 rounded-xl border border-white/10 backdrop-blur-md">
                         {adminProfile.bio}
                       </p>
                     </div>
 
                     {/* Security Clearance Details */}
-                    <div className="space-y-2 p-3.5 rounded-xl bg-[#06080e]/90 border border-emerald-500/25 text-xs font-mono">
+                    <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs font-mono backdrop-blur-md">
                       <div className="flex items-center justify-between">
                         <span className="text-slate-400">CLEARANCE_TIER:</span>
-                        <span className="text-emerald-400 font-bold">{adminProfile.securityLevel}</span>
+                        <span className="text-emerald-300 font-bold">{adminProfile.securityLevel}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-slate-400">HARDWARE_CIPHER:</span>
-                        <span className="text-cyan-400 font-bold">AES-256-GCM / QUAD-RUN</span>
+                        <span className="text-cyan-300 font-bold">AES-256-GCM / QUAD-RUN</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-slate-400">SESSION_EXPIRY:</span>
-                        <span className="text-amber-400 font-bold">{adminProfile.sessionTimeout}</span>
+                        <span className="text-amber-300 font-bold">{adminProfile.sessionTimeout}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-slate-400">THEME_SKIN:</span>
-                        <span className="text-emerald-400 font-bold uppercase">{adminProfile.themeColor}</span>
+                        <span className="text-emerald-300 font-bold uppercase">{adminProfile.themeColor}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Card Footer */}
-                  <div className="pt-6 border-t border-emerald-500/20 mt-6 flex items-center justify-between">
-                    <span className="text-[9px] font-mono text-emerald-500/60 tracking-wider">
+                  <div className="pt-6 border-t border-white/[0.08] mt-6 flex items-center justify-between">
+                    <span className="text-[9px] font-mono text-slate-400 tracking-wider">
                       SHA256:7E9A:2026:NX42
                     </span>
                     <Button
                       variant="destructive"
                       size="sm"
                       onClick={handleLockAdmin}
-                      className="h-8 text-xs font-mono font-bold gap-1.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)]"
+                      className="h-8 text-xs font-mono font-bold gap-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)] backdrop-blur-md"
                     >
                       <span>🔒</span> TERMINATE_SESSION
                     </Button>
@@ -4834,15 +4818,10 @@ export default function AdminPortalPage() {
               {/* Right Column: Settings & Security Controls (7 cols) */}
               <div className="lg:col-span-7 space-y-6">
                 {/* Form 1: Admin Profile Details */}
-                <div className="relative rounded-2xl bg-[#0b101a]/95 border border-emerald-500/25 p-5 md:p-6 backdrop-blur-xl shadow-xl">
-                  <div className="absolute top-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">┌</div>
-                  <div className="absolute top-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┐</div>
-                  <div className="absolute bottom-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">└</div>
-                  <div className="absolute bottom-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┘</div>
-
-                  <div className="pb-4 border-b border-emerald-500/20">
-                    <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest mb-1">// SYSTEM_CONFIG // IDENTITY</div>
-                    <h3 className="text-base font-bold font-mono text-emerald-100 flex items-center gap-2">
+                <div className="relative rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 p-5 md:p-6 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.4)]">
+                  <div className="pb-4 border-b border-white/[0.08]">
+                    <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-1">// SYSTEM_CONFIG // IDENTITY</div>
+                    <h3 className="text-base font-bold font-mono text-white flex items-center gap-2">
                       <span>👤</span> Master Profile Settings
                     </h3>
                     <p className="text-xs font-mono text-slate-400 mt-0.5">
@@ -4854,41 +4833,41 @@ export default function AdminPortalPage() {
                     <form onSubmit={handleSaveAdminProfile} className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <Label className="text-xs font-mono font-bold text-emerald-300">DISPLAY_NAME</Label>
+                          <Label className="text-xs font-mono font-bold text-slate-300">DISPLAY_NAME</Label>
                           <Input
                             value={adminProfile.name}
                             onChange={(e) => setAdminProfile({ ...adminProfile, name: e.target.value })}
                             placeholder="Nexus Root Operator"
-                            className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
+                            className="h-10 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 focus:border-cyan-400/60 rounded-xl backdrop-blur-md"
                             required
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs font-mono font-bold text-emerald-300">COMMAND_EMAIL</Label>
+                          <Label className="text-xs font-mono font-bold text-slate-300">COMMAND_EMAIL</Label>
                           <Input
                             type="email"
                             value={adminProfile.email}
                             onChange={(e) => setAdminProfile({ ...adminProfile, email: e.target.value })}
                             placeholder="admin@codearena.dev"
-                            className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
+                            className="h-10 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 focus:border-cyan-400/60 rounded-xl backdrop-blur-md"
                             required
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-mono font-bold text-emerald-300">TITLE // DESIGNATION</Label>
+                        <Label className="text-xs font-mono font-bold text-slate-300">TITLE // DESIGNATION</Label>
                         <Input
                           value={adminProfile.title}
                           onChange={(e) => setAdminProfile({ ...adminProfile, title: e.target.value })}
                           placeholder="Chief System Architect & Root Judge"
-                          className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
+                          className="h-10 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 focus:border-cyan-400/60 rounded-xl backdrop-blur-md"
                         />
                       </div>
 
                       {/* Avatar Picker */}
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-mono font-bold text-emerald-300">CYBER_AVATAR_SIGIL</Label>
+                        <Label className="text-xs font-mono font-bold text-slate-300">CYBER_AVATAR_SIGIL</Label>
                         <div className="flex flex-wrap gap-2">
                           {["🛡️", "⚡", "🚀", "👑", "🧬", "🛸", "🎯", "🔮", "🤖", "🔥"].map((emoji) => (
                             <button
@@ -4898,10 +4877,10 @@ export default function AdminPortalPage() {
                                 playCyberSound("click");
                                 setAdminProfile({ ...adminProfile, avatar: emoji });
                               }}
-                              className={`w-10 h-10 rounded-xl text-lg flex items-center justify-center border transition-all ${
+                              className={`w-10 h-10 rounded-xl text-lg flex items-center justify-center border transition-all backdrop-blur-md ${
                                 adminProfile.avatar === emoji
                                   ? "border-emerald-400 bg-emerald-500/20 scale-110 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
-                                  : "border-emerald-500/20 bg-[#06080e]/60 hover:border-emerald-500/40 hover:bg-[#06080e]"
+                                  : "border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.08]"
                               }`}
                             >
                               {emoji}
@@ -4911,18 +4890,18 @@ export default function AdminPortalPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-mono font-bold text-emerald-300">BIO & ARCHITECT_DIRECTIVE</Label>
+                        <Label className="text-xs font-mono font-bold text-slate-300">BIO & ARCHITECT_DIRECTIVE</Label>
                         <textarea
                           rows={3}
                           value={adminProfile.bio}
                           onChange={(e) => setAdminProfile({ ...adminProfile, bio: e.target.value })}
                           placeholder="Describe administrative responsibilities and system directives..."
-                          className="w-full rounded-md bg-[#06080e] p-3 text-xs font-mono text-emerald-100 border border-emerald-500/30 placeholder-emerald-800/60 focus:border-emerald-400 focus:outline-none"
+                          className="w-full rounded-xl bg-white/[0.04] p-3 text-xs font-mono text-white border border-white/10 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none backdrop-blur-md"
                         />
                       </div>
 
                       <div className="flex justify-end pt-2">
-                        <Button type="submit" size="sm" className="h-9 px-4 text-xs font-mono font-bold bg-emerald-500 hover:bg-emerald-400 text-black gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                        <Button type="submit" size="sm" className="h-9 px-5 text-xs font-mono font-bold bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)] rounded-xl transition-all">
                           <span>💾</span> COMMIT_PROFILE_CHANGES
                         </Button>
                       </div>
@@ -4931,15 +4910,10 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* Form 2: Passcode & Master Access Key Management */}
-                <div className="relative rounded-2xl bg-[#0b101a]/95 border border-emerald-500/25 p-5 md:p-6 backdrop-blur-xl shadow-xl">
-                  <div className="absolute top-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">┌</div>
-                  <div className="absolute top-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┐</div>
-                  <div className="absolute bottom-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">└</div>
-                  <div className="absolute bottom-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┘</div>
-
-                  <div className="pb-4 border-b border-emerald-500/20">
+                <div className="relative rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 p-5 md:p-6 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.4)]">
+                  <div className="pb-4 border-b border-white/[0.08]">
                     <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-1">// SECURITY_CIPHER // HARDWARE_KEY</div>
-                    <h3 className="text-base font-bold font-mono text-emerald-100 flex items-center gap-2">
+                    <h3 className="text-base font-bold font-mono text-white flex items-center gap-2">
                       <span>🔑</span> Passcode & Security Authorization
                     </h3>
                     <p className="text-xs font-mono text-slate-400 mt-0.5">
@@ -4951,10 +4925,10 @@ export default function AdminPortalPage() {
                     <form onSubmit={handleChangePasscode} className="space-y-4">
                       {passcodeUpdateMsg && (
                         <p
-                          className={`text-xs p-3 rounded-lg border font-mono font-bold animate-in fade-in ${
+                          className={`text-xs p-3 rounded-xl border font-mono font-bold animate-in fade-in backdrop-blur-md ${
                             passcodeUpdateMsg.type === "success"
-                              ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
-                              : "bg-rose-950/80 border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)]"
+                              ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                              : "bg-rose-500/15 border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)]"
                           }`}
                         >
                           {passcodeUpdateMsg.text}
@@ -4963,29 +4937,29 @@ export default function AdminPortalPage() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <Label className="text-xs font-mono font-bold text-emerald-300">NEW_PASSCODE</Label>
+                          <Label className="text-xs font-mono font-bold text-slate-300">NEW_PASSCODE</Label>
                           <Input
                             type="password"
                             value={newPasscodeVal}
                             onChange={(e) => setNewPasscodeVal(e.target.value)}
                             placeholder="Min 6 characters"
-                            className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
+                            className="h-10 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 focus:border-cyan-400/60 rounded-xl backdrop-blur-md"
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs font-mono font-bold text-emerald-300">CONFIRM_PASSCODE</Label>
+                          <Label className="text-xs font-mono font-bold text-slate-300">CONFIRM_PASSCODE</Label>
                           <Input
                             type="password"
                             value={confirmPasscodeVal}
                             onChange={(e) => setConfirmPasscodeVal(e.target.value)}
                             placeholder="Re-enter new passcode"
-                            className="h-10 text-xs font-mono bg-[#06080e] border-emerald-500/30 text-emerald-100 placeholder-emerald-800/60 focus:border-emerald-400"
+                            className="h-10 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 focus:border-cyan-400/60 rounded-xl backdrop-blur-md"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-xs font-mono font-bold text-emerald-300">SESSION_AUTO_LOCK_TIMEOUT</Label>
+                        <Label className="text-xs font-mono font-bold text-slate-300">SESSION_AUTO_LOCK_TIMEOUT</Label>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {[
                             { label: "15 Minutes", val: "15m" },
@@ -5002,10 +4976,10 @@ export default function AdminPortalPage() {
                                 setAdminProfile(updated);
                                 localStorage.setItem("codearena_admin_profile", JSON.stringify(updated));
                               }}
-                              className={`p-2.5 rounded-lg text-xs font-mono border text-center transition-all ${
+                              className={`p-2.5 rounded-xl text-xs font-mono border text-center transition-all backdrop-blur-md ${
                                 adminProfile.sessionTimeout === t.val
                                   ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 font-bold shadow-[0_0_12px_rgba(16,185,129,0.2)]"
-                                  : "border-emerald-500/20 bg-[#06080e]/60 hover:bg-[#06080e] text-slate-400 hover:text-emerald-200"
+                                  : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 hover:text-white"
                               }`}
                             >
                               {t.label}
@@ -5015,7 +4989,7 @@ export default function AdminPortalPage() {
                       </div>
 
                       <div className="flex justify-end pt-2">
-                        <Button type="submit" size="sm" variant="outline" className="h-9 px-4 text-xs font-mono font-bold gap-1.5 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/15">
+                        <Button type="submit" size="sm" variant="outline" className="h-9 px-4 text-xs font-mono font-bold gap-1.5 rounded-xl border-white/10 bg-white/[0.04] text-cyan-300 hover:bg-cyan-500/15 backdrop-blur-md">
                           <span>🔐</span> ROTATE_ROOT_PASSCODE
                         </Button>
                       </div>
@@ -5024,15 +4998,10 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* Form 3: 2026 HUD Visual Theme Presets */}
-                <div className="relative rounded-2xl bg-[#0b101a]/95 border border-emerald-500/25 p-5 md:p-6 backdrop-blur-xl shadow-xl">
-                  <div className="absolute top-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">┌</div>
-                  <div className="absolute top-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┐</div>
-                  <div className="absolute bottom-2 left-2 text-[10px] font-mono text-emerald-500/40 select-none">└</div>
-                  <div className="absolute bottom-2 right-2 text-[10px] font-mono text-emerald-500/40 select-none">┘</div>
-
-                  <div className="pb-4 border-b border-emerald-500/20">
+                <div className="relative rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 p-5 md:p-6 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.4)]">
+                  <div className="pb-4 border-b border-white/[0.08]">
                     <div className="text-[10px] font-mono text-amber-400 uppercase tracking-widest mb-1">// DISPLAY_MATRIX // THEME_CORE</div>
-                    <h3 className="text-base font-bold font-mono text-emerald-100 flex items-center gap-2">
+                    <h3 className="text-base font-bold font-mono text-white flex items-center gap-2">
                       <span>🎨</span> 2026 Nexus HUD Theme Presets
                     </h3>
                     <p className="text-xs font-mono text-slate-400 mt-0.5">
@@ -5059,10 +5028,10 @@ export default function AdminPortalPage() {
                             setAdminProfile(updated);
                             localStorage.setItem("codearena_admin_profile", JSON.stringify(updated));
                           }}
-                          className={`p-3 rounded-xl border font-mono text-left transition-all flex items-center gap-2.5 ${
+                          className={`p-3 rounded-xl border font-mono text-left transition-all flex items-center gap-2.5 backdrop-blur-md ${
                             adminProfile.themeColor === t.id
-                              ? "border-emerald-400 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.2)] font-bold text-emerald-100"
-                              : "border-emerald-500/20 bg-[#06080e]/60 hover:bg-[#06080e] text-slate-400 hover:text-emerald-200"
+                              ? "border-emerald-400 bg-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.25)] font-bold text-white"
+                              : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 hover:text-white"
                           }`}
                         >
                           <span
