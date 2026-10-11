@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
 import { ProblemDefinition } from "@/lib/problems-data";
-import { saveCustomProblemServer } from "@/lib/server-problems-store";
+import { saveCustomProblemServer, deleteCustomProblemServer } from "@/lib/server-problems-store";
 
 export async function GET(req: NextRequest) {
   try {
@@ -123,3 +123,22 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const slug = searchParams.get("slug");
+    if (!slug) {
+      return NextResponse.json({ success: false, message: "Missing slug parameter" }, { status: 400 });
+    }
+
+    const removed = deleteCustomProblemServer(slug);
+    return NextResponse.json({ success: true, removed, slug });
+  } catch (err: any) {
+    return NextResponse.json(
+      { success: false, message: err.message || "Failed to delete question" },
+      { status: 500 }
+    );
+  }
+}
+

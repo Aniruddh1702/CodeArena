@@ -29,3 +29,27 @@ export function saveCustomProblemServer(problem: ProblemDefinition): void {
     console.error("Error saving server custom problem:", e);
   }
 }
+
+export function deleteCustomProblemServer(slug: string): boolean {
+  try {
+    const current = getServerCustomProblems();
+    const normSlug = slug.toLowerCase().trim().replace(/_/g, "-");
+    let found = false;
+    if (current[slug]) {
+      delete current[slug];
+      found = true;
+    }
+    if (current[normSlug]) {
+      delete current[normSlug];
+      found = true;
+    }
+    if (found) {
+      fs.writeFileSync(FILE_PATH, JSON.stringify(current, null, 2), "utf-8");
+      return true;
+    }
+  } catch (e) {
+    console.error("Error deleting server custom problem:", e);
+  }
+  return false;
+}
+

@@ -52,10 +52,10 @@ export default function OrgAnalyticsPage() {
               </div>
             </Link>
             <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
-                <a href="/org/dashboard" className="hover:text-primary transition-colors">Overview</a>
-                <a href="/org/batches" className="hover:text-primary transition-colors">Batches</a>
-                <a href="/org/tests" className="hover:text-primary transition-colors">Test Assignments</a>
-                <a href="/org/analytics" className="text-primary">Analytics</a>
+                <Link href="/org/dashboard" className="hover:text-primary transition-colors">Overview</Link>
+                <Link href="/org/batches" className="hover:text-primary transition-colors">Batches</Link>
+                <Link href="/org/tests" className="hover:text-primary transition-colors">Test Assignments</Link>
+                <Link href="/org/analytics" className="text-primary font-semibold">Analytics</Link>
             </nav>
             <Button variant="outline" size="sm" onClick={() => router.push('/dashboard')}>Exit</Button>
         </div>

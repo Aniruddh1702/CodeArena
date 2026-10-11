@@ -921,9 +921,16 @@ export default function AdminPortalPage() {
   };
 
   // Delete Question
-  const handleDelete = (slug: string) => {
+  const handleDelete = async (slug: string) => {
     if (confirm(`Are you sure you want to delete question "${slug}"?`)) {
       deleteCustomProblem(slug);
+      try {
+        await fetch(`/api/admin/questions?slug=${encodeURIComponent(slug)}`, {
+          method: "DELETE",
+        });
+      } catch (e) {
+        console.warn("Server deletion optional:", e);
+      }
       loadQuestions();
     }
   };

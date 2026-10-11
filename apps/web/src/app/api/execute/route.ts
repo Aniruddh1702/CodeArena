@@ -968,11 +968,14 @@ function transpileJavaToJs(javaCode: string): string {
   // Constants & String methods
   js = js.replace(/Integer\.MAX_VALUE/g, 'Infinity');
   js = js.replace(/Integer\.MIN_VALUE/g, '-Infinity');
+  js = js.replace(/Arrays\.sort\s*\(([^)]+)\)/g, '$1.sort((a, b) => a - b)');
+  js = js.replace(/System\.out\.println\s*\(/g, 'console.log(');
+  js = js.replace(/System\.out\.print\s*\(/g, 'console.log(');
   js = js.replace(/\.charAt\s*\(([^)]+)\)/g, '[$1]');
   js = js.replace(/\.length\s*\(\)/g, '.length');
 
-  // Method signatures: public ... methodName(...) -> methodName(...)
-  js = js.replace(/public\s+(?:static\s+)?[a-zA-Z0-9_<>[\]]+\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)/g, (_match, fnName, params) => {
+  // Method signatures: (public/protected/private)? (static)? returnType methodName(...) -> methodName(...)
+  js = js.replace(/(?:(?:public|protected|private)\s+)?(?:static\s+)?[a-zA-Z0-9_<>[\]]+\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)/g, (_match, fnName, params) => {
     const cleanParams = params.split(',').map((p: string) => {
       const parts = p.trim().split(/\s+/);
       return parts[parts.length - 1];
@@ -995,7 +998,7 @@ async function executeJava(
 ): Promise<ExecutionSummary> {
   const targetMethod = problem?.methodName || "solution";
   // Check if Java code contains class Solution and the target method
-  if (!code.includes("class Solution") || !code.includes(targetMethod)) {
+  if (!/class\s+Solution/i.test(code) || !code.includes(targetMethod)) {
     return {
       status: "Compilation Error",
       statusColor: "text-red-500",
