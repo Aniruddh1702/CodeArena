@@ -18,12 +18,14 @@ function execPromise(command: string, options: any): Promise<{ stdout: string; s
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { slug, language, code, isSubmission, customProblem } = body;
+    const { slug, language, code, isSubmission, customProblem, customTestCases } = body;
 
     const problem = customProblem || getProblem(slug || "two-sum");
-    const testCases: TestCase[] = isSubmission
-      ? [...(problem.publicTestCases || []), ...(problem.hiddenTestCases || [])]
-      : (problem.publicTestCases || []);
+    const testCases: TestCase[] = (customTestCases && Array.isArray(customTestCases) && customTestCases.length > 0)
+      ? customTestCases
+      : (isSubmission
+          ? [...(problem.publicTestCases || []), ...(problem.hiddenTestCases || [])]
+          : (problem.publicTestCases || []));
 
     const lang = String(language || "javascript").toLowerCase().trim();
 
@@ -246,7 +248,10 @@ for i, tc in enumerate(test_cases):
         comp_actual = list(actual) if isinstance(actual, tuple) else actual
         
         is_passed = False
-        if comp_actual == expected:
+        is_custom = expected is None and (tc.get('output') == '?' or tc.get('output') is None)
+        if is_custom:
+            is_passed = actual is not None
+        elif comp_actual == expected:
             is_passed = True
         elif "${problem.slug}" == "two-sum" and isinstance(comp_actual, list) and isinstance(expected, list) and len(comp_actual) == 2 and len(expected) == 2:
             is_passed = (comp_actual[0] == expected[1] and comp_actual[1] == expected[0])
@@ -264,7 +269,7 @@ for i, tc in enumerate(test_cases):
             "caseIndex": i,
             "passed": is_passed,
             "actualOutput": actual_str,
-            "expectedOutput": tc['output'],
+            "expectedOutput": "— (Custom Input)" if is_custom else tc['output'],
             "input": tc['input'],
             "stdout": user_stdout.strip()
         }

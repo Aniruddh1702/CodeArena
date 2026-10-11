@@ -260,13 +260,14 @@ export function evaluateJavaScript(
       const caseElapsed = Math.round(performance.now() - caseStartTime);
 
       // Compare actual vs expected
-      let isCorrect = deepEqual(result, tc.expected);
-      if (!isCorrect && problem.slug === "two-sum" && Array.isArray(result) && Array.isArray(tc.expected)) {
+      const isCustomCase = tc.expected === undefined && (tc.output === "?" || tc.output === undefined);
+      let isCorrect = isCustomCase ? (result !== undefined) : deepEqual(result, tc.expected);
+      if (!isCorrect && !isCustomCase && problem.slug === "two-sum" && Array.isArray(result) && Array.isArray(tc.expected)) {
         if (result.length === 2 && tc.expected.length === 2) {
           isCorrect = (result[0] === tc.expected[1] && result[1] === tc.expected[0]);
         }
       }
-      if (!isCorrect && problem.slug === "longest-palindromic-substring" && typeof result === "string" && typeof tc.expected === "string") {
+      if (!isCorrect && !isCustomCase && problem.slug === "longest-palindromic-substring" && typeof result === "string" && typeof tc.expected === "string") {
         const s = String(tc.args[0] || "");
         if (result.length === tc.expected.length && s.includes(result)) {
           const rev = result.split("").reverse().join("");
@@ -284,13 +285,18 @@ export function evaluateJavaScript(
           caseIndex: i,
           passed: true,
           input: tc.input,
-          expectedOutput: tc.output,
+          expectedOutput: isCustomCase ? "— (Custom Input)" : tc.output,
           actualOutput: formattedActual,
           stdout: capturedLogs.join("\n"),
           runtimeMs: caseElapsed
         });
       } else {
-        const mismatch = explainMismatch(tc.expected, result, tc.input);
+        const mismatch = isCustomCase
+          ? {
+              errorMsg: "TypeError [ERR_NO_RETURN]: Function returned undefined. Expected a returned value.",
+              diffExplanation: "Function did not return any value for custom arguments. Ensure your function has an explicit return statement."
+            }
+          : explainMismatch(tc.expected, result, tc.input);
         const errorLineCandidate = findRelevantCodeLine(code, problem.methodName);
 
         if (firstFailIndex === -1) {

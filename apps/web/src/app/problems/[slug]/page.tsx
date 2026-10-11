@@ -24,6 +24,23 @@ interface SavedSubmission {
   testResults?: TestResult[];
 }
 
+function parseCustomArgs(raw: string): any[] {
+  const trimmed = raw.trim();
+  if (!trimmed) return [];
+  try {
+    return JSON.parse(`[${trimmed}]`);
+  } catch (e) {}
+  try {
+    const single = JSON.parse(trimmed);
+    return Array.isArray(single) ? [single] : [single];
+  } catch (e) {}
+  try {
+    const fn = new Function(`return [${trimmed}];`);
+    return fn();
+  } catch (e) {}
+  return [trimmed];
+}
+
 export default function ProblemWorkspace({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const initialProb = getProblem(params.slug) || (PROBLEMS_DATABASE as any)[params.slug] || Object.values(PROBLEMS_DATABASE)[0];
@@ -39,6 +56,12 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
   const [consoleTab, setConsoleTab] = useState("testcases");
   const [activeTestCase, setActiveTestCase] = useState(0);
   const [consoleView, setConsoleView] = useState<"normal" | "expanded" | "minimized">("normal");
+
+  // Custom Input Mode (Debug Edge Cases)
+  const [customInputMode, setCustomInputMode] = useState(false);
+  const [customInputText, setCustomInputText] = useState(
+    initialProb?.publicTestCases?.[0]?.input || ""
+  );
 
   // Execution Results
   const [hasRun, setHasRun] = useState(false);
@@ -189,6 +212,9 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     const prob = getProblem(params.slug) || (PROBLEMS_DATABASE as any)[params.slug] || Object.values(PROBLEMS_DATABASE)[0];
     if (prob) {
       setQuestion(prob);
+      if (prob.publicTestCases?.[0]?.input) {
+        setCustomInputText((prev: string) => prev || prob.publicTestCases[0].input);
+      }
     }
     setRunResult(null);
     setSubmitFeedback(null);
@@ -293,7 +319,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     }
   }, [params.slug, router]);
 
-  // Run Code (Public Testcases)
+  // Run Code (Public Testcases or Custom Input)
   const handleRunCode = async () => {
     const activeAcc = getActiveAccount();
     if (!activeAcc) {
@@ -307,6 +333,16 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     if (consoleView === "minimized") setConsoleView("normal");
     setSubmitFeedback(null);
 
+    const isCustom = customInputMode && customInputText.trim().length > 0;
+    const customTestCases = isCustom ? [
+      {
+        input: customInputText.trim(),
+        output: "?",
+        args: parseCustomArgs(customInputText.trim()),
+        expected: undefined
+      }
+    ] : undefined;
+
     try {
       const res = await fetch("/api/execute", {
         method: "POST",
@@ -315,7 +351,8 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
           slug: question.slug,
           language,
           code,
-          isSubmission: false
+          isSubmission: false,
+          customTestCases
         })
       });
 
@@ -331,20 +368,22 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
           setActiveTestCase(errJson.status === "Accepted" ? 0 : errJson.failedTestCaseIndex);
           updateEditorMarkers(errJson, code);
         } else if (language === "javascript") {
-          const fallback = evaluateJavaScript(code, question, question.publicTestCases);
+          const testCasesToRun = customTestCases || question.publicTestCases;
+          const fallback = evaluateJavaScript(code, question, testCasesToRun);
           setRunResult(fallback);
           setActiveTestCase(fallback.status === "Accepted" ? 0 : fallback.failedTestCaseIndex);
           updateEditorMarkers(fallback, code);
         } else {
+          const targetCases = customTestCases || question.publicTestCases;
           const fallback: ExecutionSummary = {
             status: "Runtime Error",
             statusColor: "text-amber-500",
             runtime: "0ms",
             memory: "0MB",
-            totalTestCases: question.publicTestCases.length,
+            totalTestCases: targetCases.length,
             passedTestCases: 0,
             failedTestCaseIndex: 0,
-            testResults: question.publicTestCases.map((tc, idx) => ({
+            testResults: targetCases.map((tc, idx) => ({
               caseIndex: idx,
               passed: false,
               input: tc.input,
@@ -361,8 +400,9 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         }
       }
     } catch (err: any) {
+      const targetCases = customTestCases || question.publicTestCases;
       if (language === "javascript") {
-        const fallback = evaluateJavaScript(code, question, question.publicTestCases);
+        const fallback = evaluateJavaScript(code, question, targetCases);
         setRunResult(fallback);
         setActiveTestCase(fallback.status === "Accepted" ? 0 : fallback.failedTestCaseIndex);
         updateEditorMarkers(fallback, code);
@@ -372,19 +412,19 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
           statusColor: "text-amber-500",
           runtime: "0ms",
           memory: "0MB",
-          totalTestCases: question.publicTestCases.length,
+          totalTestCases: targetCases.length,
           passedTestCases: 0,
           failedTestCaseIndex: 0,
-          testResults: question.publicTestCases.map((tc, idx) => ({
+          testResults: targetCases.map((tc, idx) => ({
             caseIndex: idx,
             passed: false,
             input: tc.input,
             expectedOutput: tc.output,
             actualOutput: "",
             stdout: "",
-            error: err.message || "Failed to reach execution runner."
+            error: err.message || "Execution error occurred."
           })),
-          errorDetails: err.message || "Network error"
+          errorDetails: err.message || "Execution error occurred."
         };
         setRunResult(fallback);
         setActiveTestCase(0);
@@ -1039,16 +1079,54 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
                     <Button 
                       key={idx} 
                       size="sm" 
-                      variant={activeTestCase === idx ? "secondary" : "ghost"}
-                      onClick={() => setActiveTestCase(idx)}
+                      variant={activeTestCase === idx && !customInputMode ? "secondary" : "ghost"}
+                      onClick={() => {
+                        setActiveTestCase(idx);
+                        setCustomInputMode(false);
+                      }}
                       className="h-7 text-xs font-mono font-semibold"
                     >
                       Case {idx + 1}
                     </Button>
                   ))}
+                  <Button
+                    size="sm"
+                    variant={customInputMode ? "secondary" : "ghost"}
+                    onClick={() => setCustomInputMode(true)}
+                    className="h-7 text-xs font-mono font-semibold text-primary hover:text-primary/90"
+                  >
+                    + Custom Input
+                  </Button>
                 </div>
 
-                {activePublicCase && (
+                {customInputMode ? (
+                  <div className="space-y-4 font-mono text-xs">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                          Custom Arguments Input (JSON or Comma-Separated)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setCustomInputText(question.publicTestCases[0]?.input || "")}
+                          className="text-[11px] text-muted-foreground hover:text-foreground underline"
+                        >
+                          Reset to Case 1
+                        </button>
+                      </div>
+                      <textarea
+                        rows={3}
+                        value={customInputText}
+                        onChange={(e) => setCustomInputText(e.target.value)}
+                        placeholder="[2, 7, 11, 15], 9"
+                        className="mt-1 w-full p-3.5 rounded-xl bg-secondary/40 border border-border/60 text-foreground font-mono text-xs resize-none focus:outline-none focus:ring-1 focus:ring-primary shadow-inner"
+                      />
+                      <p className="mt-1.5 text-[11px] text-muted-foreground">
+                        Enter custom parameters (e.g. <code className="bg-muted px-1 py-0.5 rounded text-[10px]">[2, 7, 11, 15], 9</code>). Clicking <strong>Run Code</strong> will evaluate your algorithm against this custom testcase.
+                      </p>
+                    </div>
+                  </div>
+                ) : activePublicCase && (
                   <div className="space-y-4 font-mono text-xs">
                     <div>
                       <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
@@ -1087,7 +1165,9 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
                     <div className="flex flex-wrap items-center justify-between p-3.5 rounded-xl bg-secondary/40 border border-border/80 gap-3">
                       <div className="flex items-center gap-3">
                         <span className={`text-xl font-extrabold ${runResult.statusColor}`}>
-                          {runResult.status === "Accepted" ? "✓ Accepted" : `✕ ${runResult.status}`}
+                          {runResult.status === "Accepted" 
+                            ? (runResult.testResults.some(r => r.expectedOutput?.includes("Custom Input")) ? "✓ Evaluated" : "✓ Accepted") 
+                            : `✕ ${runResult.status}`}
                         </span>
                         <span className="text-xs text-muted-foreground font-mono">
                           ({runResult.passedTestCases}/{runResult.totalTestCases} cases passed)
@@ -1160,7 +1240,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
                               }`}
                             >
                               <span className={`h-2 w-2 rounded-full ${r.passed ? 'bg-emerald-400' : 'bg-rose-400'}`} />
-                              Case {idx + 1}
+                              {r.expectedOutput?.includes("Custom Input") ? "Custom Input" : `Case ${idx + 1}`}
                             </button>
                           ))}
                         </div>
@@ -1209,11 +1289,19 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
                                   <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                                     Expected Output
                                   </label>
-                                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                                    Target ✓
+                                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${
+                                    currentResultCase.expectedOutput?.includes("Custom Input")
+                                      ? "bg-blue-500/15 text-blue-400 border border-blue-500/30"
+                                      : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                                  }`}>
+                                    {currentResultCase.expectedOutput?.includes("Custom Input") ? "Custom Input" : "Target ✓"}
                                   </span>
                                 </div>
-                                <div className="mt-1.5 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-300 font-bold whitespace-pre-wrap break-all min-h-[52px] shadow-inner leading-relaxed">
+                                <div className={`mt-1.5 p-3 rounded-xl border font-bold whitespace-pre-wrap break-all min-h-[52px] shadow-inner leading-relaxed ${
+                                  currentResultCase.expectedOutput?.includes("Custom Input")
+                                    ? "bg-blue-500/5 border-blue-500/20 text-blue-300"
+                                    : "bg-emerald-500/5 border-emerald-500/20 text-emerald-300"
+                                }`}>
                                   {currentResultCase.expectedOutput}
                                 </div>
                               </div>
