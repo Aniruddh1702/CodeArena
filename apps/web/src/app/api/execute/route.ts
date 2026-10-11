@@ -205,9 +205,10 @@ async function executePython(
   problem: any,
   testCases: TestCase[]
 ): Promise<ExecutionSummary> {
+  const targetMethod = problem?.methodName || "solution";
   // Try in-engine evaluation first for speed and reliable cloud execution
   try {
-    const transpiledJs = transpilePythonToJs(code, problem.methodName);
+    const transpiledJs = transpilePythonToJs(code, targetMethod);
     const inEngineSummary = evaluateJavaScript(transpiledJs, problem, testCases);
     if (inEngineSummary.status === "Accepted" || (inEngineSummary.status === "Wrong Answer" && inEngineSummary.testResults.length > 0)) {
       return inEngineSummary;
@@ -230,7 +231,7 @@ ${code}
 
 # Testcase Data
 test_cases = ${JSON.stringify(testCases)}
-method_name = "${problem.methodName}"
+method_name = "${targetMethod}"
 
 results = []
 sol = None
@@ -556,9 +557,10 @@ async function executeCpp(
   problem: any,
   testCases: TestCase[]
 ): Promise<ExecutionSummary> {
+  const targetMethod = problem?.methodName || "solution";
   // Try ultra-fast, robust transpiled in-engine evaluation first (guaranteed to work in serverless/Render/Docker environments)
   try {
-    const transpiledJs = transpileCppToJs(code, problem.methodName);
+    const transpiledJs = transpileCppToJs(code, targetMethod);
     const inEngineSummary = evaluateJavaScript(transpiledJs, problem, testCases);
     if (inEngineSummary.status === "Accepted" || (inEngineSummary.status === "Wrong Answer" && inEngineSummary.testResults.length > 0)) {
       return inEngineSummary;
@@ -571,7 +573,7 @@ async function executeCpp(
   const binPath = path.join(tmpDir, baseName);
 
   // Determine argument types for this problem
-  const defaultArgTypes = PROBLEM_CPP_META[problem.slug] || 
+  const defaultArgTypes = PROBLEM_CPP_META[problem?.slug || "two-sum"] || 
     (testCases[0]?.args || []).map((a: any) => inferCppType(a));
 
   // Build C++ test case invocations
@@ -595,7 +597,7 @@ ${argDecls}
         stringstream ss;
         auto oldBuf = cout.rdbuf(ss.rdbuf());
         try {
-            auto ret = sol.${problem.methodName}(${callArgs});
+            auto ret = sol.${targetMethod}(${callArgs});
             printJson(ret);
         } catch (const exception& e) {
             cout << "[Error: " << e.what() << "]";
@@ -988,8 +990,9 @@ async function executeJava(
   problem: any,
   testCases: TestCase[]
 ): Promise<ExecutionSummary> {
+  const targetMethod = problem?.methodName || "solution";
   // Check if Java code contains class Solution and the target method
-  if (!code.includes("class Solution") || !code.includes(problem.methodName)) {
+  if (!code.includes("class Solution") || !code.includes(targetMethod)) {
     return {
       status: "Compilation Error",
       statusColor: "text-red-500",
@@ -1005,9 +1008,9 @@ async function executeJava(
         expectedOutput: tc.output,
         actualOutput: "",
         stdout: "",
-        error: `Could not find class Solution or method ${problem.methodName}`
+        error: `Could not find class Solution or method ${targetMethod}`
       })),
-      errorDetails: `Could not find class Solution or method ${problem.methodName}. Please verify Java class and method signature.`
+      errorDetails: `Could not find class Solution or method ${targetMethod}. Please verify Java class and method signature.`
     };
   }
 
