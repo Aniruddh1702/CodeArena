@@ -20,7 +20,24 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { slug, language, code, isSubmission, customProblem, customTestCases } = body;
 
-    const problem = customProblem || getProblem(slug || "two-sum");
+    const problem = customProblem || getProblem(slug || "two-sum") || getProblem("two-sum");
+    if (!problem) {
+      return NextResponse.json(
+        {
+          status: "Runtime Error",
+          statusColor: "text-amber-500",
+          runtime: "0ms",
+          memory: "0MB",
+          totalTestCases: 0,
+          passedTestCases: 0,
+          failedTestCaseIndex: 0,
+          testResults: [],
+          errorDetails: `Problem not found for slug '${slug}'.`
+        },
+        { status: 404 }
+      );
+    }
+
     const testCases: TestCase[] = (customTestCases && Array.isArray(customTestCases) && customTestCases.length > 0)
       ? customTestCases
       : (isSubmission

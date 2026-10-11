@@ -66,6 +66,14 @@ export default function OrgTestsPage() {
 
     const nextList = [newTest, ...tests];
     saveTests(nextList);
+
+    // Save to server store
+    fetch("/api/org/tests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newTest),
+    }).catch(() => {});
+
     setNewTitle("");
     setIsCreateOpen(false);
   };

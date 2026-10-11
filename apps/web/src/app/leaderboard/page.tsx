@@ -142,11 +142,13 @@ export default function LeaderboardPage() {
       {/* Top Header */}
       <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="font-extrabold text-2xl tracking-tight text-foreground flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="text-primary-foreground text-sm font-black">C</span>
+          <Link href="/" className="group flex items-center gap-2.5">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
+              <span className="text-white text-base font-black">C</span>
             </div>
-            Code<span className="text-primary">Arena</span>
+            <span className="font-extrabold text-xl tracking-tight text-white">
+              Code<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">Arena</span>
+            </span>
           </Link>
           <nav className="hidden md:flex gap-8 text-sm font-medium">
             <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">Home</Link>

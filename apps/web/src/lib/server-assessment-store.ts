@@ -218,6 +218,24 @@ export function getAllAssessments(): AssessmentTest[] {
   return global.__codearena_server_assessments || DEFAULT_ASSESSMENTS;
 }
 
+export function saveAssessmentTest(test: AssessmentTest): AssessmentTest {
+  ensureInitialized();
+  if (!global.__codearena_server_assessments) {
+    global.__codearena_server_assessments = [...DEFAULT_ASSESSMENTS];
+  }
+  const idx = global.__codearena_server_assessments.findIndex((t) => t.id === test.id);
+  if (idx >= 0) {
+    global.__codearena_server_assessments[idx] = test;
+  } else {
+    global.__codearena_server_assessments.unshift(test);
+  }
+  writeToFile(
+    global.__codearena_server_assessments,
+    global.__codearena_server_assessment_students || {}
+  );
+  return test;
+}
+
 export function getAssessmentById(id: string): AssessmentTest | undefined {
   const tests = getAllAssessments();
   return tests.find((t) => t.id === id);
