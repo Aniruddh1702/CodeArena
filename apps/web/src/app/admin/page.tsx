@@ -52,22 +52,103 @@ const AVAILABLE_TOPICS = [
 function parseCustomArgs(raw: string): any[] {
   const trimmed = (raw || "").trim();
   if (!trimmed) return [];
-  const cleaned = trimmed.replace(/[a-zA-Z0-9_]+\s*=\s*/g, "");
+
+  // Try direct JSON parse first
   try {
-    return JSON.parse(`[${cleaned}]`);
+    const direct = JSON.parse(trimmed);
+    if (Array.isArray(direct)) return direct;
+    return [direct];
   } catch (e) {}
-  try {
-    const single = JSON.parse(cleaned);
-    return Array.isArray(single) ? [single] : [single];
-  } catch (e) {}
-  try {
-    const fn = new Function(`return [${cleaned}];`);
-    return fn();
-  } catch (e) {}
-  try {
-    return JSON.parse(`[${trimmed}]`);
-  } catch (e) {}
-  return [trimmed];
+
+  // Split into top-level arguments respecting quotes, brackets, braces, and parens
+  const parts: string[] = [];
+  let current = "";
+  let depthBracket = 0;
+  let depthBrace = 0;
+  let depthParen = 0;
+  let inQuote: string | null = null;
+  let escape = false;
+
+  for (let i = 0; i < trimmed.length; i++) {
+    const char = trimmed[i];
+    if (escape) {
+      current += char;
+      escape = false;
+      continue;
+    }
+    if (char === "\\") {
+      current += char;
+      escape = true;
+      continue;
+    }
+    if (inQuote) {
+      current += char;
+      if (char === inQuote) {
+        inQuote = null;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      inQuote = char;
+      current += char;
+      continue;
+    }
+    if (char === "[") { depthBracket++; current += char; continue; }
+    if (char === "]") { depthBracket = Math.max(0, depthBracket - 1); current += char; continue; }
+    if (char === "{") { depthBrace++; current += char; continue; }
+    if (char === "}") { depthBrace = Math.max(0, depthBrace - 1); current += char; continue; }
+    if (char === "(") { depthParen++; current += char; continue; }
+    if (char === ")") { depthParen = Math.max(0, depthParen - 1); current += char; continue; }
+
+    if (char === "," && depthBracket === 0 && depthBrace === 0 && depthParen === 0) {
+      if (current.trim()) {
+        parts.push(current.trim());
+      }
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  if (current.trim()) {
+    parts.push(current.trim());
+  }
+
+  if (parts.length === 0) return [trimmed];
+
+  const results: any[] = [];
+  for (const part of parts) {
+    // Strip leading parameter variable label like "nums = " or "target = "
+    let valStr = part.replace(/^[a-zA-Z0-9_$]+\s*=\s*/, "").trim();
+
+    // Normalize python booleans/null
+    if (valStr === "True") valStr = "true";
+    else if (valStr === "False") valStr = "false";
+    else if (valStr === "None") valStr = "null";
+
+    let parsed = false;
+    try {
+      results.push(JSON.parse(valStr));
+      parsed = true;
+    } catch (e) {}
+
+    if (!parsed) {
+      try {
+        const fn = new Function(`return (${valStr});`);
+        results.push(fn());
+        parsed = true;
+      } catch (e) {}
+    }
+
+    if (!parsed) {
+      if ((valStr.startsWith('"') && valStr.endsWith('"')) || (valStr.startsWith("'") && valStr.endsWith("'"))) {
+        results.push(valStr.slice(1, -1));
+      } else {
+        results.push(valStr);
+      }
+    }
+  }
+
+  return results;
 }
 
 const DEFAULT_SAMPLE_JSON = [
@@ -212,6 +293,8 @@ function AdminTiltCard({
   );
 }
 
+let sharedAudioCtx: AudioContext | null = null;
+
 export default function AdminPortalPage() {
   const router = useRouter();
 
@@ -242,7 +325,13 @@ export default function AdminPortalPage() {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) return;
-      const ctx = new AudioCtx();
+      if (!sharedAudioCtx || sharedAudioCtx.state === "closed") {
+        sharedAudioCtx = new AudioCtx();
+      }
+      if (sharedAudioCtx.state === "suspended") {
+        sharedAudioCtx.resume().catch(() => {});
+      }
+      const ctx = sharedAudioCtx;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       if (type === "blip") {
@@ -375,7 +464,7 @@ export default function AdminPortalPage() {
     { input: "nums = [3, 2, 4], target = 6", output: "[1, 2]", argsStr: "[[3, 2, 4], 6]", expectedStr: "[1, 2]", isPublic: true },
   ]);
 
-  const [formFeedback, setFormFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [formFeedback, setFormFeedback] = useState<{ type: "success" | "error"; message: string; slug?: string } | null>(null);
 
   // File Drop & Import State
   const [isDragging, setIsDragging] = useState(false);
@@ -479,12 +568,11 @@ export default function AdminPortalPage() {
       await fetch("/api/admin/users", { method: "DELETE" });
       setAllUsersList([]);
       const active = getActiveAccount();
-      if (active && (active.role === "SUPER_ADMIN" || active.role === "ADMIN")) {
-        localStorage.setItem("codearena_accounts", JSON.stringify([active]));
-        localStorage.setItem("codearena_active_account_id", active.id);
-      } else {
-        localStorage.removeItem("codearena_accounts");
-        localStorage.removeItem("codearena_active_account_id");
+      if (active) {
+        const preservedAdmin = { ...active, role: "SUPER_ADMIN" as const };
+        localStorage.setItem("codearena_accounts", JSON.stringify([preservedAdmin]));
+        localStorage.setItem("codearena_active_account_id", preservedAdmin.id);
+        localStorage.setItem("user", JSON.stringify(preservedAdmin));
       }
       setUserRoleFeedback("All student accounts cleared from the server and database for a fresh start.");
       setTimeout(() => setUserRoleFeedback(null), 4000);
@@ -764,9 +852,30 @@ export default function AdminPortalPage() {
     }
   }, []);
 
-  const loadQuestions = () => {
-    const list = getAllProblems();
-    const custom = getCustomProblems();
+  const loadQuestions = async () => {
+    let list = getAllProblems();
+    let custom = getCustomProblems();
+
+    // Hydrate server custom problems into local store if not present
+    try {
+      const res = await fetch("/api/admin/questions", { cache: "no-store" });
+      const json = await res.json().catch(() => null);
+      const serverCustom: ProblemDefinition[] = json?.customItems || [];
+      if (Array.isArray(serverCustom) && serverCustom.length > 0) {
+        let updatedLocal = false;
+        for (const item of serverCustom) {
+          if (!custom[item.slug]) {
+            saveCustomProblem(item);
+            updatedLocal = true;
+          }
+        }
+        if (updatedLocal) {
+          list = getAllProblems();
+          custom = getCustomProblems();
+        }
+      }
+    } catch (e) {}
+
     setAllQuestions(list);
     setCustomSlugs(new Set(Object.keys(custom)));
     setIsCustomOrderActive(getQuestionOrder() !== null);
@@ -834,21 +943,30 @@ export default function AdminPortalPage() {
   };
 
   const handleMoveQuestion = (slug: string, direction: "UP" | "DOWN") => {
-    const idx = allQuestions.findIndex(q => q.slug === slug);
-    if (idx < 0) return;
-    if (direction === "UP" && idx === 0) return;
-    if (direction === "DOWN" && idx === allQuestions.length - 1) return;
+    const isFiltered = filteredQuestions.length !== allQuestions.length;
+    const currentList = isFiltered ? filteredQuestions : allQuestions;
+    const currentIdx = currentList.findIndex(q => q.slug === slug);
+    if (currentIdx < 0) return;
+    if (direction === "UP" && currentIdx === 0) return;
+    if (direction === "DOWN" && currentIdx === currentList.length - 1) return;
 
-    const targetIdx = direction === "UP" ? idx - 1 : idx + 1;
+    const targetItem = currentList[direction === "UP" ? currentIdx - 1 : currentIdx + 1];
+    if (!targetItem) return;
+
     const newAll = [...allQuestions];
-    const [moved] = newAll.splice(idx, 1);
-    newAll.splice(targetIdx, 0, moved);
+    const realFromIdx = newAll.findIndex(q => q.slug === slug);
+    const realToIdx = newAll.findIndex(q => q.slug === targetItem.slug);
 
-    setAllQuestions(newAll);
-    saveQuestionOrder(newAll.map(q => q.slug));
-    setIsCustomOrderActive(true);
-    setOrderFeedback(`✓ Moved "${moved.title}" ${direction === "UP" ? "up" : "down"} to position #${targetIdx + 1}`);
-    setTimeout(() => setOrderFeedback(null), 3500);
+    if (realFromIdx >= 0 && realToIdx >= 0) {
+      const [moved] = newAll.splice(realFromIdx, 1);
+      newAll.splice(realToIdx, 0, moved);
+
+      setAllQuestions(newAll);
+      saveQuestionOrder(newAll.map(q => q.slug));
+      setIsCustomOrderActive(true);
+      setOrderFeedback(`✓ Moved "${moved.title}" ${direction === "UP" ? "above" : "below"} "${targetItem.title}" (position #${realToIdx + 1})`);
+      setTimeout(() => setOrderFeedback(null), 3500);
+    }
   };
 
   const handleSortByDifficulty = () => {
@@ -929,6 +1047,9 @@ export default function AdminPortalPage() {
 
       setIsAuthorized(true);
       localStorage.setItem("codearena_admin_authorized", "true");
+      if (typeof document !== "undefined") {
+        document.cookie = "codearena_admin_auth=true; path=/; max-age=86400; SameSite=Lax";
+      }
       loadQuestions();
       loadUsers();
       loadContests();
@@ -945,6 +1066,44 @@ export default function AdminPortalPage() {
     document.cookie = "codearena_admin_auth=; path=/; max-age=0";
     setIsAuthorized(false);
   };
+
+  // Auto-lock admin session on inactivity based on adminProfile.sessionTimeout
+  useEffect(() => {
+    if (!isAuthorized || typeof window === "undefined") return;
+    const timeoutSetting = adminProfile.sessionTimeout || "8h";
+    if (timeoutSetting === "never") return;
+
+    const timeoutMap: Record<string, number> = {
+      "15m": 15 * 60 * 1000,
+      "1h": 60 * 60 * 1000,
+      "8h": 8 * 60 * 60 * 1000,
+    };
+    const maxInactiveMs = timeoutMap[timeoutSetting] || 8 * 60 * 60 * 1000;
+
+    let lastActive = Date.now();
+    const updateActivity = () => {
+      lastActive = Date.now();
+    };
+
+    window.addEventListener("mousemove", updateActivity, { passive: true });
+    window.addEventListener("keydown", updateActivity, { passive: true });
+    window.addEventListener("click", updateActivity, { passive: true });
+    window.addEventListener("scroll", updateActivity, { passive: true });
+
+    const checker = setInterval(() => {
+      if (Date.now() - lastActive > maxInactiveMs) {
+        handleLockAdmin();
+      }
+    }, 15000);
+
+    return () => {
+      clearInterval(checker);
+      window.removeEventListener("mousemove", updateActivity);
+      window.removeEventListener("keydown", updateActivity);
+      window.removeEventListener("click", updateActivity);
+      window.removeEventListener("scroll", updateActivity);
+    };
+  }, [isAuthorized, adminProfile.sessionTimeout]);
 
   const handleSaveAdminProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1237,15 +1396,16 @@ export default function AdminPortalPage() {
       console.warn("Backend sync optional:", e);
     }
 
+    const savedSlug = problemToSave.slug;
+    if (!editingSlug) {
+      handleResetForm();
+    }
     loadQuestions();
     setFormFeedback({
       type: "success",
       message: `Question "${problemToSave.title}" saved successfully! It is now live in the practice bank and IDE.`,
+      slug: savedSlug,
     });
-
-    if (!editingSlug) {
-      handleResetForm();
-    }
   };
 
   // Delete Question
@@ -1263,27 +1423,31 @@ export default function AdminPortalPage() {
     }
   };
 
-  // Export JSON
+  // Export JSON via Blob to support large payloads without URI length limits
   const handleExportJson = () => {
     const questions = getAllProblems();
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions, null, 2));
+    const blob = new Blob([JSON.stringify(questions, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("href", url);
     downloadAnchor.setAttribute("download", `codearena_questions_backup_${Date.now()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
-  // Download Sample Template
+  // Download Sample Template via Blob
   const handleDownloadTemplate = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DEFAULT_SAMPLE_JSON, null, 2));
+    const blob = new Blob([JSON.stringify(DEFAULT_SAMPLE_JSON, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("href", url);
     downloadAnchor.setAttribute("download", "codearena_sample_question_template.json");
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // Process Uploaded File with strict security validation (.json, .pdf, .txt, .md)
@@ -1361,6 +1525,15 @@ export default function AdminPortalPage() {
   // Structured PDF / Text Question Extractor
   const parsePdfOrTextProblemSheet = (content: string, fileName: string, formatType: string) => {
     try {
+      if (formatType === "PDF" && (content.startsWith("%PDF-") || content.includes("/FlateDecode"))) {
+        setImportFeedback({
+          type: "error",
+          message: `Notice: "${fileName}" is a binary-encoded PDF. For accurate problem generation, please copy the problem text into the input field or upload as a .JSON / .MD document.`,
+        });
+        setParsedImportItems([]);
+        return;
+      }
+
       const cleanText = content.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, " ").trim();
       if (!cleanText || cleanText.length < 10) {
         throw new Error("Document does not contain readable problem text.");
@@ -1730,10 +1903,17 @@ export default function AdminPortalPage() {
   // Full Admin Portal (Directly rendered for Admin - Glassmorphism Theme)
   return (
     <div className="min-h-screen bg-[#070b16] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200 relative overflow-x-hidden font-sans">
-      {/* Glassmorphic Ambient Luminous Refraction Orbs */}
-      <div className="fixed -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-cyan-500/20 blur-[140px] pointer-events-none z-0" />
-      <div className="fixed top-1/4 -right-40 w-[650px] h-[650px] rounded-full bg-purple-600/20 blur-[150px] pointer-events-none z-0" />
-      <div className="fixed -bottom-40 left-1/3 w-[600px] h-[600px] rounded-full bg-emerald-500/15 blur-[150px] pointer-events-none z-0" />
+      {/* Glassmorphic Ambient Luminous Refraction Orbs (Dynamic to HUD Theme Preset) */}
+      <div className={`fixed -top-40 -left-40 w-[600px] h-[600px] rounded-full blur-[140px] pointer-events-none z-0 transition-all duration-700 ${
+        adminProfile.themeColor === "rose" ? "bg-rose-500/25" :
+        adminProfile.themeColor === "amber" ? "bg-amber-500/25" :
+        adminProfile.themeColor === "purple" ? "bg-purple-600/25" :
+        adminProfile.themeColor === "indigo" ? "bg-indigo-600/25" :
+        adminProfile.themeColor === "cyan" ? "bg-cyan-500/25" :
+        "bg-emerald-500/25"
+      }`} />
+      <div className="fixed top-1/4 -right-40 w-[650px] h-[650px] rounded-full bg-purple-600/15 blur-[150px] pointer-events-none z-0" />
+      <div className="fixed -bottom-40 left-1/3 w-[600px] h-[600px] rounded-full bg-cyan-500/15 blur-[150px] pointer-events-none z-0" />
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:24px_24px] opacity-40 z-0" />
 
       {/* Top Floating Frosted Glass Admin Header */}
@@ -1844,6 +2024,37 @@ export default function AdminPortalPage() {
               <span>🔒</span> <span className="hidden sm:inline">[LOCK]</span>
             </Button>
           </div>
+        </div>
+
+        {/* Mobile / Tablet Horizontal Navigation Scroll Bar */}
+        <div className="flex lg:hidden overflow-x-auto no-scrollbar gap-1.5 px-4 sm:px-6 py-2 border-t border-white/5 bg-slate-950/40 backdrop-blur-xl">
+          {[
+            { id: "overview", label: "OVERVIEW", icon: "⚡" },
+            { id: "questions", label: `QUESTIONS (${allQuestions.length})`, icon: "📚" },
+            { id: "contests", label: `CONTESTS (${contestsList.length})`, icon: "🏆", action: loadContests },
+            { id: "create", label: "CREATOR", icon: "➕" },
+            { id: "import", label: "IMPORT", icon: "📁" },
+            { id: "users", label: `ROSTER (${allUsersList.length})`, icon: "👥", action: loadUsers },
+            { id: "system", label: "HEALTH", icon: "🎛️" },
+            { id: "profile", label: "VAULT", icon: "🛡️" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                playCyberSound("blip");
+                if (tab.action) tab.action();
+              }}
+              className={`whitespace-nowrap flex-shrink-0 transition-all px-2.5 py-1.5 rounded-xl text-[11px] font-mono flex items-center gap-1.5 ${
+                activeTab === tab.id
+                  ? "bg-white/15 text-white border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.12),inset_0_1px_1px_rgba(255,255,255,0.25)] font-bold backdrop-blur-xl"
+                  : "text-slate-300 hover:text-white hover:bg-white/[0.06] border border-transparent backdrop-blur-md"
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </div>
       </header>
 
@@ -2155,7 +2366,7 @@ export default function AdminPortalPage() {
 
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between font-mono">
                   <span className="text-[10px] text-slate-400">
-                    {contestsList.reduce((acc, c) => acc + (c.participantsCount || 0), 0)} Registrations
+                    {contestsList.reduce((acc, c) => acc + Math.max(c.participantsCount || 0, (c.registeredUsers || []).length), 0)} Registrations
                   </span>
                   <button
                     onClick={() => {
@@ -2307,9 +2518,9 @@ export default function AdminPortalPage() {
                     setActiveTab("create");
                     playCyberSound("blip");
                   }}
-                  className="group p-4 rounded-xl border border-emerald-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-emerald-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
+                  className="group p-4 rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 hover:bg-slate-900/60 hover:border-emerald-400/50 backdrop-blur-2xl transition-all duration-200 text-left flex items-start gap-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-inner">
                     ➕
                   </div>
                   <div className="flex-1 min-w-0 font-mono">
@@ -2329,9 +2540,9 @@ export default function AdminPortalPage() {
                     loadContests();
                     playCyberSound("blip");
                   }}
-                  className="group p-4 rounded-xl border border-amber-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-amber-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
+                  className="group p-4 rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-400/50 backdrop-blur-2xl transition-all duration-200 text-left flex items-start gap-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-inner">
                     🏆
                   </div>
                   <div className="flex-1 min-w-0 font-mono">
@@ -2350,9 +2561,9 @@ export default function AdminPortalPage() {
                     setActiveTab("import");
                     playCyberSound("blip");
                   }}
-                  className="group p-4 rounded-xl border border-cyan-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-cyan-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
+                  className="group p-4 rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 hover:bg-slate-900/60 hover:border-cyan-400/50 backdrop-blur-2xl transition-all duration-200 text-left flex items-start gap-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-inner">
                     📁
                   </div>
                   <div className="flex-1 min-w-0 font-mono">
@@ -2372,9 +2583,9 @@ export default function AdminPortalPage() {
                     loadUsers();
                     playCyberSound("blip");
                   }}
-                  className="group p-4 rounded-xl border border-sky-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-sky-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
+                  className="group p-4 rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 hover:bg-slate-900/60 hover:border-sky-400/50 backdrop-blur-2xl transition-all duration-200 text-left flex items-start gap-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-inner">
                     👥
                   </div>
                   <div className="flex-1 min-w-0 font-mono">
@@ -2393,9 +2604,9 @@ export default function AdminPortalPage() {
                     setActiveTab("profile");
                     playCyberSound("blip");
                   }}
-                  className="group p-4 rounded-xl border border-emerald-500/25 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-emerald-400 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
+                  className="group p-4 rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 hover:bg-slate-900/60 hover:border-emerald-400/50 backdrop-blur-2xl transition-all duration-200 text-left flex items-start gap-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-inner">
                     🛡️
                   </div>
                   <div className="flex-1 min-w-0 font-mono">
@@ -2414,15 +2625,15 @@ export default function AdminPortalPage() {
                     handleExportJson();
                     playCyberSound("success");
                   }}
-                  className="group p-4 rounded-xl border border-slate-700 bg-[#0a0f19] hover:bg-[#0e1624] hover:border-slate-500 transition-all duration-200 text-left flex items-start gap-3.5 shadow-md relative overflow-hidden"
+                  className="group p-4 rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 hover:bg-slate-900/60 hover:border-cyan-400/50 backdrop-blur-2xl transition-all duration-200 text-left flex items-start gap-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/15 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-inner">
                     📥
                   </div>
                   <div className="flex-1 min-w-0 font-mono">
                     <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
                       <span>[06: GLOBAL_EXPORT]</span>
-                      <span className="text-xs text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+                      <span className="text-xs text-cyan-400 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
                     <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
                       Download complete JSON backup of all problems and test cases for disaster recovery.
@@ -2436,8 +2647,8 @@ export default function AdminPortalPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left: Topic Breakdown & Difficulty Visualizer (7 cols) */}
               <div className="lg:col-span-7 space-y-4">
-                <div className="rounded-xl border border-emerald-500/25 bg-[#0a0f19]/95 backdrop-blur-md p-5 shadow-lg space-y-4 font-mono">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#18263a]">
+                <div className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 backdrop-blur-2xl p-5 shadow-[0_16px_50px_rgba(0,0,0,0.4)] space-y-4 font-mono">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
                     <div>
                       <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
                         <span className="text-emerald-400">📊</span> // ALGORITHMIC_TOPIC_MATRIX
@@ -2446,7 +2657,7 @@ export default function AdminPortalPage() {
                         Filter questions by classification topic across the platform
                       </p>
                     </div>
-                    <span className="text-xs text-emerald-400">
+                    <span className="text-xs text-emerald-400 font-bold">
                       [{AVAILABLE_TOPICS.length} TOPICS]
                     </span>
                   </div>
@@ -2464,12 +2675,12 @@ export default function AdminPortalPage() {
                             setActiveTab("questions");
                             playCyberSound("blip");
                           }}
-                          className="px-2.5 py-1.5 rounded-lg bg-[#0e1626] hover:bg-emerald-500/15 hover:border-emerald-400/60 border border-[#1a293f] text-xs transition-all flex items-center gap-1.5 group"
+                          className="px-2.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-emerald-500/15 hover:border-emerald-400/60 border border-white/10 text-xs transition-all flex items-center gap-1.5 group backdrop-blur-md"
                         >
                           <span className="text-slate-300 group-hover:text-emerald-300 transition-colors">
                             {topic}
                           </span>
-                          <span className="px-1.5 py-0.2 rounded bg-[#080d17] text-[10px] text-emerald-400 font-bold border border-[#1a293f]">
+                          <span className="px-1.5 py-0.2 rounded-md bg-white/[0.06] text-[10px] text-emerald-400 font-bold border border-white/10">
                             {count}
                           </span>
                         </button>
@@ -2477,7 +2688,7 @@ export default function AdminPortalPage() {
                     })}
                   </div>
 
-                  <div className="p-3 rounded-lg bg-[#080e18] border border-[#162235] flex items-center justify-between text-xs">
+                  <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-xs backdrop-blur-md">
                     <div className="flex items-center gap-2 text-slate-400">
                       <span className="text-emerald-400">⚡</span>
                       <span>Custom topics dynamically indexed upon question authoring.</span>
@@ -2489,7 +2700,7 @@ export default function AdminPortalPage() {
                         setActiveTab("create");
                         playCyberSound("blip");
                       }}
-                      className="h-7 text-xs font-mono font-bold text-emerald-400 hover:bg-emerald-500/15"
+                      className="h-7 text-xs font-mono font-bold text-emerald-400 hover:bg-emerald-500/15 rounded-lg"
                     >
                       [+ ADD_TOPIC]
                     </Button>
@@ -2499,8 +2710,8 @@ export default function AdminPortalPage() {
 
               {/* Right: Live Audit & Activity Stream (5 cols) */}
               <div className="lg:col-span-5 space-y-4">
-                <div className="rounded-xl border border-emerald-500/25 bg-[#0a0f19]/95 backdrop-blur-md p-5 shadow-lg space-y-3 font-mono">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#18263a]">
+                <div className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 backdrop-blur-2xl p-5 shadow-[0_16px_50px_rgba(0,0,0,0.4)] space-y-3 font-mono">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
                     <div>
                       <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
                         <span className="text-emerald-400">🛰️</span> // KERNEL_AUDIT_STREAM
@@ -2514,7 +2725,7 @@ export default function AdminPortalPage() {
                         playCyberSound("blip");
                         handleRunHealthDiagnostic();
                       }}
-                      className="p-1.5 rounded-lg bg-[#0e1626] border border-[#1b2b42] hover:border-emerald-400 text-emerald-400 text-xs"
+                      className="p-1.5 rounded-xl bg-white/[0.04] border border-white/10 hover:border-emerald-400 text-emerald-400 text-xs backdrop-blur-md transition-colors"
                       title="Run Diagnostic Ping"
                     >
                       🔄
@@ -2530,10 +2741,10 @@ export default function AdminPortalPage() {
                           setAuditFilter(filter);
                           playCyberSound("blip");
                         }}
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider font-bold transition-colors ${
+                        className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono uppercase tracking-wider font-bold transition-all backdrop-blur-md ${
                           auditFilter === filter
-                            ? "bg-emerald-500 text-black border border-emerald-300"
-                            : "bg-[#0e1626] text-slate-400 border border-[#1b2b42] hover:text-slate-200"
+                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+                            : "bg-white/[0.04] text-slate-400 border border-white/10 hover:text-slate-200"
                         }`}
                       >
                         {filter}
@@ -2560,7 +2771,7 @@ export default function AdminPortalPage() {
                         return (
                           <div
                             key={log.id}
-                            className="p-2.5 rounded-lg bg-[#070b13] border border-[#141e2e] flex items-start gap-2.5 text-xs animate-in fade-in"
+                            className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-start gap-2.5 text-xs animate-in fade-in backdrop-blur-md"
                           >
                             <span className="text-sm mt-0.5">{iconMap[log.type]}</span>
                             <div className="flex-1 min-w-0">
@@ -3194,8 +3405,8 @@ export default function AdminPortalPage() {
                     >
                       <span>{formFeedback.type === "success" ? "✓" : "⚠️"}</span>
                       <span>{formFeedback.message}</span>
-                      {formFeedback.type === "success" && (
-                        <Link href={`/problems/${formData.slug || autoGenerateTemplates(formData.title).slug}`} target="_blank" className="underline ml-auto font-bold text-emerald-300 hover:text-emerald-200">
+                      {formFeedback.type === "success" && formFeedback.slug && (
+                        <Link href={`/problems/${formFeedback.slug}`} target="_blank" className="underline ml-auto font-bold text-emerald-300 hover:text-emerald-200">
                           Open in IDE &rarr;
                         </Link>
                       )}
@@ -3597,10 +3808,18 @@ export default function AdminPortalPage() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => {
+                    onClick={async () => {
                       if (confirm("Are you sure you want to delete all custom questions? This action cannot be undone.")) {
                         localStorage.removeItem("customProblems");
-                        loadQuestions();
+                        resetQuestionOrder();
+                        try {
+                          await fetch("/api/admin/questions?clearAll=true", { method: "DELETE" });
+                        } catch (e) {}
+                        if (typeof window !== "undefined") {
+                          window.dispatchEvent(new CustomEvent("codearena_problems_updated", { detail: { reset: true } }));
+                        }
+                        await loadQuestions();
+                        playCyberSound("alert");
                         alert("Custom questions reset to factory defaults.");
                       }
                     }}

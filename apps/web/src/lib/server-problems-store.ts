@@ -53,3 +53,14 @@ export function deleteCustomProblemServer(slug: string): boolean {
   return false;
 }
 
+export function clearAllCustomProblemsServer(): boolean {
+  try {
+    if (fs.existsSync(FILE_PATH)) {
+      fs.writeFileSync(FILE_PATH, JSON.stringify({}, null, 2), "utf-8");
+      return true;
+    }
+  } catch (e) {
+    console.error("Error clearing server custom problems:", e);
+  }
+  return false;
+}

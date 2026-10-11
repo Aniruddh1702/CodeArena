@@ -400,6 +400,16 @@ export async function startContestNow(id: string): Promise<Contest | null> {
 
   await saveContest(contest);
 
+  // Broadcast immediate LIVE alert to students
+  saveNotification({
+    title: "🟢 Contest is LIVE Now!",
+    message: `'${contest.title}' is now live! Enter the arena and start solving challenges.`,
+    type: "CONTEST_LIVE",
+    contestId: contest.id,
+    contestTitle: contest.title,
+    actionUrl: `/contests/${contest.id}`,
+  });
+
   try {
     await fetch(`/api/contests/${id}`, {
       method: "PATCH",

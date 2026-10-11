@@ -1,16 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
 import { ProblemDefinition } from "@/lib/problems-data";
-import { saveCustomProblemServer, deleteCustomProblemServer } from "@/lib/server-problems-store";
+import { saveCustomProblemServer, deleteCustomProblemServer, clearAllCustomProblemsServer, getServerCustomProblems } from "@/lib/server-problems-store";
 
 export async function GET(req: NextRequest) {
   try {
     const apiUrl = getBackendApiUrl();
-    const res = await fetch(`${apiUrl}/api/questions?pageSize=100`, {
-      headers: { "Content-Type": "application/json" },
+    const serverCustom = Object.values(getServerCustomProblems());
+    let backendItems: any[] = [];
+    try {
+      const res = await fetch(`${apiUrl}/api/questions?pageSize=100`, {
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+      const data = await res.json().catch(() => null);
+      backendItems = data?.data?.items || data?.items || [];
+    } catch (e) {}
+
+    const map = new Map<string, any>();
+    for (const item of backendItems) {
+      if (item.slug) map.set(item.slug, item);
+    }
+    for (const item of serverCustom) {
+      if (item.slug) map.set(item.slug, item);
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: { items: Array.from(map.values()) },
+      customItems: serverCustom,
     });
-    const data = await res.json().catch(() => null);
-    return NextResponse.json(data || { success: true, data: { items: [] } });
   } catch (err: any) {
     return NextResponse.json(
       { success: false, message: err.message || "Failed to fetch questions" },
@@ -127,6 +146,12 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
+    const clearAll = searchParams.get("clearAll");
+    if (clearAll === "true") {
+      const cleared = clearAllCustomProblemsServer();
+      return NextResponse.json({ success: true, message: "All server custom questions cleared", cleared });
+    }
+
     const slug = searchParams.get("slug");
     if (!slug) {
       return NextResponse.json({ success: false, message: "Missing slug parameter" }, { status: 400 });

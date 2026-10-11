@@ -198,19 +198,30 @@ export function getAllProblems(): ProblemDefinition[] {
     : null;
 
   return [...allList].sort((a, b) => {
+    // If an explicit custom order was established by Admin, prioritize it
+    if (orderMap) {
+      const idxA = orderMap.has(a.slug) ? orderMap.get(a.slug)! : 9999;
+      const idxB = orderMap.has(b.slug) ? orderMap.get(b.slug)! : 9999;
+      if (idxA !== idxB) {
+        return idxA - idxB;
+      }
+    }
+
     const diffA = diffScore[a.difficulty] || 2;
     const diffB = diffScore[b.difficulty] || 2;
 
-    // Strict Primary Sort: Difficulty (EASY -> MEDIUM -> HARD)
+    // Default Primary Sort: Difficulty (EASY -> MEDIUM -> HARD)
     if (diffA !== diffB) {
       return diffA - diffB;
     }
 
-    // Secondary Sort within same difficulty
-    const subA = getSubOrder(a, orderMap);
-    const subB = getSubOrder(b, orderMap);
-    if (subA !== subB) {
-      return subA - subB;
+    // Secondary Sort within same difficulty (Basic beginner problems first)
+    const basicA = BASIC_SLUGS_ORDER.indexOf(a.slug);
+    const basicB = BASIC_SLUGS_ORDER.indexOf(b.slug);
+    if (basicA !== -1 || basicB !== -1) {
+      const scoreA = basicA !== -1 ? basicA : 999;
+      const scoreB = basicB !== -1 ? basicB : 999;
+      if (scoreA !== scoreB) return scoreA - scoreB;
     }
 
     return a.title.localeCompare(b.title);
