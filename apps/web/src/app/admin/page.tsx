@@ -699,6 +699,7 @@ export default function AdminPortalPage() {
     selectedProblems: [] as ContestProblem[],
     isRated: true,
   });
+  const [editingContestId, setEditingContestId] = useState<string | null>(null);
   const [contestProblemSearch, setContestProblemSearch] = useState("");
   const [contestProblemDiffFilter, setContestProblemDiffFilter] = useState("ALL");
   const [contestFeedback, setContestFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -816,7 +817,7 @@ export default function AdminPortalPage() {
       );
 
       const newContest: Contest = {
-        id: `contest-${Date.now()}`,
+        id: editingContestId || `contest-${Date.now()}`,
         title: contestTitle,
         description: contestFormData.description.trim() || "Algorithmic contest hosted on CodeArena. Compete in real time and top the live leaderboard!",
         startTime: timing.startTime,
@@ -839,11 +840,14 @@ export default function AdminPortalPage() {
       await loadContests();
       setContestFeedback({
         type: "success",
-        message: timing.status === "LIVE"
+        message: editingContestId
+          ? `💾 Contest '${newContest.title}' updated successfully!`
+          : timing.status === "LIVE"
           ? `🟢 Contest '${newContest.title}' is now LIVE! Live contest arena opened.`
           : `📅 Contest '${newContest.title}' successfully SCHEDULED for ${timing.startFormatted}! In-App & Gmail 1-hour reminders armed.`
       });
 
+      setEditingContestId(null);
       // Reset form to next scheduled slot
       setContestFormData({
         title: "",
@@ -862,6 +866,41 @@ export default function AdminPortalPage() {
         message: `Failed to create contest: ${err?.message || "Unknown error"}`
       });
     }
+  };
+
+  const handleEditContest = (contest: Contest) => {
+    setEditingContestId(contest.id);
+    setContestFormData({
+      title: contest.title,
+      description: contest.description,
+      durationMinutes: contest.durationMinutes,
+      startTimeOption: "custom",
+      customStartTime: contest.startTime ? contest.startTime.slice(0, 16) : getFutureDateTimeLocalString(60),
+      selectedProblems: contest.problems || [],
+      isRated: contest.isRated,
+    });
+    setContestFeedback({
+      type: "success",
+      message: `Loaded "${contest.title}" for editing. Update fields and click Save Contest.`,
+    });
+    const formElem = document.getElementById("contest-builder-card");
+    if (formElem) {
+      formElem.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleCancelEditContest = () => {
+    setEditingContestId(null);
+    setContestFormData({
+      title: "",
+      description: "",
+      durationMinutes: 90,
+      startTimeOption: "1hour",
+      customStartTime: getFutureDateTimeLocalString(60),
+      selectedProblems: [],
+      isRated: true,
+    });
+    setContestFeedback(null);
   };
 
   const handleStartContestNow = async (id: string) => {
@@ -1440,9 +1479,8 @@ export default function AdminPortalPage() {
     }
 
     const savedSlug = problemToSave.slug;
-    if (!editingSlug) {
-      handleResetForm();
-    }
+    setEditingSlug(null);
+    handleResetForm();
     loadQuestions();
     setFormFeedback({
       type: "success",
@@ -4142,18 +4180,30 @@ export default function AdminPortalPage() {
             })()}
 
             {/* Create & Launch Contest Builder */}
-            <Card className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 shadow-[0_16px_50px_rgba(0,0,0,0.4)] overflow-hidden text-slate-100 backdrop-blur-2xl">
+            <Card id="contest-builder-card" className="rounded-2xl border border-white/10 border-t-white/25 bg-slate-900/40 shadow-[0_16px_50px_rgba(0,0,0,0.4)] overflow-hidden text-slate-100 backdrop-blur-2xl">
               <CardHeader className="bg-white/[0.02] border-b border-white/10 pb-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] font-mono text-amber-400 tracking-widest uppercase mb-0.5">// TOURNAMENT_ORCHESTRATOR // BUILDER</div>
+                    <div className="text-[10px] font-mono text-amber-400 tracking-widest uppercase mb-0.5">
+                      // TOURNAMENT_ORCHESTRATOR // {editingContestId ? "EDIT_MODE" : "BUILDER"}
+                    </div>
                     <CardTitle className="text-lg font-mono font-bold flex items-center gap-2 text-slate-100">
-                      <span>🚀</span> Create & Launch New Contest
+                      <span>{editingContestId ? "✏️" : "🚀"}</span> {editingContestId ? "Edit & Update Contest" : "Create & Launch New Contest"}
                     </CardTitle>
                     <CardDescription className="text-xs font-mono text-slate-400">
-                      Pick questions from the 150 DSA bank, set timing & duration, and start contests instantly for all students.
+                      {editingContestId ? "Modify timing, description, problem set, and scoring for this contest." : "Pick questions from the 150 DSA bank, set timing & duration, and start contests instantly for all students."}
                     </CardDescription>
                   </div>
+                  {editingContestId && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleCancelEditContest}
+                      className="h-8 text-xs font-mono rounded-lg border-amber-500/30 text-amber-300 hover:bg-amber-500/10"
+                    >
+                      Cancel Edit
+                    </Button>
+                  )}
                 </div>
               </CardHeader>
 
@@ -4552,6 +4602,15 @@ export default function AdminPortalPage() {
                                     <span>👁️</span> Arena
                                   </Button>
                                 </Link>
+
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEditContest(contest)}
+                                  className="h-7 text-[11px] font-mono rounded-lg border-white/10 bg-white/[0.04] text-amber-300 hover:bg-amber-500/15 gap-1 backdrop-blur-md"
+                                >
+                                  <span>✏️</span> Edit
+                                </Button>
 
                                 <Button
                                   size="sm"

@@ -301,6 +301,10 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
   // Real Code Execution against Test Cases
   const handleExecute = async (isSubmission: boolean) => {
     if (battleOverRef.current) return;
+    if (activeAccount?.status === "BANNED" || activeAccount?.isBanned) {
+      alert("Your account has been suspended by an Administrator. Battle execution is disabled.");
+      return;
+    }
     const currentCode = (codes[language] || "").trim();
     const starter = (problem.starterCode[language] || "").trim();
 

@@ -1023,7 +1023,13 @@ export default function DashboardPage() {
               </div>
 
               <button
-                onClick={() => setMatchmakingActive(!matchmakingActive)}
+                onClick={() => {
+                  if (activeAccount?.status === "BANNED" || activeAccount?.isBanned) {
+                    alert("Your account has been suspended by an Administrator. 1v1 Battle arena is disabled.");
+                    return;
+                  }
+                  setMatchmakingActive(!matchmakingActive);
+                }}
                 className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg ${
                   matchmakingActive
                     ? "bg-rose-500 text-white shadow-rose-500/30 animate-pulse"

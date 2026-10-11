@@ -60,6 +60,11 @@ export default function ExamEnvironment({ params }: { params: { id: string } }) 
       router.push(`/login?redirect=/assessments/${params.id}`);
       return;
     }
+    if (active.status === "BANNED" || active.isBanned) {
+      alert("Your account has been suspended by an Administrator. Assessment access is disabled.");
+      router.push("/assessments");
+      return;
+    }
     setActiveAccount(active);
 
     // Fetch test details or build from standard assessments

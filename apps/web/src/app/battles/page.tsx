@@ -52,6 +52,11 @@ export default function BattlesLobbyPage() {
   ];
 
   const findMatch = () => {
+    const active = getActiveAccount();
+    if (active?.status === "BANNED" || active?.isBanned) {
+      alert("Your account has been suspended by an Administrator. 1v1 Battle arena is disabled.");
+      return;
+    }
     setSearching(true);
     // Simulate socket matchmaking delay
     setTimeout(() => {

@@ -168,7 +168,13 @@ export default function AssessmentsPage() {
                           </Button>
                         </Link>
                         <Button
-                          onClick={() => router.push(`/assessments/${test.id}`)}
+                          onClick={() => {
+                            if (activeAccount?.status === "BANNED" || activeAccount?.isBanned) {
+                              alert("Your account has been suspended by an Administrator. Assessment access is disabled.");
+                              return;
+                            }
+                            router.push(`/assessments/${test.id}`);
+                          }}
                           disabled={isScheduledFuture}
                           className="h-9 px-5 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm shadow-primary/25"
                         >
