@@ -515,7 +515,6 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         testResults: data.testResults
       };
 
-      const activeAcc = getActiveAccount();
       const activeId = activeAcc?.id || "default";
 
       // Save submission scoped to active user
