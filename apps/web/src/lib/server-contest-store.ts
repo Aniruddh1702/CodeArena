@@ -52,89 +52,10 @@ declare global {
   var __codearena_server_submissions: Record<string, ContestSubmission[]> | undefined;
 }
 
-const DEFAULT_SERVER_CONTESTS: Contest[] = [
-  {
-    id: "contest-weekly-clash-1",
-    title: "CodeArena Bi-Weekly Clash #1",
-    description: "Compete against engineers worldwide in our bi-weekly algorithm challenge. 4 algorithmic challenges from Easy to Hard.",
-    startTime: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    durationMinutes: 90,
-    endTime: new Date(Date.now() + 75 * 60 * 1000).toISOString(),
-    status: "LIVE",
-    problems: [
-      {
-        problemSlug: "two-sum",
-        title: "Two Sum",
-        difficulty: "EASY",
-        points: 100,
-        problemDef: PROBLEMS_DATABASE["two-sum"]
-      },
-      {
-        problemSlug: "container-with-most-water",
-        title: "Container With Most Water",
-        difficulty: "MEDIUM",
-        points: 200,
-        problemDef: PROBLEMS_DATABASE["container-with-most-water"]
-      },
-      {
-        problemSlug: "coin-change",
-        title: "Coin Change",
-        difficulty: "MEDIUM",
-        points: 300,
-        problemDef: PROBLEMS_DATABASE["coin-change"]
-      },
-      {
-        problemSlug: "trapping-rain-water",
-        title: "Trapping Rain Water",
-        difficulty: "HARD",
-        points: 500,
-        problemDef: PROBLEMS_DATABASE["trapping-rain-water"]
-      }
-    ],
-    participantsCount: 42,
-    registeredUsers: ["admin@codearena.io", "alex.dev@gmail.com", "sarah.coder@outlook.com", "vikram.singh@iit.ac.in"],
-    isRated: true,
-    rules: [
-      "No external AI coding assistance during the live window.",
-      "Each incorrect submission incurs a 5-minute time penalty upon solving.",
-      "Rankings are decided by total score, then lowest penalty time."
-    ],
-    createdAt: new Date().toISOString()
-  }
-];
+// Contests are empty by default - only exist when created/scheduled by admin
+const DEFAULT_SERVER_CONTESTS: Contest[] = [];
 
-const DEFAULT_SERVER_SUBMISSIONS: Record<string, ContestSubmission[]> = {
-  "contest-weekly-clash-1": [
-    {
-      id: "sub_server_1",
-      contestId: "contest-weekly-clash-1",
-      userEmail: "alex.dev@gmail.com",
-      userName: "Alex Dev",
-      problemSlug: "two-sum",
-      problemTitle: "Two Sum",
-      language: "javascript",
-      code: `var twoSum = function(nums, target) {
-    const map = new Map();
-    for (let i = 0; i < nums.length; i++) {
-        const complement = target - nums[i];
-        if (map.has(complement)) {
-            return [map.get(complement), i];
-        }
-        map.set(nums[i], i);
-    }
-    return [];
-};`,
-      runtime: "48 ms",
-      memory: "42.1 MB",
-      passedTestCases: 8,
-      totalTestCases: 8,
-      status: "ACCEPTED",
-      score: 100,
-      penaltyMinutes: 8,
-      submittedAt: new Date(Date.now() - 45 * 60 * 1000).toISOString()
-    }
-  ]
-};
+const DEFAULT_SERVER_SUBMISSIONS: Record<string, ContestSubmission[]> = {};
 
 // File persistence helper
 const STORAGE_FILE = path.join(process.cwd(), ".data_contests.json");
@@ -158,12 +79,23 @@ function writeToFile(contests: Contest[]) {
 export function getServerContests(): Contest[] {
   if (!global.__codearena_server_contests_initialized) {
     const fromFile = readFromFile();
-    if (fromFile && fromFile.initialized) {
-      global.__codearena_server_contests = fromFile.contests;
+    if (fromFile && fromFile.initialized && Array.isArray(fromFile.contests)) {
+      // Purge any legacy dummy contest
+      global.__codearena_server_contests = fromFile.contests.filter((c) => c.id !== "contest-weekly-clash-1");
       global.__codearena_server_contests_initialized = true;
+      writeToFile(global.__codearena_server_contests);
     } else {
-      global.__codearena_server_contests = [...DEFAULT_SERVER_CONTESTS];
+      global.__codearena_server_contests = [];
       global.__codearena_server_contests_initialized = true;
+      writeToFile([]);
+    }
+  }
+
+  // Ensure legacy contest-weekly-clash-1 is never returned
+  if (global.__codearena_server_contests) {
+    const prevLength = global.__codearena_server_contests.length;
+    global.__codearena_server_contests = global.__codearena_server_contests.filter((c) => c.id !== "contest-weekly-clash-1");
+    if (global.__codearena_server_contests.length !== prevLength) {
       writeToFile(global.__codearena_server_contests);
     }
   }

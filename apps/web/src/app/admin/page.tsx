@@ -716,9 +716,10 @@ export default function AdminPortalPage() {
       const res = await fetch("/api/contests", { cache: "no-store" });
       const data = await res.json();
       if (data?.success && Array.isArray(data.contests)) {
-        setContestsList(data.contests);
+        const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
+        setContestsList(sanitized);
         if (typeof window !== "undefined") {
-          localStorage.setItem("codearena_contests", JSON.stringify(data.contests));
+          localStorage.setItem("codearena_contests", JSON.stringify(sanitized));
         }
         return;
       }
