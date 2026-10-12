@@ -49,6 +49,20 @@ export async function POST(req: NextRequest) {
       // Backend waking up / network delay - handled gracefully below
     }
 
+    // Check duplicate in local registry if backend did not register
+    if (!backendOk) {
+      const existingByUsername = registry.get(normalizedUsername.toLowerCase());
+      const existingByEmail = Array.from(registry.values()).find(
+        (u) => u.email.toLowerCase() === normalizedEmail
+      );
+      if (existingByUsername || existingByEmail) {
+        return NextResponse.json(
+          { message: "An account with this email or username already exists. Please sign in instead." },
+          { status: 409 }
+        );
+      }
+    }
+
     // Record registration into platform registry
     const registeredUser = recordUserLoginEvent({
       id: backendData?.data?.user?.id || backendData?.user?.id || `usr_${Date.now()}`,

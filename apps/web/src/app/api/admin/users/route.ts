@@ -143,9 +143,13 @@ export async function PATCH(req: NextRequest) {
 
     // Also forward suspend/activate to backend if status changed
     const apiUrl = getBackendApiUrl();
-    if (userId && status) {
+    const effectiveUserId = userId || (key && map.get(key)?.id);
+    if (effectiveUserId && status) {
       try {
-        const endpoint = status === "SUSPENDED" ? `${apiUrl}/api/users/${userId}/suspend` : `${apiUrl}/api/users/${userId}/activate`;
+        const isSuspended = status === "SUSPENDED" || status === "BANNED";
+        const endpoint = isSuspended
+          ? `${apiUrl}/api/users/${effectiveUserId}/suspend`
+          : `${apiUrl}/api/users/${effectiveUserId}/activate`;
         await fetch(endpoint, { method: "PATCH" });
       } catch (e) {}
     }

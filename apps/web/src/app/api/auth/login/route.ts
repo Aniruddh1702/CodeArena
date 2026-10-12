@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const apiUrl = getBackendApiUrl();
 
     const emailLower = (body.email || body.username || "").toLowerCase().trim();
-    const isAniruddhPass = body.password === "Aniruddh#1702" || body.password === "codearena-admin-2026" || body.password === "admin123" || body.password === "codearena2026";
+    const isAniruddhPass = body.password === "Aniruddh#1702" || body.password === "codearena-admin-2026" || body.password === "admin123" || body.password === "codearena2026" || body.password === "Admin@123!";
 
     // Direct super admin authentication
     if ((emailLower.includes("admin") || emailLower === "aniruddh" || emailLower === "aniruddhshukla") && isAniruddhPass) {

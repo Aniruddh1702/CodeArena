@@ -172,6 +172,32 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Missing slug parameter" }, { status: 400 });
     }
 
+    // Attempt deletion from backend database if accessible
+    let authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      const token = req.cookies.get("token")?.value;
+      if (token) authHeader = `Bearer ${token}`;
+    }
+
+    const apiUrl = getBackendApiUrl();
+    if (authHeader) {
+      try {
+        const qRes = await fetch(`${apiUrl}/api/questions/${slug}`, {
+          headers: { Authorization: authHeader },
+        });
+        const qData = await qRes.json().catch(() => null);
+        const qId = qData?.data?.id || qData?.id;
+        if (qId) {
+          await fetch(`${apiUrl}/api/questions/${qId}`, {
+            method: "DELETE",
+            headers: { Authorization: authHeader },
+          });
+        }
+      } catch (backendErr) {
+        // Non-blocking for offline or standalone mode
+      }
+    }
+
     const removed = deleteCustomProblemServer(slug);
     return NextResponse.json({ success: true, removed, slug });
   } catch (err: any) {
