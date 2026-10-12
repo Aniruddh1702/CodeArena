@@ -978,6 +978,13 @@ export default function AdminPortalPage() {
         loadQuestions();
       };
 
+      const adminPollInterval = setInterval(() => {
+        loadContests();
+        loadUsers();
+        loadQuestions();
+        setSubmissionTick((t) => t + 1);
+      }, 4000);
+
       window.addEventListener("codearena_contest_submission", handleSubmissionsChange);
       window.addEventListener("codearena_contest_submissions_updated", handleSubmissionsChange);
       window.addEventListener("codearena_account_changed", handleAccountChange);
@@ -986,6 +993,7 @@ export default function AdminPortalPage() {
       window.addEventListener("storage", handleSubmissionsChange);
 
       return () => {
+        clearInterval(adminPollInterval);
         window.removeEventListener("codearena_contest_submission", handleSubmissionsChange);
         window.removeEventListener("codearena_contest_submissions_updated", handleSubmissionsChange);
         window.removeEventListener("codearena_account_changed", handleAccountChange);

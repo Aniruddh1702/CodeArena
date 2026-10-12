@@ -194,8 +194,33 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
       }
     };
 
+    let tickCount = 0;
     // Interval for clock and standings
-    const interval = setInterval(syncContestState, 1000);
+    const interval = setInterval(() => {
+      syncContestState();
+      tickCount++;
+      if (tickCount % 3 === 0) {
+        fetch(`/api/contests/${contestId}`, { cache: "no-store" })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.success && data.contest) {
+              setContest(data.contest);
+              if (data.contest.problems) {
+                setAllProblemsMap((prev) => {
+                  const updated = { ...prev };
+                  data.contest.problems.forEach((p: any) => {
+                    if (p.problemDef) {
+                      updated[p.problemSlug] = p.problemDef;
+                    }
+                  });
+                  return updated;
+                });
+              }
+            }
+          })
+          .catch(() => {});
+      }
+    }, 1000);
 
     window.addEventListener("codearena_contests_updated", syncContestState);
     window.addEventListener("storage", syncContestState);

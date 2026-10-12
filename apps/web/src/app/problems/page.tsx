@@ -99,9 +99,16 @@ function ProblemsContent() {
       loadAllProblems();
     };
 
+    const probPollInterval = setInterval(() => {
+      syncProblemsWithServer()
+        .then(() => loadAllProblems())
+        .catch(() => {});
+    }, 5000);
+
     window.addEventListener("codearena_problems_updated", handleProblemsUpdated);
     window.addEventListener("storage", handleProblemsUpdated);
     return () => {
+      clearInterval(probPollInterval);
       window.removeEventListener("codearena_problems_updated", handleProblemsUpdated);
       window.removeEventListener("storage", handleProblemsUpdated);
     };

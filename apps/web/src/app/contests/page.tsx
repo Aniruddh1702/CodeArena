@@ -40,9 +40,25 @@ export default function ContestsPage() {
       })
       .catch(() => {});
 
+    let tickCount = 0;
     const timer = setInterval(() => {
       setNow(Date.now());
       setContests(getContests());
+      tickCount++;
+      if (tickCount % 3 === 0) {
+        fetch("/api/contests", { cache: "no-store" })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.success && Array.isArray(data.contests)) {
+              const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
+              setContests(sanitized);
+              if (typeof window !== "undefined") {
+                localStorage.setItem("codearena_contests", JSON.stringify(sanitized));
+              }
+            }
+          })
+          .catch(() => {});
+      }
     }, 1000);
 
     const handleUpdate = () => {
