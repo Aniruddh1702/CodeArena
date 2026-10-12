@@ -327,7 +327,7 @@ function LoginForm() {
                         {showPassword ? "Hide" : "Show"}
                       </button>
                       <span className="text-slate-600 text-xs">•</span>
-                      <Link href="/reset-password" className="text-[11px] text-indigo-400 hover:underline">
+                      <Link href="/forgot-password" className="text-[11px] text-indigo-400 hover:underline">
                         Forgot?
                       </Link>
                     </div>
