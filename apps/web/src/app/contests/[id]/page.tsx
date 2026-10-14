@@ -13,7 +13,8 @@ import {
   recordContestSubmission,
   getContestStandings,
   ContestStanding,
-  registerUserForContest
+  registerUserForContest,
+  submitWholeContest
 } from "@/lib/contests-data";
 import { getAllProblems, ProblemDefinition, PROBLEMS_DATABASE } from "@/lib/problems-data";
 import { getStarterCode, isStarterCodeStubOrEmpty } from "@/lib/starter-templates";
@@ -59,6 +60,10 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     points: number;
     isSuccess: boolean;
   } | null>(null);
+
+  // Whole Contest Submission Modal State
+  const [isSubmitWholeModalOpen, setIsSubmitWholeModalOpen] = useState(false);
+  const [isSubmittingWhole, setIsSubmittingWhole] = useState(false);
 
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
@@ -562,6 +567,33 @@ function parseCustomArgs(raw: string): any[] {
     }
   };
 
+  const handleConfirmSubmitWholeContest = async () => {
+    if (!currentUser || !contest) return;
+    setIsSubmittingWhole(true);
+    try {
+      const res = await submitWholeContest(contest.id, currentUser.email);
+      if (res.success) {
+        setIsSubmitWholeModalOpen(false);
+        setActiveWorkspaceView("standings");
+        setSubmissionFeedback({
+          status: "ACCEPTED",
+          message: "Whole contest submitted successfully! Your results and rank have been locked into the leaderboard.",
+          points: 0,
+          isSuccess: true,
+        });
+        const fresh = getContestById(contest.id);
+        if (fresh) setContest(fresh);
+        setStandings(getContestStandings(contest.id));
+      } else {
+        alert(res.message || "Failed to submit contest.");
+      }
+    } catch (err: any) {
+      alert(err.message || "Failed to submit contest.");
+    } finally {
+      setIsSubmittingWhole(false);
+    }
+  };
+
   if (!contest) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -582,6 +614,24 @@ function parseCustomArgs(raw: string): any[] {
   const userScore = currentUser ? standings.find((s) => s.userEmail === currentUser.email)?.score || 0 : 0;
   const isRegistered = currentUser && contest.registeredUsers.includes(currentUser.email);
   const totalPoints = contest.problems.reduce((sum, p) => sum + p.points, 0);
+  const isContestSubmitted = Boolean(
+    (currentUser &&
+      (contest.submittedUsers || []).map((e) => e.toLowerCase()).includes(currentUser.email?.toLowerCase())) ||
+      contest.status === "ENDED"
+  );
+
+  // Question attempt status breakdown for current student
+  const myStanding = currentUser ? standings.find((s) => s.userEmail === currentUser.email) : undefined;
+  const totalProblemsCount = contest.problems.length;
+  let solvedProblemsCount = 0;
+  let attemptedProblemsCount = 0;
+  if (myStanding) {
+    Object.values(myStanding.problemResults || {}).forEach((r) => {
+      if (r.attempts > 0 || r.solved) attemptedProblemsCount++;
+      if (r.solved) solvedProblemsCount++;
+    });
+  }
+  const unattemptedProblemsCount = Math.max(0, totalProblemsCount - attemptedProblemsCount);
 
   // If contest is upcoming / scheduled, render the Pre-Contest Lobby
   if (isUpcoming) {
@@ -778,6 +828,22 @@ function parseCustomArgs(raw: string): any[] {
             >
               <span>📊</span> Leaderboard
             </Button>
+
+            {isContestSubmitted ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold shadow-sm">
+                <span>✓</span> Contest Submitted
+              </span>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => setIsSubmitWholeModalOpen(true)}
+                disabled={isSubmittingWhole}
+                className="h-8 text-xs font-mono font-bold gap-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white shadow-[0_0_15px_rgba(168,85,247,0.35)] transition-all"
+                title="Submit entire contest (whether you attempted all questions or not)"
+              >
+                <span>🏁</span> Submit Entire Contest
+              </Button>
+            )}
           </div>
         </div>
 
@@ -1251,6 +1317,106 @@ function parseCustomArgs(raw: string): any[] {
             </div>
           </div>
         </main>
+      )}
+
+      {/* Submit Entire Contest Confirmation Modal */}
+      {isSubmitWholeModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-card border border-border/80 rounded-3xl w-full max-w-lg p-6 shadow-2xl text-foreground backdrop-blur-2xl space-y-5">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(168,85,247,0.3)] shrink-0">
+                🏁
+              </div>
+              <div className="flex-1">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 border border-purple-500/30 px-2.5 py-0.5 rounded-full">
+                  Final Contest Submission
+                </span>
+                <h3 className="text-lg font-mono font-black text-foreground mt-1">
+                  Submit Entire Contest
+                </h3>
+                <p className="text-xs text-muted-foreground font-mono mt-0.5">
+                  {contest.title}
+                </p>
+              </div>
+            </div>
+
+            {/* Attempt Status Cards */}
+            <div className="grid grid-cols-3 gap-2.5 font-mono text-center">
+              <div className="p-3 rounded-xl bg-card/60 border border-border/80">
+                <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Total Questions</span>
+                <span className="text-base font-bold text-foreground">
+                  {totalProblemsCount}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-card/60 border border-border/80">
+                <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Solved</span>
+                <span className="text-base font-bold text-emerald-400">
+                  {solvedProblemsCount}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-card/60 border border-border/80">
+                <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Unattempted</span>
+                <span className={`text-base font-bold ${unattemptedProblemsCount > 0 ? "text-amber-400" : "text-emerald-400"}`}>
+                  {unattemptedProblemsCount}
+                </span>
+              </div>
+            </div>
+
+            {/* Explicit Notice about unattempted questions */}
+            {unattemptedProblemsCount > 0 ? (
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 space-y-2 text-xs font-mono text-amber-200/90">
+                <div className="flex items-center gap-2 font-bold text-amber-300">
+                  <span>⚠️</span> Unattempted Questions Notice
+                </div>
+                <p className="text-[11px] leading-relaxed">
+                  You have <strong>{unattemptedProblemsCount} unattempted question{unattemptedProblemsCount > 1 ? "s" : ""}</strong>.
+                </p>
+                <p className="text-[11px] leading-relaxed">
+                  <strong>You can submit the entire contest now whether you have attempted all questions or not.</strong> Unattempted questions will simply receive 0 points without blocking submission, and all your verified scores will be locked into the official leaderboard.
+                </p>
+              </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 space-y-1 text-xs font-mono text-emerald-300">
+                <div className="flex items-center gap-2 font-bold">
+                  <span>✓</span> All Questions Attempted!
+                </div>
+                <p className="text-[11px]">
+                  You have attempted all questions in this contest. Submitting now will lock your score of <strong>{userScore} pts</strong> into the final standings.
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-border/60 font-mono">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsSubmitWholeModalOpen(false)}
+                disabled={isSubmittingWhole}
+                className="h-9 px-4 text-xs font-semibold rounded-xl"
+              >
+                Continue Solving
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                disabled={isSubmittingWhole}
+                onClick={handleConfirmSubmitWholeContest}
+                className="h-9 px-5 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] gap-2"
+              >
+                {isSubmittingWhole ? (
+                  <>
+                    <span className="animate-spin">⏳</span> Submitting...
+                  </>
+                ) : (
+                  <>
+                    <span>🏁</span> Confirm & Submit Entire Contest
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

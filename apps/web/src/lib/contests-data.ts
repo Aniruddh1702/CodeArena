@@ -20,6 +20,7 @@ export interface Contest {
   problems: ContestProblem[];
   participantsCount: number;
   registeredUsers: string[]; // emails
+  submittedUsers?: string[]; // emails of participants whose whole contest was submitted
   isRated: boolean;
   rules: string[];
   createdAt: string;
@@ -51,6 +52,7 @@ export interface ContestStanding {
   score: number;
   penaltyMinutes: number;
   problemsSolved: number;
+  isContestSubmitted?: boolean;
   problemResults: Record<string, {
     solved: boolean;
     attempts: number;
@@ -568,5 +570,122 @@ export function getContestStandings(contestId: string): ContestStanding[] {
     s.rank = i + 1;
   });
 
+  // Mark whether user has submitted the whole contest
+  const submittedSet = new Set((contest.submittedUsers || []).map((e) => e.toLowerCase()));
+  standings.forEach((s) => {
+    s.isContestSubmitted = submittedSet.has(s.userEmail.toLowerCase()) || contest.status === "ENDED";
+  });
+
   return standings;
+}
+
+/**
+ * Submit the whole contest — either for a single student or for the entire contest (all participants).
+ * Submits regardless of whether the student had attempted all questions or not!
+ */
+export async function submitWholeContest(
+  contestId: string,
+  userEmail?: string,
+  options?: { adminForce?: boolean; reason?: string }
+): Promise<{ success: boolean; contest: Contest | null; message: string }> {
+  const contest = getContestById(contestId);
+  if (!contest) {
+    return { success: false, contest: null, message: "Contest not found." };
+  }
+
+  contest.submittedUsers = contest.submittedUsers || [];
+
+  if (userEmail) {
+    const cleanEmail = userEmail.toLowerCase().trim();
+    if (!contest.submittedUsers.includes(cleanEmail)) {
+      contest.submittedUsers.push(cleanEmail);
+    }
+    if (!contest.registeredUsers.includes(cleanEmail)) {
+      contest.registeredUsers.push(cleanEmail);
+      contest.participantsCount = Math.max(contest.participantsCount, contest.registeredUsers.length);
+    }
+
+    await saveContest(contest);
+
+    saveNotification({
+      title: "🏁 Contest Submission Received",
+      message: `Your entire submission for '${contest.title}' has been submitted and locked into the leaderboard.`,
+      type: "CONTEST_SUBMISSION",
+      contestId: contest.id,
+      contestTitle: contest.title,
+      actionUrl: `/contests/${contest.id}`,
+    });
+
+    try {
+      await fetch(`/api/contests/${contestId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ submittedUserEmail: cleanEmail }),
+      });
+    } catch (e) {}
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("codearena_contest_submitted", {
+          detail: { contestId, userEmail: cleanEmail, contest },
+        })
+      );
+      window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: [contest] }));
+    }
+
+    return {
+      success: true,
+      contest,
+      message: `Contest successfully submitted for ${userEmail}.`,
+    };
+  }
+
+  // Admin Force-Submitting the WHOLE contest for all students (whether they attempted all questions or not)
+  const allSubmissions = getContestSubmissions(contestId);
+  const participantSet = new Set<string>((contest.registeredUsers || []).map((e) => e.toLowerCase()));
+  allSubmissions.forEach((s) => {
+    if (s.userEmail) participantSet.add(s.userEmail.toLowerCase());
+  });
+
+  contest.submittedUsers = Array.from(participantSet);
+  contest.status = "ENDED";
+  contest.endTime = new Date().toISOString();
+
+  await saveContest(contest);
+
+  saveNotification({
+    title: "🏆 Contest Officially Finalized & Submitted",
+    message: `Admin has submitted and closed '${contest.title}'. All scores and ranks have been locked into the final leaderboard.`,
+    type: "CONTEST_FINALIZED",
+    contestId: contest.id,
+    contestTitle: contest.title,
+    actionUrl: `/contests/${contest.id}`,
+  });
+
+  try {
+    await fetch(`/api/contests/${contestId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "ENDED",
+        endTime: contest.endTime,
+        submittedUsers: contest.submittedUsers,
+      }),
+    });
+  } catch (e) {}
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("codearena_contest_submitted", {
+        detail: { contestId, allSubmitted: true, contest },
+      })
+    );
+    window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: [contest] }));
+  }
+
+  return {
+    success: true,
+    contest,
+    message: `Entire contest '${contest.title}' successfully submitted for all participants.`,
+  };
 }

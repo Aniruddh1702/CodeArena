@@ -21,6 +21,7 @@ export interface Contest {
   problems: ContestProblem[];
   participantsCount: number;
   registeredUsers: string[]; // emails
+  submittedUsers?: string[]; // emails of students whose contest has been submitted
   isRated: boolean;
   rules: string[];
   createdAt: string;

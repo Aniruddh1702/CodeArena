@@ -4,7 +4,7 @@ export interface AppNotification {
   id: string;
   title: string;
   message: string;
-  type: "CONTEST_SCHEDULED" | "CONTEST_1HOUR_ALERT" | "CONTEST_STARTING" | "CONTEST_LIVE" | "GENERAL";
+  type: "CONTEST_SCHEDULED" | "CONTEST_1HOUR_ALERT" | "CONTEST_STARTING" | "CONTEST_LIVE" | "CONTEST_SUBMISSION" | "CONTEST_FINALIZED" | "GENERAL";
   contestId?: string;
   contestTitle?: string;
   timestamp: string;

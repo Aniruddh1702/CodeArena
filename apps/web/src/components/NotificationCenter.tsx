@@ -239,7 +239,8 @@ export function NotificationCenter() {
                       <span className="text-base mt-0.5">
                         {notif.type === "CONTEST_1HOUR_ALERT" ? "⏰" :
                          notif.type === "CONTEST_STARTING" ? "🚀" :
-                         notif.type === "CONTEST_LIVE" ? "🟢" : "🏆"}
+                         notif.type === "CONTEST_LIVE" ? "🟢" :
+                         notif.type === "CONTEST_SUBMISSION" || notif.type === "CONTEST_FINALIZED" ? "🏁" : "🏆"}
                       </span>
                       <div className="flex-1 min-w-0 space-y-0.5">
                         <div className="flex items-center justify-between gap-1">

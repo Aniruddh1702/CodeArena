@@ -67,6 +67,20 @@ export async function PATCH(
       }
     }
 
+    if (body.submittedUserEmail) {
+      const email = String(body.submittedUserEmail).toLowerCase();
+      const currentSubmitted = updated.submittedUsers || [];
+      if (!currentSubmitted.includes(email)) {
+        updated.submittedUsers = [...currentSubmitted, email];
+      }
+    }
+
+    if (Array.isArray(body.submittedUsers)) {
+      const currentSubmitted = new Set(updated.submittedUsers || []);
+      body.submittedUsers.forEach((e: string) => currentSubmitted.add(String(e).toLowerCase()));
+      updated.submittedUsers = Array.from(currentSubmitted);
+    }
+
     saveServerContest(updated);
 
     return NextResponse.json({

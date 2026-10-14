@@ -22,6 +22,8 @@ import {
   deleteContest,
   startContestNow,
   endContestNow,
+  submitWholeContest,
+  getContestById,
   clearAllContests,
   getContestSubmissions,
   getAllContestSubmissions,
@@ -714,6 +716,10 @@ export default function AdminPortalPage() {
   const [submissionFilterStatus, setSubmissionFilterStatus] = useState<"ALL" | "ACCEPTED" | "WRONG_ANSWER">("ALL");
   const [submissionSearchQuery, setSubmissionSearchQuery] = useState("");
   const [codeCopied, setCodeCopied] = useState(false);
+  const [submittingContestId, setSubmittingContestId] = useState<string | null>(null);
+  const [submittingStudentEmail, setSubmittingStudentEmail] = useState<string | null>(null);
+  const [contestToSubmitWhole, setContestToSubmitWhole] = useState<Contest | null>(null);
+  const [inspectorViewTab, setInspectorViewTab] = useState<"roster" | "submissions">("roster");
 
   // Broadcast Announcement State
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
@@ -944,6 +950,39 @@ export default function AdminPortalPage() {
     await loadContests();
   };
 
+  const handleConfirmSubmitWholeContest = async (contestId: string, studentEmail?: string) => {
+    setSubmittingContestId(contestId);
+    if (studentEmail) setSubmittingStudentEmail(studentEmail);
+    try {
+      const res = await submitWholeContest(contestId, studentEmail);
+      if (res.success) {
+        setContestFeedback({
+          type: "success",
+          message: res.message || "Contest submission processed successfully!",
+        });
+        await loadContests();
+        if (selectedContestForSubmissions && selectedContestForSubmissions.id === contestId) {
+          const fresh = getContestById(contestId);
+          setSelectedContestForSubmissions(fresh || { ...selectedContestForSubmissions, status: "ENDED" });
+        }
+      } else {
+        setContestFeedback({
+          type: "error",
+          message: res.message || "Failed to submit contest.",
+        });
+      }
+    } catch (err: any) {
+      setContestFeedback({
+        type: "error",
+        message: err.message || "Failed to submit contest.",
+      });
+    } finally {
+      setSubmittingContestId(null);
+      setSubmittingStudentEmail(null);
+      setContestToSubmitWhole(null);
+    }
+  };
+
   const handleDeleteContestItem = async (id: string) => {
     if (confirm("Are you sure you want to delete this contest?")) {
       await deleteContest(id);
@@ -987,6 +1026,7 @@ export default function AdminPortalPage() {
 
       window.addEventListener("codearena_contest_submission", handleSubmissionsChange);
       window.addEventListener("codearena_contest_submissions_updated", handleSubmissionsChange);
+      window.addEventListener("codearena_contest_submitted", handleContestChange);
       window.addEventListener("codearena_account_changed", handleAccountChange);
       window.addEventListener("codearena_contests_updated", handleContestChange);
       window.addEventListener("codearena_problems_updated", handleProblemChange);
@@ -996,6 +1036,7 @@ export default function AdminPortalPage() {
         clearInterval(adminPollInterval);
         window.removeEventListener("codearena_contest_submission", handleSubmissionsChange);
         window.removeEventListener("codearena_contest_submissions_updated", handleSubmissionsChange);
+        window.removeEventListener("codearena_contest_submitted", handleContestChange);
         window.removeEventListener("codearena_account_changed", handleAccountChange);
         window.removeEventListener("codearena_contests_updated", handleContestChange);
         window.removeEventListener("codearena_problems_updated", handleProblemChange);
@@ -4873,12 +4914,12 @@ export default function AdminPortalPage() {
                         </div>
 
                         {/* Admin Action Bar */}
-                        <div className="p-4 pt-2 border-t border-white/[0.06] flex items-center justify-between">
+                        <div className="p-4 pt-2 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-2">
                           <span className="text-xs font-mono text-slate-400">
                             👥 {enrolledCount} participants
                           </span>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             {isUpcoming && (
                               <Button
                                 size="sm"
@@ -4888,6 +4929,18 @@ export default function AdminPortalPage() {
                                 <span>▶</span> Start Live Now
                               </Button>
                             )}
+
+                            {/* Submit Whole Contest Button (For All Students) */}
+                            <Button
+                              size="sm"
+                              onClick={() => setContestToSubmitWhole(contest)}
+                              disabled={submittingContestId === contest.id}
+                              className="h-7 text-[11px] font-mono font-bold rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white gap-1 shadow-[0_0_15px_rgba(168,85,247,0.35)] transition-all"
+                              title="Submit whole contest for all students (whether they attempted all questions or not)"
+                            >
+                              <span>🏁</span> Submit Whole Contest
+                            </Button>
+
                             {isLive && (
                               <Button
                                 size="sm"
@@ -4930,14 +4983,25 @@ export default function AdminPortalPage() {
                       </p>
                     </div>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedContestForSubmissions(null)}
-                      className="h-8 w-8 p-0 rounded-full text-slate-400 hover:text-white hover:bg-white/[0.08]"
-                    >
-                      ✕
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => setContestToSubmitWhole(selectedContestForSubmissions)}
+                        disabled={submittingContestId === selectedContestForSubmissions.id}
+                        className="h-8 text-xs font-mono font-bold rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white gap-1.5 shadow-[0_0_15px_rgba(168,85,247,0.35)] transition-all"
+                        title="Submit whole contest for all students (whether they attempted all questions or not)"
+                      >
+                        <span>🏁</span> Submit Whole Contest
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedContestForSubmissions(null)}
+                        className="h-8 w-8 p-0 rounded-full text-slate-400 hover:text-white hover:bg-white/[0.08]"
+                      >
+                        ✕
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Submissions Stats & Filters */}
@@ -4947,6 +5011,38 @@ export default function AdminPortalPage() {
                     const failedSubs = subs.filter(s => s.status !== "ACCEPTED");
                     const uniqueStudents = new Set(subs.map(s => s.userEmail)).size;
                     const passRate = subs.length > 0 ? Math.round((acceptedSubs.length / subs.length) * 100) : 0;
+
+                    const enrolledEmails = Array.from(new Set([
+                      ...(selectedContestForSubmissions.registeredUsers || []),
+                      ...subs.map(s => s.userEmail).filter(Boolean)
+                    ]));
+                    const submittedUsersSet = new Set((selectedContestForSubmissions.submittedUsers || []).map(e => e.toLowerCase()));
+                    const totalContestProblems = selectedContestForSubmissions.problems?.length || 0;
+
+                    const studentsRoster = enrolledEmails.map((email) => {
+                      const studentSubs = subs.filter(s => s.userEmail.toLowerCase() === email.toLowerCase());
+                      const studentName = studentSubs[0]?.userName || email.split("@")[0];
+                      const attemptedProblemSlugs = new Set(studentSubs.map(s => s.problemSlug));
+                      const solvedProblemSlugs = new Set(studentSubs.filter(s => s.status === "ACCEPTED").map(s => s.problemSlug));
+                      const totalScore = studentSubs.filter(s => s.status === "ACCEPTED").reduce((acc, curr) => acc + (curr.score || 0), 0);
+                      const isSubmitted = submittedUsersSet.has(email.toLowerCase()) || selectedContestForSubmissions.status === "ENDED";
+                      const attemptedCount = attemptedProblemSlugs.size;
+                      const unattemptedCount = Math.max(0, totalContestProblems - attemptedCount);
+                      const solvedCount = solvedProblemSlugs.size;
+
+                      return {
+                        email,
+                        name: studentName,
+                        attemptedCount,
+                        unattemptedCount,
+                        solvedCount,
+                        totalScore,
+                        isSubmitted,
+                        attemptedProblemSlugs,
+                        solvedProblemSlugs,
+                        subsCount: studentSubs.length
+                      };
+                    });
 
                     const filteredSubs = subs.filter(sub => {
                       const matchesStatus =
@@ -4963,6 +5059,11 @@ export default function AdminPortalPage() {
                       return matchesStatus && matchesSearch;
                     });
 
+                    const filteredStudents = studentsRoster.filter(s => {
+                      const q = submissionSearchQuery.toLowerCase().trim();
+                      return !q || s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q);
+                    });
+
                     return (
                       <div className="flex-1 flex flex-col overflow-hidden font-mono">
                         {/* Summary Badges */}
@@ -4970,7 +5071,7 @@ export default function AdminPortalPage() {
                           <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 text-center backdrop-blur-md">
                             <span className="text-[10px] uppercase font-bold text-slate-400 block">Enrolled Students</span>
                             <span className="text-lg font-black text-white">
-                              {Math.max(selectedContestForSubmissions.participantsCount, (selectedContestForSubmissions.registeredUsers || []).length)}
+                              {Math.max(selectedContestForSubmissions.participantsCount, enrolledEmails.length)}
                             </span>
                           </div>
 
@@ -4991,168 +5092,355 @@ export default function AdminPortalPage() {
                           </div>
                         </div>
 
-                        {/* Filter Bar */}
-                        <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-white/10 bg-white/[0.01]">
-                          {/* Search Input */}
-                          <div className="w-full sm:w-80">
-                            <Input
-                              placeholder="Search by student name, email, or problem..."
-                              value={submissionSearchQuery}
-                              onChange={(e) => setSubmissionSearchQuery(e.target.value)}
-                              className="h-8 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 rounded-xl"
-                            />
+                        {/* Sub-tab switcher */}
+                        <div className="p-3 bg-white/[0.015] border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setInspectorViewTab("roster")}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+                                inspectorViewTab === "roster"
+                                  ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm"
+                                  : "text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] border border-transparent"
+                              }`}
+                            >
+                              <span>👥</span> Student Attempt Status & Submission ({studentsRoster.length})
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setInspectorViewTab("submissions")}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+                                inspectorViewTab === "submissions"
+                                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm"
+                                  : "text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] border border-transparent"
+                              }`}
+                            >
+                              <span>📜</span> Code Submissions Feed ({subs.length})
+                            </button>
                           </div>
 
-                          {/* Filter Tabs */}
-                          <div className="flex items-center gap-1.5 self-start sm:self-auto">
-                            <Button
-                              size="sm"
-                              variant={submissionFilterStatus === "ALL" ? "default" : "outline"}
-                              onClick={() => setSubmissionFilterStatus("ALL")}
-                              className="h-8 text-xs font-mono rounded-lg"
-                            >
-                              All ({subs.length})
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant={submissionFilterStatus === "ACCEPTED" ? "default" : "outline"}
-                              onClick={() => setSubmissionFilterStatus("ACCEPTED")}
-                              className="h-8 text-xs font-mono rounded-lg text-emerald-300 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20"
-                            >
-                              Accepted ({acceptedSubs.length})
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant={submissionFilterStatus === "WRONG_ANSWER" ? "default" : "outline"}
-                              onClick={() => setSubmissionFilterStatus("WRONG_ANSWER")}
-                              className="h-8 text-xs font-mono rounded-lg text-rose-300 border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20"
-                            >
-                              Failed ({failedSubs.length})
-                            </Button>
-                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() => setContestToSubmitWhole(selectedContestForSubmissions)}
+                            disabled={submittingContestId === selectedContestForSubmissions.id}
+                            className="h-7 text-[11px] font-mono font-bold rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white gap-1 shadow-sm"
+                          >
+                            <span>🏁</span> Submit Whole Contest (All)
+                          </Button>
                         </div>
 
-                        {/* Submissions List / Table */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                          {filteredSubs.length === 0 ? (
-                            <div className="p-12 text-center text-slate-400 space-y-2 font-mono">
-                              <span className="text-3xl block">📭</span>
-                              <p className="text-sm font-semibold">No submissions found matching criteria</p>
-                              <p className="text-xs">When students enter the arena and submit their code, their solutions will appear here in real-time.</p>
+                        {/* TAB 1: STUDENT ROSTER & SUBMISSION STATUS */}
+                        {inspectorViewTab === "roster" && (
+                          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                            {/* Policy Banner */}
+                            <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-slate-900/40 border border-purple-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 backdrop-blur-md">
+                              <div className="space-y-1">
+                                <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                                  <span>🏁</span> Finalize & Submit Contest for Students
+                                </h4>
+                                <p className="text-[11px] text-slate-300">
+                                  You can submit the whole contest for all participants at once, or finalize for any individual student below.
+                                  Students can be submitted <strong className="text-purple-300">whether they have attempted all questions or not</strong>: unattempted questions receive 0 points without blocking submission.
+                                </p>
+                              </div>
+                              <Button
+                                size="sm"
+                                onClick={() => setContestToSubmitWhole(selectedContestForSubmissions)}
+                                disabled={submittingContestId === selectedContestForSubmissions.id}
+                                className="h-8 text-xs font-mono font-bold rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white gap-1.5 shadow-[0_0_15px_rgba(168,85,247,0.35)] shrink-0"
+                              >
+                                <span>🏁</span> Submit Whole Contest (All)
+                              </Button>
                             </div>
-                          ) : (
-                            <div className="overflow-x-auto border border-white/10 rounded-2xl bg-white/[0.02] backdrop-blur-md">
-                              <table className="w-full text-left text-xs border-collapse">
-                                <thead>
-                                  <tr className="border-b border-white/10 bg-white/[0.03] text-slate-300 font-semibold font-mono text-[10px] uppercase">
-                                    <th className="p-3.5">Student</th>
-                                    <th className="p-3.5">Problem Solved</th>
-                                    <th className="p-3.5">Language</th>
-                                    <th className="p-3.5">Verdict</th>
-                                    <th className="p-3.5">Score</th>
-                                    <th className="p-3.5">Runtime / Memory</th>
-                                    <th className="p-3.5">Submitted</th>
-                                    <th className="p-3.5 text-right">Action</th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-white/[0.06] font-mono">
-                                  {filteredSubs.map((sub) => {
-                                    const isAc = sub.status === "ACCEPTED";
-                                    return (
-                                      <tr key={sub.id} className="hover:bg-white/[0.04] transition-colors">
+
+                            {/* Search Filter */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                              <Input
+                                placeholder="Filter student roster by name or email..."
+                                value={submissionSearchQuery}
+                                onChange={(e) => setSubmissionSearchQuery(e.target.value)}
+                                className="h-8 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 rounded-xl max-w-sm"
+                              />
+                              <span className="text-[11px] text-slate-400 font-mono">
+                                Showing {filteredStudents.length} of {studentsRoster.length} students
+                              </span>
+                            </div>
+
+                            {/* Students Table */}
+                            {filteredStudents.length === 0 ? (
+                              <div className="p-12 text-center text-slate-400 space-y-2 font-mono">
+                                <span className="text-3xl block">👥</span>
+                                <p className="text-sm font-semibold">No students registered yet for this contest</p>
+                              </div>
+                            ) : (
+                              <div className="overflow-x-auto border border-white/10 rounded-2xl bg-white/[0.02] backdrop-blur-md">
+                                <table className="w-full text-left text-xs border-collapse">
+                                  <thead>
+                                    <tr className="border-b border-white/10 bg-white/[0.03] text-slate-300 font-semibold font-mono text-[10px] uppercase">
+                                      <th className="p-3.5">Student</th>
+                                      <th className="p-3.5">Questions Progress</th>
+                                      <th className="p-3.5">Solved</th>
+                                      <th className="p-3.5">Score</th>
+                                      <th className="p-3.5">Contest Status</th>
+                                      <th className="p-3.5 text-right">Submission Action</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-white/[0.06] font-mono">
+                                    {filteredStudents.map((st) => (
+                                      <tr key={st.email} className="hover:bg-white/[0.04] transition-colors">
                                         <td className="p-3 font-medium">
                                           <div className="flex items-center gap-2">
                                             <div className="w-7 h-7 rounded-full bg-white/[0.06] border border-white/15 text-white font-black flex items-center justify-center text-xs">
-                                              {sub.userName.charAt(0).toUpperCase()}
+                                              {st.name.charAt(0).toUpperCase()}
                                             </div>
                                             <div>
-                                              <p className="font-bold text-slate-100">{sub.userName}</p>
-                                              <p className="text-[10px] text-slate-400 font-mono">{sub.userEmail}</p>
+                                              <p className="font-bold text-slate-100">{st.name}</p>
+                                              <p className="text-[10px] text-slate-400 font-mono">{st.email}</p>
                                             </div>
                                           </div>
                                         </td>
                                         <td className="p-3">
-                                          <span className="font-semibold text-slate-100 block">
-                                            {sub.problemTitle || sub.problemSlug}
-                                          </span>
-                                          <span className="text-[10px] text-cyan-400/80 font-mono">
-                                            {sub.problemSlug}
-                                          </span>
+                                          <div className="space-y-1">
+                                            <span className="font-semibold text-slate-200 block text-[11px]">
+                                              {st.attemptedCount} of {totalContestProblems} questions attempted
+                                            </span>
+                                            {st.unattemptedCount > 0 ? (
+                                              <span className="text-[10px] text-amber-400/90 font-mono block">
+                                                ⚠️ {st.unattemptedCount} unattempted (submits with 0 pts)
+                                              </span>
+                                            ) : (
+                                              <span className="text-[10px] text-emerald-400 font-mono block">
+                                                ✓ All questions attempted
+                                              </span>
+                                            )}
+                                          </div>
                                         </td>
                                         <td className="p-3">
-                                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase font-bold bg-white/[0.06] border border-white/10 text-slate-300">
-                                            {sub.language || "javascript"}
+                                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                            {st.solvedCount} / {totalContestProblems} Solved
                                           </span>
                                         </td>
+                                        <td className="p-3 font-mono font-bold text-emerald-400">
+                                          {st.totalScore} pts
+                                        </td>
                                         <td className="p-3">
-                                          {isAc ? (
+                                          {st.isSubmitted ? (
                                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                                              <span>✓</span> ACCEPTED
+                                              <span>✓</span> Submitted & Locked
                                             </span>
                                           ) : (
-                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
-                                              <span>✗</span> {sub.status.replace("_", " ")}
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                                              <span>⏳</span> In Progress
                                             </span>
                                           )}
-                                        </td>
-                                        <td className="p-3 font-mono font-bold">
-                                          {isAc ? (
-                                            <span className="text-emerald-400">+{sub.score} pts</span>
-                                          ) : (
-                                            <span className="text-slate-500">0 pts</span>
-                                          )}
-                                        </td>
-                                        <td className="p-3 text-[11px] font-mono text-slate-400">
-                                          {sub.runtime || "—"} / {sub.memory || "—"}
-                                          {typeof sub.passedTestCases === "number" && sub.totalTestCases && (
-                                            <span className="block text-[10px] text-slate-500">
-                                              ({sub.passedTestCases}/{sub.totalTestCases} cases)
-                                            </span>
-                                          )}
-                                        </td>
-                                        <td className="p-3 text-[11px] text-slate-400">
-                                          {new Date(sub.submittedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                                          <span className="block text-[10px] text-slate-500">
-                                            {new Date(sub.submittedAt).toLocaleDateString()}
-                                          </span>
                                         </td>
                                         <td className="p-3 text-right">
-                                          <Button
-                                            size="sm"
-                                            onClick={() => {
-                                              setSelectedSubmissionForCode(sub);
-                                              setCodeCopied(false);
-                                            }}
-                                            className="h-7 text-[11px] font-mono font-bold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-cyan-300 border border-white/10 gap-1 backdrop-blur-md"
-                                          >
-                                            <span>💻</span> View Solution
-                                          </Button>
+                                          {st.isSubmitted ? (
+                                            <span className="text-[11px] text-slate-400 font-mono">
+                                              Finalized
+                                            </span>
+                                          ) : (
+                                            <Button
+                                              size="sm"
+                                              disabled={submittingContestId === selectedContestForSubmissions.id && submittingStudentEmail === st.email}
+                                              onClick={() => handleConfirmSubmitWholeContest(selectedContestForSubmissions.id, st.email)}
+                                              className="h-7 text-[11px] font-mono font-bold rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 gap-1 shadow-sm"
+                                              title="Submit contest for this student whether they attempted all questions or not"
+                                            >
+                                              {submittingStudentEmail === st.email ? (
+                                                <span>⏳ Submitting...</span>
+                                              ) : (
+                                                <span>🏁 Submit Contest</span>
+                                              )}
+                                            </Button>
+                                          )}
                                         </td>
                                       </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* TAB 2: CODE SUBMISSIONS FEED */}
+                        {inspectorViewTab === "submissions" && (
+                          <>
+                            {/* Filter Bar */}
+                            <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-white/10 bg-white/[0.01]">
+                              {/* Search Input */}
+                              <div className="w-full sm:w-80">
+                                <Input
+                                  placeholder="Search by student name, email, or problem..."
+                                  value={submissionSearchQuery}
+                                  onChange={(e) => setSubmissionSearchQuery(e.target.value)}
+                                  className="h-8 text-xs font-mono bg-white/[0.04] border-white/10 text-white placeholder-slate-500 rounded-xl"
+                                />
+                              </div>
+
+                              {/* Filter Tabs */}
+                              <div className="flex items-center gap-1.5 self-start sm:self-auto">
+                                <Button
+                                  size="sm"
+                                  variant={submissionFilterStatus === "ALL" ? "default" : "outline"}
+                                  onClick={() => setSubmissionFilterStatus("ALL")}
+                                  className="h-8 text-xs font-mono rounded-lg"
+                                >
+                                  All ({subs.length})
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant={submissionFilterStatus === "ACCEPTED" ? "default" : "outline"}
+                                  onClick={() => setSubmissionFilterStatus("ACCEPTED")}
+                                  className="h-8 text-xs font-mono rounded-lg text-emerald-300 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20"
+                                >
+                                  Accepted ({acceptedSubs.length})
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant={submissionFilterStatus === "WRONG_ANSWER" ? "default" : "outline"}
+                                  onClick={() => setSubmissionFilterStatus("WRONG_ANSWER")}
+                                  className="h-8 text-xs font-mono rounded-lg text-rose-300 border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20"
+                                >
+                                  Failed ({failedSubs.length})
+                                </Button>
+                              </div>
                             </div>
-                          )}
-                        </div>
+
+                            {/* Submissions List / Table */}
+                            <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                              {filteredSubs.length === 0 ? (
+                                <div className="p-12 text-center text-slate-400 space-y-2 font-mono">
+                                  <span className="text-3xl block">📭</span>
+                                  <p className="text-sm font-semibold">No submissions found matching criteria</p>
+                                  <p className="text-xs">When students enter the arena and submit their code, their solutions will appear here in real-time.</p>
+                                </div>
+                              ) : (
+                                <div className="overflow-x-auto border border-white/10 rounded-2xl bg-white/[0.02] backdrop-blur-md">
+                                  <table className="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                      <tr className="border-b border-white/10 bg-white/[0.03] text-slate-300 font-semibold font-mono text-[10px] uppercase">
+                                        <th className="p-3.5">Student</th>
+                                        <th className="p-3.5">Problem Solved</th>
+                                        <th className="p-3.5">Language</th>
+                                        <th className="p-3.5">Verdict</th>
+                                        <th className="p-3.5">Score</th>
+                                        <th className="p-3.5">Runtime / Memory</th>
+                                        <th className="p-3.5">Submitted</th>
+                                        <th className="p-3.5 text-right">Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/[0.06] font-mono">
+                                      {filteredSubs.map((sub) => {
+                                        const isAc = sub.status === "ACCEPTED";
+                                        return (
+                                          <tr key={sub.id} className="hover:bg-white/[0.04] transition-colors">
+                                            <td className="p-3 font-medium">
+                                              <div className="flex items-center gap-2">
+                                                <div className="w-7 h-7 rounded-full bg-white/[0.06] border border-white/15 text-white font-black flex items-center justify-center text-xs">
+                                                  {sub.userName.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                  <p className="font-bold text-slate-100">{sub.userName}</p>
+                                                  <p className="text-[10px] text-slate-400 font-mono">{sub.userEmail}</p>
+                                                </div>
+                                              </div>
+                                            </td>
+                                            <td className="p-3">
+                                              <span className="font-semibold text-slate-100 block">
+                                                {sub.problemTitle || sub.problemSlug}
+                                              </span>
+                                              <span className="text-[10px] text-cyan-400/80 font-mono">
+                                                {sub.problemSlug}
+                                              </span>
+                                            </td>
+                                            <td className="p-3">
+                                              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase font-bold bg-white/[0.06] border border-white/10 text-slate-300">
+                                                {sub.language || "javascript"}
+                                              </span>
+                                            </td>
+                                            <td className="p-3">
+                                              {isAc ? (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                                  <span>✓</span> ACCEPTED
+                                                </span>
+                                              ) : (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
+                                                  <span>✗</span> {sub.status.replace("_", " ")}
+                                                </span>
+                                              )}
+                                            </td>
+                                            <td className="p-3 font-mono font-bold">
+                                              {isAc ? (
+                                                <span className="text-emerald-400">+{sub.score} pts</span>
+                                              ) : (
+                                                <span className="text-slate-500">0 pts</span>
+                                              )}
+                                            </td>
+                                            <td className="p-3 text-[11px] font-mono text-slate-400">
+                                              {sub.runtime || "—"} / {sub.memory || "—"}
+                                              {typeof sub.passedTestCases === "number" && sub.totalTestCases && (
+                                                <span className="block text-[10px] text-slate-500">
+                                                  ({sub.passedTestCases}/{sub.totalTestCases} cases)
+                                                </span>
+                                              )}
+                                            </td>
+                                            <td className="p-3 text-[11px] text-slate-400">
+                                              {new Date(sub.submittedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                              <span className="block text-[10px] text-slate-500">
+                                                {new Date(sub.submittedAt).toLocaleDateString()}
+                                              </span>
+                                            </td>
+                                            <td className="p-3 text-right">
+                                              <Button
+                                                size="sm"
+                                                onClick={() => {
+                                                  setSelectedSubmissionForCode(sub);
+                                                  setCodeCopied(false);
+                                                }}
+                                                className="h-7 text-[11px] font-mono font-bold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-cyan-300 border border-white/10 gap-1 backdrop-blur-md"
+                                              >
+                                                <span>💻</span> View Solution
+                                              </Button>
+                                            </td>
+                                          </tr>
+                                        );
+                                      })}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     );
                   })()}
 
                   {/* Footer */}
-                  <div className="p-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-between font-mono">
+                  <div className="p-4 border-t border-white/10 bg-white/[0.02] flex flex-wrap items-center justify-between gap-3 font-mono">
                     <span className="text-xs text-slate-400">
                       Contest ID: <strong className="font-mono text-cyan-300">{selectedContestForSubmissions.id}</strong>
                     </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setSelectedContestForSubmissions(null)}
-                      className="h-8 text-xs font-mono font-semibold rounded-lg border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
-                    >
-                      Close Inspector
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => setContestToSubmitWhole(selectedContestForSubmissions)}
+                        disabled={submittingContestId === selectedContestForSubmissions.id}
+                        className="h-8 text-xs font-mono font-bold rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white gap-1.5 shadow-[0_0_15px_rgba(168,85,247,0.35)]"
+                      >
+                        <span>🏁</span> Submit Whole Contest
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedContestForSubmissions(null)}
+                        className="h-8 text-xs font-mono font-semibold rounded-lg border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
+                      >
+                        Close Inspector
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -5252,6 +5540,96 @@ export default function AdminPortalPage() {
                       className="h-7 text-xs font-mono font-semibold rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/10"
                     >
                       Done Viewing
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* MODAL 3: CONFIRM SUBMIT WHOLE CONTEST DIALOG */}
+            {contestToSubmitWhole && (
+              <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div className="bg-slate-950/90 border border-white/20 rounded-3xl w-full max-w-xl p-6 sm:p-7 shadow-[0_25px_80px_rgba(0,0,0,0.85)] text-slate-100 backdrop-blur-2xl space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+                      🏁
+                    </div>
+                    <div className="flex-1">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 border border-purple-500/30 px-2.5 py-0.5 rounded-full">
+                        Admin Contest Finalization
+                      </span>
+                      <h3 className="text-lg font-mono font-black text-white mt-1">
+                        Submit Whole Contest For All Students
+                      </h3>
+                      <p className="text-xs text-slate-400 font-mono mt-0.5">
+                        {contestToSubmitWhole.title}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 space-y-2 text-xs font-mono text-amber-200/90">
+                    <div className="flex items-center gap-2 font-bold text-amber-300">
+                      <span>⚠️</span> Important Submission Policy
+                    </div>
+                    <p className="text-[11px] leading-relaxed">
+                      This will finalize and submit the whole contest for <strong>all enrolled students</strong>, 
+                      <strong> whether they have attempted all questions or not</strong>.
+                    </p>
+                    <ul className="text-[11px] list-disc list-inside space-y-1 text-slate-300">
+                      <li><strong>Attempted & Solved questions</strong> will lock in with their current verified scores.</li>
+                      <li><strong>Unattempted questions</strong> will simply receive 0 points without blocking submission.</li>
+                      <li>The contest status will transition to <strong>ENDED</strong> and official ranks will be locked.</li>
+                    </ul>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2.5 font-mono text-center">
+                    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                      <span className="text-[10px] text-slate-400 uppercase font-semibold block">Enrolled Students</span>
+                      <span className="text-base font-bold text-white">
+                        {Math.max(contestToSubmitWhole.participantsCount, (contestToSubmitWhole.registeredUsers || []).length)}
+                      </span>
+                    </div>
+                    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                      <span className="text-[10px] text-slate-400 uppercase font-semibold block">Questions</span>
+                      <span className="text-base font-bold text-cyan-400">
+                        {contestToSubmitWhole.problems?.length || 0}
+                      </span>
+                    </div>
+                    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                      <span className="text-[10px] text-slate-400 uppercase font-semibold block">Current Status</span>
+                      <span className="text-xs font-bold text-emerald-400 block mt-1">
+                        {contestToSubmitWhole.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-2 border-t border-white/10 font-mono">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setContestToSubmitWhole(null)}
+                      disabled={submittingContestId === contestToSubmitWhole.id}
+                      className="h-9 px-4 text-xs font-semibold rounded-xl border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={submittingContestId === contestToSubmitWhole.id}
+                      onClick={() => handleConfirmSubmitWholeContest(contestToSubmitWhole.id)}
+                      className="h-9 px-5 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] gap-2"
+                    >
+                      {submittingContestId === contestToSubmitWhole.id ? (
+                        <>
+                          <span className="animate-spin">⏳</span> Submitting Contest...
+                        </>
+                      ) : (
+                        <>
+                          <span>🏁</span> Confirm & Submit Whole Contest
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>
