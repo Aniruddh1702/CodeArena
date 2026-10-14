@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { ProblemDefinition } from "./problems-data";
+import { ensureProblemStarterCode } from "./starter-templates";
 
 const FILE_PATH = path.join(process.cwd(), ".data_custom_problems.json");
 
@@ -40,7 +41,12 @@ function writeStore(store: ServerProblemStoreData): void {
 }
 
 export function getServerCustomProblems(): Record<string, ProblemDefinition> {
-  return readStore().problems;
+  const problems = readStore().problems;
+  const normalized: Record<string, ProblemDefinition> = {};
+  for (const [key, prob] of Object.entries(problems)) {
+    normalized[key] = ensureProblemStarterCode(prob);
+  }
+  return normalized;
 }
 
 export function getServerDeletedProblemSlugs(): string[] {
@@ -50,9 +56,10 @@ export function getServerDeletedProblemSlugs(): string[] {
 export function saveCustomProblemServer(problem: ProblemDefinition): void {
   try {
     const store = readStore();
-    store.problems[problem.slug] = problem;
-    const normSlug = problem.slug.toLowerCase().trim().replace(/_/g, "-");
-    store.deletedSlugs = store.deletedSlugs.filter((s) => s !== problem.slug && s !== normSlug);
+    const ensured = ensureProblemStarterCode(problem);
+    store.problems[ensured.slug] = ensured;
+    const normSlug = ensured.slug.toLowerCase().trim().replace(/_/g, "-");
+    store.deletedSlugs = store.deletedSlugs.filter((s) => s !== ensured.slug && s !== normSlug);
     writeStore(store);
   } catch (e) {
     console.error("Error saving server custom problem:", e);

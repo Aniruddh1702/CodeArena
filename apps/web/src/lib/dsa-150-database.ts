@@ -1,4 +1,4 @@
-import { ProblemDefinition } from "./problems-data";
+import type { ProblemDefinition } from "./problems-data";
 
 export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
   "two-sum": {
@@ -29,9 +29,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, target\n * @return {any}\n */\nvar twoSum = function(nums, target) {\n    \n};",
-      "python": "class Solution:\n    def twoSum(self, nums, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement twoSum\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement twoSum\n}"
+      "python": "class Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -129,9 +129,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar isValid = function(s) {\n    \n};",
-      "python": "class Solution:\n    def isValid(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isValid\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isValid\n}"
+      "python": "class Solution:\n    def isValid(self, s: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isValid(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isValid(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -216,9 +216,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums1, m, nums2, n\n * @return {any}\n */\nvar merge = function(nums1, m, nums2, n) {\n    \n};",
-      "python": "class Solution:\n    def merge(self, nums1, m, nums2, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement merge\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement merge\n}"
+      "python": "class Solution:\n    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] merge(int[] nums1, int m, int[] nums2, int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -342,9 +342,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} prices\n * @return {any}\n */\nvar maxProfit = function(prices) {\n    \n};",
-      "python": "class Solution:\n    def maxProfit(self, prices):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxProfit\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxProfit\n}"
+      "python": "class Solution:\n    def maxProfit(self, prices: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxProfit(vector<int>& prices) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxProfit(int[] prices) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -432,9 +432,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar isPalindrome = function(s) {\n    \n};",
-      "python": "class Solution:\n    def isPalindrome(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isPalindrome\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isPalindrome\n}"
+      "python": "class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isPalindrome(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isPalindrome(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -499,9 +499,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n\n * @return {any}\n */\nvar climbStairs = function(n) {\n    \n};",
-      "python": "class Solution:\n    def climbStairs(self, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement climbStairs\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement climbStairs\n}"
+      "python": "class Solution:\n    def climbStairs(self, n: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int climbStairs(int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int climbStairs(int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -575,9 +575,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar singleNumber = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def singleNumber(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement singleNumber\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement singleNumber\n}"
+      "python": "class Solution:\n    def singleNumber(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int singleNumber(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int singleNumber(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -660,9 +660,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar containsDuplicate = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def containsDuplicate(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement containsDuplicate\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement containsDuplicate\n}"
+      "python": "class Solution:\n    def containsDuplicate(self, nums: List[int]) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool containsDuplicate(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean containsDuplicate(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -754,9 +754,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar missingNumber = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def missingNumber(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement missingNumber\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement missingNumber\n}"
+      "python": "class Solution:\n    def missingNumber(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int missingNumber(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int missingNumber(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -840,9 +840,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar reverseString = function(s) {\n    \n};",
-      "python": "class Solution:\n    def reverseString(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement reverseString\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement reverseString\n}"
+      "python": "class Solution:\n    def reverseString(self, s: List[str]) -> List[str]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<char> reverseString(vector<char>& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public char[] reverseString(char[] s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -929,9 +929,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, t\n * @return {any}\n */\nvar isAnagram = function(s, t) {\n    \n};",
-      "python": "class Solution:\n    def isAnagram(self, s, t):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isAnagram\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isAnagram\n}"
+      "python": "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isAnagram(string& s, string& t) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isAnagram(String s, String t) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1001,9 +1001,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, target\n * @return {any}\n */\nvar search = function(nums, target) {\n    \n};",
-      "python": "class Solution:\n    def search(self, nums, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement search\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement search\n}"
+      "python": "class Solution:\n    def search(self, nums: List[int], target: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int search(int[] nums, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1098,9 +1098,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar maxSubArray = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def maxSubArray(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxSubArray\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxSubArray\n}"
+      "python": "class Solution:\n    def maxSubArray(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxSubArray(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxSubArray(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1186,9 +1186,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar moveZeroes = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def moveZeroes(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement moveZeroes\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement moveZeroes\n}"
+      "python": "class Solution:\n    def moveZeroes(self, nums: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> moveZeroes(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] moveZeroes(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1285,9 +1285,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} digits\n * @return {any}\n */\nvar plusOne = function(digits) {\n    \n};",
-      "python": "class Solution:\n    def plusOne(self, digits):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement plusOne\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement plusOne\n}"
+      "python": "class Solution:\n    def plusOne(self, digits: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> plusOne(vector<int>& digits) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] plusOne(int[] digits) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1384,9 +1384,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} x\n * @return {any}\n */\nvar mySqrt = function(x) {\n    \n};",
-      "python": "class Solution:\n    def mySqrt(self, x):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement mySqrt\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement mySqrt\n}"
+      "python": "class Solution:\n    def mySqrt(self, x: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int mySqrt(int x) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int mySqrt(int x) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1467,9 +1467,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar firstUniqChar = function(s) {\n    \n};",
-      "python": "class Solution:\n    def firstUniqChar(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement firstUniqChar\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement firstUniqChar\n}"
+      "python": "class Solution:\n    def firstUniqChar(self, s: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int firstUniqChar(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int firstUniqChar(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1534,9 +1534,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} numRows\n * @return {any}\n */\nvar generate = function(numRows) {\n    \n};",
-      "python": "class Solution:\n    def generate(self, numRows):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement generate\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement generate\n}"
+      "python": "class Solution:\n    def generate(self, numRows: int) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> generate(int numRows) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] generate(int numRows) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1634,9 +1634,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar majorityElement = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def majorityElement(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement majorityElement\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement majorityElement\n}"
+      "python": "class Solution:\n    def majorityElement(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int majorityElement(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int majorityElement(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1716,9 +1716,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n\n * @return {any}\n */\nvar hammingWeight = function(n) {\n    \n};",
-      "python": "class Solution:\n    def hammingWeight(self, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement hammingWeight\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement hammingWeight\n}"
+      "python": "class Solution:\n    def hammingWeight(self, n: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int hammingWeight(int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int hammingWeight(int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1786,9 +1786,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n\n * @return {any}\n */\nvar isHappy = function(n) {\n    \n};",
-      "python": "class Solution:\n    def isHappy(self, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isHappy\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isHappy\n}"
+      "python": "class Solution:\n    def isHappy(self, n: int) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isHappy(int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isHappy(int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1856,9 +1856,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar romanToInt = function(s) {\n    \n};",
-      "python": "class Solution:\n    def romanToInt(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement romanToInt\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement romanToInt\n}"
+      "python": "class Solution:\n    def romanToInt(self, s: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int romanToInt(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int romanToInt(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -1931,9 +1931,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} strs\n * @return {any}\n */\nvar longestCommonPrefix = function(strs) {\n    \n};",
-      "python": "class Solution:\n    def longestCommonPrefix(self, strs):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement longestCommonPrefix\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement longestCommonPrefix\n}"
+      "python": "class Solution:\n    def longestCommonPrefix(self, strs: List[str]) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string longestCommonPrefix(vector<string>& strs) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String longestCommonPrefix(String[] strs) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2012,9 +2012,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar removeDuplicates = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def removeDuplicates(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement removeDuplicates\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement removeDuplicates\n}"
+      "python": "class Solution:\n    def removeDuplicates(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int removeDuplicates(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int removeDuplicates(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2101,9 +2101,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, val\n * @return {any}\n */\nvar removeElement = function(nums, val) {\n    \n};",
-      "python": "class Solution:\n    def removeElement(self, nums, val):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement removeElement\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement removeElement\n}"
+      "python": "class Solution:\n    def removeElement(self, nums: List[int], val: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int removeElement(vector<int>& nums, int val) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int removeElement(int[] nums, int val) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2188,9 +2188,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, target\n * @return {any}\n */\nvar searchInsert = function(nums, target) {\n    \n};",
-      "python": "class Solution:\n    def searchInsert(self, nums, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement searchInsert\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement searchInsert\n}"
+      "python": "class Solution:\n    def searchInsert(self, nums: List[int], target: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int searchInsert(vector<int>& nums, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int searchInsert(int[] nums, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2276,9 +2276,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar lengthOfLastWord = function(s) {\n    \n};",
-      "python": "class Solution:\n    def lengthOfLastWord(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement lengthOfLastWord\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement lengthOfLastWord\n}"
+      "python": "class Solution:\n    def lengthOfLastWord(self, s: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int lengthOfLastWord(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int lengthOfLastWord(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2343,9 +2343,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n\n * @return {any}\n */\nvar countBits = function(n) {\n    \n};",
-      "python": "class Solution:\n    def countBits(self, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement countBits\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement countBits\n}"
+      "python": "class Solution:\n    def countBits(self, n: int) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> countBits(int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] countBits(int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2429,9 +2429,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} ransomNote, magazine\n * @return {any}\n */\nvar canConstruct = function(ransomNote, magazine) {\n    \n};",
-      "python": "class Solution:\n    def canConstruct(self, ransomNote, magazine):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement canConstruct\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement canConstruct\n}"
+      "python": "class Solution:\n    def canConstruct(self, ransomNote: str, magazine: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool canConstruct(string& ransomNote, string& magazine) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean canConstruct(String ransomNote, String magazine) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2504,9 +2504,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, t\n * @return {any}\n */\nvar isSubsequence = function(s, t) {\n    \n};",
-      "python": "class Solution:\n    def isSubsequence(self, s, t):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isSubsequence\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isSubsequence\n}"
+      "python": "class Solution:\n    def isSubsequence(self, s: str, t: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isSubsequence(string& s, string& t) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isSubsequence(String s, String t) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2578,9 +2578,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar sortedSquares = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def sortedSquares(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement sortedSquares\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement sortedSquares\n}"
+      "python": "class Solution:\n    def sortedSquares(self, nums: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> sortedSquares(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] sortedSquares(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2686,9 +2686,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, t\n * @return {any}\n */\nvar backspaceCompare = function(s, t) {\n    \n};",
-      "python": "class Solution:\n    def backspaceCompare(self, s, t):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement backspaceCompare\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement backspaceCompare\n}"
+      "python": "class Solution:\n    def backspaceCompare(self, s: str, t: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool backspaceCompare(string& s, string& t) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean backspaceCompare(String s, String t) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2757,9 +2757,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} stones\n * @return {any}\n */\nvar lastStoneWeight = function(stones) {\n    \n};",
-      "python": "class Solution:\n    def lastStoneWeight(self, stones):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement lastStoneWeight\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement lastStoneWeight\n}"
+      "python": "class Solution:\n    def lastStoneWeight(self, stones: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int lastStoneWeight(vector<int>& stones) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int lastStoneWeight(int[] stones) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2840,9 +2840,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} cost\n * @return {any}\n */\nvar minCostClimbingStairs = function(cost) {\n    \n};",
-      "python": "class Solution:\n    def minCostClimbingStairs(self, cost):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minCostClimbingStairs\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minCostClimbingStairs\n}"
+      "python": "class Solution:\n    def minCostClimbingStairs(self, cost: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int minCostClimbingStairs(vector<int>& cost) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int minCostClimbingStairs(int[] cost) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -2930,9 +2930,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar pivotIndex = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def pivotIndex(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement pivotIndex\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement pivotIndex\n}"
+      "python": "class Solution:\n    def pivotIndex(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int pivotIndex(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int pivotIndex(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3017,9 +3017,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n\n * @return {any}\n */\nvar isPowerOfTwo = function(n) {\n    \n};",
-      "python": "class Solution:\n    def isPowerOfTwo(self, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isPowerOfTwo\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isPowerOfTwo\n}"
+      "python": "class Solution:\n    def isPowerOfTwo(self, n: int) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isPowerOfTwo(int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isPowerOfTwo(int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3111,9 +3111,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums1, nums2\n * @return {any}\n */\nvar intersection = function(nums1, nums2) {\n    \n};",
-      "python": "class Solution:\n    def intersection(self, nums1, nums2):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement intersection\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement intersection\n}"
+      "python": "class Solution:\n    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] intersection(int[] nums1, int[] nums2) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3205,9 +3205,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar findDisappearedNumbers = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def findDisappearedNumbers(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findDisappearedNumbers\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findDisappearedNumbers\n}"
+      "python": "class Solution:\n    def findDisappearedNumbers(self, nums: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> findDisappearedNumbers(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] findDisappearedNumbers(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3296,9 +3296,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar reverseVowels = function(s) {\n    \n};",
-      "python": "class Solution:\n    def reverseVowels(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement reverseVowels\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement reverseVowels\n}"
+      "python": "class Solution:\n    def reverseVowels(self, s: str) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string reverseVowels(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String reverseVowels(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3366,9 +3366,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar maximumProduct = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def maximumProduct(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maximumProduct\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maximumProduct\n}"
+      "python": "class Solution:\n    def maximumProduct(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maximumProduct(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maximumProduct(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3453,9 +3453,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} flowerbed, n\n * @return {any}\n */\nvar canPlaceFlowers = function(flowerbed, n) {\n    \n};",
-      "python": "class Solution:\n    def canPlaceFlowers(self, flowerbed, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement canPlaceFlowers\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement canPlaceFlowers\n}"
+      "python": "class Solution:\n    def canPlaceFlowers(self, flowerbed: List[int], n: int) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool canPlaceFlowers(vector<int>& flowerbed, int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean canPlaceFlowers(int[] flowerbed, int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3544,9 +3544,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} num\n * @return {any}\n */\nvar isPerfectSquare = function(num) {\n    \n};",
-      "python": "class Solution:\n    def isPerfectSquare(self, num):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isPerfectSquare\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isPerfectSquare\n}"
+      "python": "class Solution:\n    def isPerfectSquare(self, num: int) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isPerfectSquare(int num) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isPerfectSquare(int num) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3622,9 +3622,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} a, b\n * @return {any}\n */\nvar addBinary = function(a, b) {\n    \n};",
-      "python": "class Solution:\n    def addBinary(self, a, b):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement addBinary\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement addBinary\n}"
+      "python": "class Solution:\n    def addBinary(self, a: str, b: str) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string addBinary(string& a, string& b) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String addBinary(String a, String b) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3690,9 +3690,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} x, y\n * @return {any}\n */\nvar hammingDistance = function(x, y) {\n    \n};",
-      "python": "class Solution:\n    def hammingDistance(self, x, y):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement hammingDistance\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement hammingDistance\n}"
+      "python": "class Solution:\n    def hammingDistance(self, x: int, y: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int hammingDistance(int x, int y) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int hammingDistance(int x, int y) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3763,9 +3763,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} matrix\n * @return {any}\n */\nvar isToeplitzMatrix = function(matrix) {\n    \n};",
-      "python": "class Solution:\n    def isToeplitzMatrix(self, matrix):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isToeplitzMatrix\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isToeplitzMatrix\n}"
+      "python": "class Solution:\n    def isToeplitzMatrix(self, matrix: List[List[int]]) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isToeplitzMatrix(vector<vector<int>>& matrix) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isToeplitzMatrix(int[][] matrix) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -3878,9 +3878,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} matrix\n * @return {any}\n */\nvar transpose = function(matrix) {\n    \n};",
-      "python": "class Solution:\n    def transpose(self, matrix):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement transpose\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement transpose\n}"
+      "python": "class Solution:\n    def transpose(self, matrix: List[List[int]]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> transpose(vector<vector<int>>& matrix) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] transpose(int[][] matrix) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4018,9 +4018,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar isMonotonic = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def isMonotonic(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isMonotonic\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isMonotonic\n}"
+      "python": "class Solution:\n    def isMonotonic(self, nums: List[int]) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isMonotonic(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isMonotonic(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4116,9 +4116,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar sortArrayByParity = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def sortArrayByParity(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement sortArrayByParity\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement sortArrayByParity\n}"
+      "python": "class Solution:\n    def sortArrayByParity(self, nums: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> sortArrayByParity(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] sortArrayByParity(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4210,9 +4210,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} address\n * @return {any}\n */\nvar defangIPaddr = function(address) {\n    \n};",
-      "python": "class Solution:\n    def defangIPaddr(self, address):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement defangIPaddr\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement defangIPaddr\n}"
+      "python": "class Solution:\n    def defangIPaddr(self, address: str) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string defangIPaddr(string& address) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String defangIPaddr(String address) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4275,9 +4275,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, n\n * @return {any}\n */\nvar shuffle = function(nums, n) {\n    \n};",
-      "python": "class Solution:\n    def shuffle(self, nums, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement shuffle\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement shuffle\n}"
+      "python": "class Solution:\n    def shuffle(self, nums: List[int], n: int) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> shuffle(vector<int>& nums, int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] shuffle(int[] nums, int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4383,9 +4383,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar threeSum = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def threeSum(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement threeSum\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement threeSum\n}"
+      "python": "class Solution:\n    def threeSum(self, nums: List[int]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> threeSum(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] threeSum(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4502,9 +4502,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar lengthOfLongestSubstring = function(s) {\n    \n};",
-      "python": "class Solution:\n    def lengthOfLongestSubstring(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement lengthOfLongestSubstring\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement lengthOfLongestSubstring\n}"
+      "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int lengthOfLongestSubstring(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int lengthOfLongestSubstring(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4581,9 +4581,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} height\n * @return {any}\n */\nvar maxArea = function(height) {\n    \n};",
-      "python": "class Solution:\n    def maxArea(self, height):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxArea\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxArea\n}"
+      "python": "class Solution:\n    def maxArea(self, height: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxArea(vector<int>& height) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxArea(int[] height) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4677,9 +4677,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} strs\n * @return {any}\n */\nvar groupAnagrams = function(strs) {\n    \n};",
-      "python": "class Solution:\n    def groupAnagrams(self, strs):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement groupAnagrams\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement groupAnagrams\n}"
+      "python": "class Solution:\n    def groupAnagrams(self, strs: List[str]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> groupAnagrams(vector<string>& strs) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] groupAnagrams(String[] strs) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4775,9 +4775,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, k\n * @return {any}\n */\nvar topKFrequent = function(nums, k) {\n    \n};",
-      "python": "class Solution:\n    def topKFrequent(self, nums, k):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement topKFrequent\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement topKFrequent\n}"
+      "python": "class Solution:\n    def topKFrequent(self, nums: List[int], k: int) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> topKFrequent(vector<int>& nums, int k) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] topKFrequent(int[] nums, int k) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4862,9 +4862,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar productExceptSelf = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def productExceptSelf(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement productExceptSelf\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement productExceptSelf\n}"
+      "python": "class Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] productExceptSelf(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -4966,9 +4966,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar longestConsecutive = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def longestConsecutive(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement longestConsecutive\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement longestConsecutive\n}"
+      "python": "class Solution:\n    def longestConsecutive(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int longestConsecutive(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int longestConsecutive(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5066,9 +5066,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} numbers, target\n * @return {any}\n */\nvar twoSumII = function(numbers, target) {\n    \n};",
-      "python": "class Solution:\n    def twoSumII(self, numbers, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement twoSumII\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement twoSumII\n}"
+      "python": "class Solution:\n    def twoSumII(self, numbers: List[int], target: int) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> twoSumII(vector<int>& numbers, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] twoSumII(int[] numbers, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5171,9 +5171,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, k\n * @return {any}\n */\nvar subarraySum = function(nums, k) {\n    \n};",
-      "python": "class Solution:\n    def subarraySum(self, nums, k):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement subarraySum\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement subarraySum\n}"
+      "python": "class Solution:\n    def subarraySum(self, nums: List[int], k: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int subarraySum(vector<int>& nums, int k) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int subarraySum(int[] nums, int k) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5263,9 +5263,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar longestPalindrome = function(s) {\n    \n};",
-      "python": "class Solution:\n    def longestPalindrome(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement longestPalindrome\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement longestPalindrome\n}"
+      "python": "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string longestPalindrome(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String longestPalindrome(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5338,9 +5338,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar countSubstrings = function(s) {\n    \n};",
-      "python": "class Solution:\n    def countSubstrings(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement countSubstrings\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement countSubstrings\n}"
+      "python": "class Solution:\n    def countSubstrings(self, s: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int countSubstrings(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int countSubstrings(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5409,9 +5409,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} coins, amount\n * @return {any}\n */\nvar coinChange = function(coins, amount) {\n    \n};",
-      "python": "class Solution:\n    def coinChange(self, coins, amount):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement coinChange\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement coinChange\n}"
+      "python": "class Solution:\n    def coinChange(self, coins: List[int], amount: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int coinChange(vector<int>& coins, int amount) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int coinChange(int[] coins, int amount) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5492,9 +5492,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar numDecodings = function(s) {\n    \n};",
-      "python": "class Solution:\n    def numDecodings(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement numDecodings\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement numDecodings\n}"
+      "python": "class Solution:\n    def numDecodings(self, s: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int numDecodings(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int numDecodings(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5567,9 +5567,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar rob = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def rob(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement rob\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement rob\n}"
+      "python": "class Solution:\n    def rob(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int rob(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int rob(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5652,9 +5652,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar robII = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def robII(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement robII\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement robII\n}"
+      "python": "class Solution:\n    def robII(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int robII(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int robII(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5737,9 +5737,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} m, n\n * @return {any}\n */\nvar uniquePaths = function(m, n) {\n    \n};",
-      "python": "class Solution:\n    def uniquePaths(self, m, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement uniquePaths\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement uniquePaths\n}"
+      "python": "class Solution:\n    def uniquePaths(self, m: int, n: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int uniquePaths(int m, int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int uniquePaths(int m, int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5811,9 +5811,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar canJump = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def canJump(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement canJump\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement canJump\n}"
+      "python": "class Solution:\n    def canJump(self, nums: List[int]) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool canJump(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean canJump(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5899,9 +5899,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar jump = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def jump(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement jump\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement jump\n}"
+      "python": "class Solution:\n    def jump(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int jump(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int jump(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -5985,9 +5985,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} gas, cost\n * @return {any}\n */\nvar canCompleteCircuit = function(gas, cost) {\n    \n};",
-      "python": "class Solution:\n    def canCompleteCircuit(self, gas, cost):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement canCompleteCircuit\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement canCompleteCircuit\n}"
+      "python": "class Solution:\n    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int canCompleteCircuit(int[] gas, int[] cost) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6083,9 +6083,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} matrix\n * @return {any}\n */\nvar rotate = function(matrix) {\n    \n};",
-      "python": "class Solution:\n    def rotate(self, matrix):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement rotate\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement rotate\n}"
+      "python": "class Solution:\n    def rotate(self, matrix: List[List[int]]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> rotate(vector<vector<int>>& matrix) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] rotate(int[][] matrix) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6221,9 +6221,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} matrix\n * @return {any}\n */\nvar spiralOrder = function(matrix) {\n    \n};",
-      "python": "class Solution:\n    def spiralOrder(self, matrix):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement spiralOrder\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement spiralOrder\n}"
+      "python": "class Solution:\n    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> spiralOrder(vector<vector<int>>& matrix) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] spiralOrder(int[][] matrix) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6335,9 +6335,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} matrix\n * @return {any}\n */\nvar setZeroes = function(matrix) {\n    \n};",
-      "python": "class Solution:\n    def setZeroes(self, matrix):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement setZeroes\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement setZeroes\n}"
+      "python": "class Solution:\n    def setZeroes(self, matrix: List[List[int]]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> setZeroes(vector<vector<int>>& matrix) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] setZeroes(int[][] matrix) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6467,9 +6467,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} grid\n * @return {any}\n */\nvar numIslands = function(grid) {\n    \n};",
-      "python": "class Solution:\n    def numIslands(self, grid):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement numIslands\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement numIslands\n}"
+      "python": "class Solution:\n    def numIslands(self, grid: List[List[str]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int numIslands(vector<vector<char>>& grid) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int numIslands(char[][] grid) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6579,9 +6579,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} temperatures\n * @return {any}\n */\nvar dailyTemperatures = function(temperatures) {\n    \n};",
-      "python": "class Solution:\n    def dailyTemperatures(self, temperatures):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement dailyTemperatures\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement dailyTemperatures\n}"
+      "python": "class Solution:\n    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> dailyTemperatures(vector<int>& temperatures) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] dailyTemperatures(int[] temperatures) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6693,9 +6693,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} tokens\n * @return {any}\n */\nvar evalRPN = function(tokens) {\n    \n};",
-      "python": "class Solution:\n    def evalRPN(self, tokens):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement evalRPN\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement evalRPN\n}"
+      "python": "class Solution:\n    def evalRPN(self, tokens: List[str]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int evalRPN(vector<char>& tokens) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int evalRPN(char[] tokens) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6781,9 +6781,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n\n * @return {any}\n */\nvar generateParenthesis = function(n) {\n    \n};",
-      "python": "class Solution:\n    def generateParenthesis(self, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement generateParenthesis\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement generateParenthesis\n}"
+      "python": "class Solution:\n    def generateParenthesis(self, n: int) -> List[str]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<string> generateParenthesis(int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String[] generateParenthesis(int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6856,9 +6856,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} matrix, target\n * @return {any}\n */\nvar searchMatrix = function(matrix, target) {\n    \n};",
-      "python": "class Solution:\n    def searchMatrix(self, matrix, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement searchMatrix\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement searchMatrix\n}"
+      "python": "class Solution:\n    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool searchMatrix(vector<vector<int>>& matrix, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean searchMatrix(int[][] matrix, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -6975,9 +6975,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar findMin = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def findMin(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findMin\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findMin\n}"
+      "python": "class Solution:\n    def findMin(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int findMin(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int findMin(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7074,9 +7074,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, target\n * @return {any}\n */\nvar searchRotated = function(nums, target) {\n    \n};",
-      "python": "class Solution:\n    def searchRotated(self, nums, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement searchRotated\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement searchRotated\n}"
+      "python": "class Solution:\n    def searchRotated(self, nums: List[int], target: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int searchRotated(vector<int>& nums, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int searchRotated(int[] nums, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7179,9 +7179,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} piles, h\n * @return {any}\n */\nvar minEatingSpeed = function(piles, h) {\n    \n};",
-      "python": "class Solution:\n    def minEatingSpeed(self, piles, h):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minEatingSpeed\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minEatingSpeed\n}"
+      "python": "class Solution:\n    def minEatingSpeed(self, piles: List[int], h: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int minEatingSpeed(vector<int>& piles, int h) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int minEatingSpeed(int[] piles, int h) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7272,9 +7272,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} digits\n * @return {any}\n */\nvar letterCombinations = function(digits) {\n    \n};",
-      "python": "class Solution:\n    def letterCombinations(self, digits):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement letterCombinations\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement letterCombinations\n}"
+      "python": "class Solution:\n    def letterCombinations(self, digits: str) -> List[str]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<string> letterCombinations(string& digits) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String[] letterCombinations(String digits) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7346,9 +7346,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} candidates, target\n * @return {any}\n */\nvar combinationSum = function(candidates, target) {\n    \n};",
-      "python": "class Solution:\n    def combinationSum(self, candidates, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement combinationSum\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement combinationSum\n}"
+      "python": "class Solution:\n    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] combinationSum(int[] candidates, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7444,9 +7444,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar permute = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def permute(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement permute\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement permute\n}"
+      "python": "class Solution:\n    def permute(self, nums: List[int]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> permute(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] permute(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7559,9 +7559,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar subsets = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def subsets(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement subsets\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement subsets\n}"
+      "python": "class Solution:\n    def subsets(self, nums: List[int]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> subsets(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] subsets(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7680,9 +7680,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} board, word\n * @return {any}\n */\nvar exist = function(board, word) {\n    \n};",
-      "python": "class Solution:\n    def exist(self, board, word):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement exist\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement exist\n}"
+      "python": "class Solution:\n    def exist(self, board: List[List[str]], word: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool exist(vector<vector<char>>& board, string& word) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean exist(char[][] board, String word) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7802,9 +7802,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, p\n * @return {any}\n */\nvar findAnagrams = function(s, p) {\n    \n};",
-      "python": "class Solution:\n    def findAnagrams(self, s, p):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findAnagrams\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findAnagrams\n}"
+      "python": "class Solution:\n    def findAnagrams(self, s: str, p: str) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> findAnagrams(string& s, string& p) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] findAnagrams(String s, String p) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7875,9 +7875,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, k\n * @return {any}\n */\nvar characterReplacement = function(s, k) {\n    \n};",
-      "python": "class Solution:\n    def characterReplacement(self, s, k):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement characterReplacement\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement characterReplacement\n}"
+      "python": "class Solution:\n    def characterReplacement(self, s: str, k: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int characterReplacement(string& s, int k) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int characterReplacement(String s, int k) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -7952,9 +7952,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s1, s2\n * @return {any}\n */\nvar checkInclusion = function(s1, s2) {\n    \n};",
-      "python": "class Solution:\n    def checkInclusion(self, s1, s2):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement checkInclusion\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement checkInclusion\n}"
+      "python": "class Solution:\n    def checkInclusion(self, s1: str, s2: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool checkInclusion(string& s1, string& s2) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean checkInclusion(String s1, String s2) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8021,9 +8021,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} target, nums\n * @return {any}\n */\nvar minSubArrayLen = function(target, nums) {\n    \n};",
-      "python": "class Solution:\n    def minSubArrayLen(self, target, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minSubArrayLen\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minSubArrayLen\n}"
+      "python": "class Solution:\n    def minSubArrayLen(self, target: int, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int minSubArrayLen(int target, vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int minSubArrayLen(int target, int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8122,9 +8122,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, target\n * @return {any}\n */\nvar findTargetSumWays = function(nums, target) {\n    \n};",
-      "python": "class Solution:\n    def findTargetSumWays(self, nums, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findTargetSumWays\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findTargetSumWays\n}"
+      "python": "class Solution:\n    def findTargetSumWays(self, nums: List[int], target: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int findTargetSumWays(vector<int>& nums, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int findTargetSumWays(int[] nums, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8221,9 +8221,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, wordDict\n * @return {any}\n */\nvar wordBreak = function(s, wordDict) {\n    \n};",
-      "python": "class Solution:\n    def wordBreak(self, s, wordDict):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement wordBreak\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement wordBreak\n}"
+      "python": "class Solution:\n    def wordBreak(self, s: str, wordDict: List[str]) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool wordBreak(string& s, vector<string>& wordDict) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean wordBreak(String s, String[] wordDict) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8296,9 +8296,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar canPartition = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def canPartition(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement canPartition\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement canPartition\n}"
+      "python": "class Solution:\n    def canPartition(self, nums: List[int]) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool canPartition(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean canPartition(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8384,9 +8384,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar lengthOfLIS = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def lengthOfLIS(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement lengthOfLIS\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement lengthOfLIS\n}"
+      "python": "class Solution:\n    def lengthOfLIS(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int lengthOfLIS(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int lengthOfLIS(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8485,9 +8485,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar maxProduct = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def maxProduct(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxProduct\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxProduct\n}"
+      "python": "class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxProduct(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxProduct(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8577,9 +8577,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, k\n * @return {any}\n */\nvar findKthLargest = function(nums, k) {\n    \n};",
-      "python": "class Solution:\n    def findKthLargest(self, nums, k):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findKthLargest\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findKthLargest\n}"
+      "python": "class Solution:\n    def findKthLargest(self, nums: List[int], k: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int findKthLargest(vector<int>& nums, int k) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int findKthLargest(int[] nums, int k) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8679,9 +8679,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar sortColors = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def sortColors(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement sortColors\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement sortColors\n}"
+      "python": "class Solution:\n    def sortColors(self, nums: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> sortColors(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] sortColors(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8776,9 +8776,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar nextPermutation = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def nextPermutation(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement nextPermutation\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement nextPermutation\n}"
+      "python": "class Solution:\n    def nextPermutation(self, nums: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> nextPermutation(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] nextPermutation(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8877,9 +8877,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} intervals\n * @return {any}\n */\nvar eraseOverlapIntervals = function(intervals) {\n    \n};",
-      "python": "class Solution:\n    def eraseOverlapIntervals(self, intervals):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement eraseOverlapIntervals\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement eraseOverlapIntervals\n}"
+      "python": "class Solution:\n    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int eraseOverlapIntervals(vector<vector<int>>& intervals) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int eraseOverlapIntervals(int[][] intervals) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -8975,9 +8975,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} intervals\n * @return {any}\n */\nvar mergeIntervals = function(intervals) {\n    \n};",
-      "python": "class Solution:\n    def mergeIntervals(self, intervals):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement mergeIntervals\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement mergeIntervals\n}"
+      "python": "class Solution:\n    def mergeIntervals(self, intervals: List[List[int]]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> mergeIntervals(vector<vector<int>>& intervals) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] mergeIntervals(int[][] intervals) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9111,9 +9111,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} intervals, newInterval\n * @return {any}\n */\nvar insert = function(intervals, newInterval) {\n    \n};",
-      "python": "class Solution:\n    def insert(self, intervals, newInterval):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement insert\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement insert\n}"
+      "python": "class Solution:\n    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] insert(int[][] intervals, int[] newInterval) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9247,9 +9247,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} height\n * @return {any}\n */\nvar trap = function(height) {\n    \n};",
-      "python": "class Solution:\n    def trap(self, height):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement trap\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement trap\n}"
+      "python": "class Solution:\n    def trap(self, height: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int trap(vector<int>& height) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int trap(int[] height) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9364,9 +9364,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums1, nums2\n * @return {any}\n */\nvar findMedianSortedArrays = function(nums1, nums2) {\n    \n};",
-      "python": "class Solution:\n    def findMedianSortedArrays(self, nums1, nums2):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findMedianSortedArrays\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findMedianSortedArrays\n}"
+      "python": "class Solution:\n    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int findMedianSortedArrays(int[] nums1, int[] nums2) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9459,9 +9459,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} lists\n * @return {any}\n */\nvar mergeKLists = function(lists) {\n    \n};",
-      "python": "class Solution:\n    def mergeKLists(self, lists):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement mergeKLists\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement mergeKLists\n}"
+      "python": "class Solution:\n    def mergeKLists(self, lists: List[List[int]]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> mergeKLists(vector<vector<int>>& lists) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] mergeKLists(int[][] lists) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9559,9 +9559,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar firstMissingPositive = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def firstMissingPositive(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement firstMissingPositive\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement firstMissingPositive\n}"
+      "python": "class Solution:\n    def firstMissingPositive(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int firstMissingPositive(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int firstMissingPositive(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9659,9 +9659,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, p\n * @return {any}\n */\nvar isMatch = function(s, p) {\n    \n};",
-      "python": "class Solution:\n    def isMatch(self, s, p):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isMatch\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isMatch\n}"
+      "python": "class Solution:\n    def isMatch(self, s: str, p: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isMatch(string& s, string& p) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isMatch(String s, String p) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9739,9 +9739,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n\n * @return {any}\n */\nvar solveNQueens = function(n) {\n    \n};",
-      "python": "class Solution:\n    def solveNQueens(self, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement solveNQueens\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement solveNQueens\n}"
+      "python": "class Solution:\n    def solveNQueens(self, n: int) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> solveNQueens(int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] solveNQueens(int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9823,9 +9823,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} word1, word2\n * @return {any}\n */\nvar minDistance = function(word1, word2) {\n    \n};",
-      "python": "class Solution:\n    def minDistance(self, word1, word2):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minDistance\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minDistance\n}"
+      "python": "class Solution:\n    def minDistance(self, word1: str, word2: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int minDistance(string& word1, string& word2) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int minDistance(String word1, String word2) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -9907,9 +9907,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} heights\n * @return {any}\n */\nvar largestRectangleArea = function(heights) {\n    \n};",
-      "python": "class Solution:\n    def largestRectangleArea(self, heights):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement largestRectangleArea\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement largestRectangleArea\n}"
+      "python": "class Solution:\n    def largestRectangleArea(self, heights: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int largestRectangleArea(vector<int>& heights) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int largestRectangleArea(int[] heights) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10013,9 +10013,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, k\n * @return {any}\n */\nvar maxSlidingWindow = function(nums, k) {\n    \n};",
-      "python": "class Solution:\n    def maxSlidingWindow(self, nums, k):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxSlidingWindow\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxSlidingWindow\n}"
+      "python": "class Solution:\n    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> maxSlidingWindow(vector<int>& nums, int k) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] maxSlidingWindow(int[] nums, int k) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10120,9 +10120,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, t\n * @return {any}\n */\nvar minWindow = function(s, t) {\n    \n};",
-      "python": "class Solution:\n    def minWindow(self, s, t):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minWindow\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minWindow\n}"
+      "python": "class Solution:\n    def minWindow(self, s: str, t: str) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string minWindow(string& s, string& t) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String minWindow(String s, String t) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10195,9 +10195,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, p\n * @return {any}\n */\nvar isMatchRegex = function(s, p) {\n    \n};",
-      "python": "class Solution:\n    def isMatchRegex(self, s, p):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement isMatchRegex\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement isMatchRegex\n}"
+      "python": "class Solution:\n    def isMatchRegex(self, s: str, p: str) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isMatchRegex(string& s, string& p) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean isMatchRegex(String s, String p) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10286,9 +10286,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} matrix\n * @return {any}\n */\nvar maximalRectangle = function(matrix) {\n    \n};",
-      "python": "class Solution:\n    def maximalRectangle(self, matrix):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maximalRectangle\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maximalRectangle\n}"
+      "python": "class Solution:\n    def maximalRectangle(self, matrix: List[List[str]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maximalRectangle(vector<vector<char>>& matrix) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maximalRectangle(char[][] matrix) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10385,9 +10385,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar longestValidParentheses = function(s) {\n    \n};",
-      "python": "class Solution:\n    def longestValidParentheses(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement longestValidParentheses\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement longestValidParentheses\n}"
+      "python": "class Solution:\n    def longestValidParentheses(self, s: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int longestValidParentheses(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int longestValidParentheses(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10462,9 +10462,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar maxCoins = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def maxCoins(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxCoins\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxCoins\n}"
+      "python": "class Solution:\n    def maxCoins(self, nums: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxCoins(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxCoins(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10543,9 +10543,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s, t\n * @return {any}\n */\nvar numDistinct = function(s, t) {\n    \n};",
-      "python": "class Solution:\n    def numDistinct(self, s, t):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement numDistinct\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement numDistinct\n}"
+      "python": "class Solution:\n    def numDistinct(self, s: str, t: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int numDistinct(string& s, string& t) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int numDistinct(String s, String t) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10620,9 +10620,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} envelopes\n * @return {any}\n */\nvar maxEnvelopes = function(envelopes) {\n    \n};",
-      "python": "class Solution:\n    def maxEnvelopes(self, envelopes):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxEnvelopes\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxEnvelopes\n}"
+      "python": "class Solution:\n    def maxEnvelopes(self, envelopes: List[List[int]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxEnvelopes(vector<vector<int>>& envelopes) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxEnvelopes(int[][] envelopes) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10734,9 +10734,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} k, n\n * @return {any}\n */\nvar superEggDrop = function(k, n) {\n    \n};",
-      "python": "class Solution:\n    def superEggDrop(self, k, n):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement superEggDrop\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement superEggDrop\n}"
+      "python": "class Solution:\n    def superEggDrop(self, k: int, n: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int superEggDrop(int k, int n) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int superEggDrop(int k, int n) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10805,9 +10805,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar minCut = function(s) {\n    \n};",
-      "python": "class Solution:\n    def minCut(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minCut\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minCut\n}"
+      "python": "class Solution:\n    def minCut(self, s: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int minCut(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int minCut(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10891,9 +10891,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar shortestPalindrome = function(s) {\n    \n};",
-      "python": "class Solution:\n    def shortestPalindrome(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement shortestPalindrome\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement shortestPalindrome\n}"
+      "python": "class Solution:\n    def shortestPalindrome(self, s: str) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string shortestPalindrome(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String shortestPalindrome(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -10962,9 +10962,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} beginWord, endWord, wordList\n * @return {any}\n */\nvar ladderLength = function(beginWord, endWord, wordList) {\n    \n};",
-      "python": "class Solution:\n    def ladderLength(self, beginWord, endWord, wordList):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement ladderLength\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement ladderLength\n}"
+      "python": "class Solution:\n    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int ladderLength(string& beginWord, string& endWord, vector<string>& wordList) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int ladderLength(String beginWord, String endWord, String[] wordList) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11053,9 +11053,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} commands, args\n * @return {any}\n */\nvar streamMedian = function(commands, args) {\n    \n};",
-      "python": "class Solution:\n    def streamMedian(self, commands, args):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement streamMedian\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement streamMedian\n}"
+      "python": "class Solution:\n    def streamMedian(self, commands: List[str], args: List[List[int]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int streamMedian(vector<string>& commands, vector<vector<int>>& args) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int streamMedian(String[] commands, int[][] args) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11145,9 +11145,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} words, maxWidth\n * @return {any}\n */\nvar fullJustify = function(words, maxWidth) {\n    \n};",
-      "python": "class Solution:\n    def fullJustify(self, words, maxWidth):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement fullJustify\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement fullJustify\n}"
+      "python": "class Solution:\n    def fullJustify(self, words: List[str], maxWidth: int) -> List[str]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<string> fullJustify(vector<string>& words, int maxWidth) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String[] fullJustify(String[] words, int maxWidth) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11225,9 +11225,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n, cuts\n * @return {any}\n */\nvar minCost = function(n, cuts) {\n    \n};",
-      "python": "class Solution:\n    def minCost(self, n, cuts):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minCost\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minCost\n}"
+      "python": "class Solution:\n    def minCost(self, n: int, cuts: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int minCost(int n, vector<int>& cuts) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int minCost(int n, int[] cuts) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11303,9 +11303,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} stones\n * @return {any}\n */\nvar canCross = function(stones) {\n    \n};",
-      "python": "class Solution:\n    def canCross(self, stones):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement canCross\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement canCross\n}"
+      "python": "class Solution:\n    def canCross(self, stones: List[int]) -> bool:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool canCross(vector<int>& stones) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public boolean canCross(int[] stones) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11404,9 +11404,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums\n * @return {any}\n */\nvar countSmaller = function(nums) {\n    \n};",
-      "python": "class Solution:\n    def countSmaller(self, nums):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement countSmaller\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement countSmaller\n}"
+      "python": "class Solution:\n    def countSmaller(self, nums: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> countSmaller(vector<int>& nums) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] countSmaller(int[] nums) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11525,9 +11525,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} points\n * @return {any}\n */\nvar maxPoints = function(points) {\n    \n};",
-      "python": "class Solution:\n    def maxPoints(self, points):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxPoints\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxPoints\n}"
+      "python": "class Solution:\n    def maxPoints(self, points: List[List[int]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxPoints(vector<vector<int>>& points) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxPoints(int[][] points) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11627,9 +11627,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} prices\n * @return {any}\n */\nvar maxProfitIII = function(prices) {\n    \n};",
-      "python": "class Solution:\n    def maxProfitIII(self, prices):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxProfitIII\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxProfitIII\n}"
+      "python": "class Solution:\n    def maxProfitIII(self, prices: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxProfitIII(vector<int>& prices) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxProfitIII(int[] prices) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11708,9 +11708,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} k, prices\n * @return {any}\n */\nvar maxProfitIV = function(k, prices) {\n    \n};",
-      "python": "class Solution:\n    def maxProfitIV(self, k, prices):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxProfitIV\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxProfitIV\n}"
+      "python": "class Solution:\n    def maxProfitIV(self, k: int, prices: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxProfitIV(int k, vector<int>& prices) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxProfitIV(int k, int[] prices) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11787,9 +11787,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} s\n * @return {any}\n */\nvar removeInvalidParentheses = function(s) {\n    \n};",
-      "python": "class Solution:\n    def removeInvalidParentheses(self, s):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement removeInvalidParentheses\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement removeInvalidParentheses\n}"
+      "python": "class Solution:\n    def removeInvalidParentheses(self, s: str) -> List[str]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<string> removeInvalidParentheses(string& s) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String[] removeInvalidParentheses(String s) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -11861,9 +11861,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} board\n * @return {any}\n */\nvar solveSudoku = function(board) {\n    \n};",
-      "python": "class Solution:\n    def solveSudoku(self, board):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement solveSudoku\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement solveSudoku\n}"
+      "python": "class Solution:\n    def solveSudoku(self, board: List[List[str]]) -> List[List[str]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<char>> solveSudoku(vector<vector<char>>& board) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public char[][] solveSudoku(char[][] board) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -12316,9 +12316,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} grid\n * @return {any}\n */\nvar cherryPickup = function(grid) {\n    \n};",
-      "python": "class Solution:\n    def cherryPickup(self, grid):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement cherryPickup\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement cherryPickup\n}"
+      "python": "class Solution:\n    def cherryPickup(self, grid: List[List[int]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int cherryPickup(vector<vector<int>>& grid) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int cherryPickup(int[][] grid) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -12421,9 +12421,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} words\n * @return {any}\n */\nvar findAllConcatenatedWordsInADict = function(words) {\n    \n};",
-      "python": "class Solution:\n    def findAllConcatenatedWordsInADict(self, words):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findAllConcatenatedWordsInADict\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findAllConcatenatedWordsInADict\n}"
+      "python": "class Solution:\n    def findAllConcatenatedWordsInADict(self, words: List[str]) -> List[str]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<string> findAllConcatenatedWordsInADict(vector<string>& words) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String[] findAllConcatenatedWordsInADict(String[] words) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -12495,9 +12495,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} n, k\n * @return {any}\n */\nvar crackSafe = function(n, k) {\n    \n};",
-      "python": "class Solution:\n    def crackSafe(self, n, k):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement crackSafe\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement crackSafe\n}"
+      "python": "class Solution:\n    def crackSafe(self, n: int, k: int) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string crackSafe(int n, int k) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String crackSafe(int n, int k) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -12560,9 +12560,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} trees\n * @return {any}\n */\nvar outerTrees = function(trees) {\n    \n};",
-      "python": "class Solution:\n    def outerTrees(self, trees):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement outerTrees\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement outerTrees\n}"
+      "python": "class Solution:\n    def outerTrees(self, trees: List[List[int]]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> outerTrees(vector<vector<int>>& trees) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] outerTrees(int[][] trees) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -12690,9 +12690,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} words\n * @return {any}\n */\nvar alienOrder = function(words) {\n    \n};",
-      "python": "class Solution:\n    def alienOrder(self, words):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement alienOrder\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement alienOrder\n}"
+      "python": "class Solution:\n    def alienOrder(self, words: List[str]) -> str:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    string alienOrder(vector<string>& words) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String alienOrder(String[] words) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -12771,9 +12771,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, lower, upper\n * @return {any}\n */\nvar countRangeSum = function(nums, lower, upper) {\n    \n};",
-      "python": "class Solution:\n    def countRangeSum(self, nums, lower, upper):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement countRangeSum\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement countRangeSum\n}"
+      "python": "class Solution:\n    def countRangeSum(self, nums: List[int], lower: int, upper: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int countRangeSum(vector<int>& nums, int lower, int upper) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int countRangeSum(int[] nums, int lower, int upper) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -12856,9 +12856,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} edges\n * @return {any}\n */\nvar findRedundantDirectedConnection = function(edges) {\n    \n};",
-      "python": "class Solution:\n    def findRedundantDirectedConnection(self, edges):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findRedundantDirectedConnection\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findRedundantDirectedConnection\n}"
+      "python": "class Solution:\n    def findRedundantDirectedConnection(self, edges: List[List[int]]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] findRedundantDirectedConnection(int[][] edges) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -12975,9 +12975,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} head, k\n * @return {any}\n */\nvar reverseKGroup = function(head, k) {\n    \n};",
-      "python": "class Solution:\n    def reverseKGroup(self, head, k):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement reverseKGroup\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement reverseKGroup\n}"
+      "python": "class Solution:\n    def reverseKGroup(self, head: List[int], k: int) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> reverseKGroup(vector<int>& head, int k) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] reverseKGroup(int[] head, int k) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13092,9 +13092,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} ring, key\n * @return {any}\n */\nvar findRotateSteps = function(ring, key) {\n    \n};",
-      "python": "class Solution:\n    def findRotateSteps(self, ring, key):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findRotateSteps\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findRotateSteps\n}"
+      "python": "class Solution:\n    def findRotateSteps(self, ring: str, key: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int findRotateSteps(string& ring, string& key) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int findRotateSteps(String ring, String key) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13156,9 +13156,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} houses, cost, m, n, target\n * @return {any}\n */\nvar minCostPaint = function(houses, cost, m, n, target) {\n    \n};",
-      "python": "class Solution:\n    def minCostPaint(self, houses, cost, m, n, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minCostPaint\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minCostPaint\n}"
+      "python": "class Solution:\n    def minCostPaint(self, houses: List[int], cost: List[List[int]], m: int, n: int, target: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int minCostPaint(vector<int>& houses, vector<vector<int>>& cost, int m, int n, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int minCostPaint(int[] houses, int[][] cost, int m, int n, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13316,9 +13316,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} treeArray\n * @return {any}\n */\nvar serializeAndDeserialize = function(treeArray) {\n    \n};",
-      "python": "class Solution:\n    def serializeAndDeserialize(self, treeArray):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement serializeAndDeserialize\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement serializeAndDeserialize\n}"
+      "python": "class Solution:\n    def serializeAndDeserialize(self, treeArray: List[int]) -> List[int]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> serializeAndDeserialize(vector<int>& treeArray) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[] serializeAndDeserialize(int[] treeArray) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13413,9 +13413,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nodes\n * @return {any}\n */\nvar maxPathSum = function(nodes) {\n    \n};",
-      "python": "class Solution:\n    def maxPathSum(self, nodes):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement maxPathSum\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement maxPathSum\n}"
+      "python": "class Solution:\n    def maxPathSum(self, nodes: List[int]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxPathSum(vector<int>& nodes) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int maxPathSum(int[] nodes) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13511,9 +13511,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} matrix\n * @return {any}\n */\nvar longestIncreasingPath = function(matrix) {\n    \n};",
-      "python": "class Solution:\n    def longestIncreasingPath(self, matrix):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement longestIncreasingPath\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement longestIncreasingPath\n}"
+      "python": "class Solution:\n    def longestIncreasingPath(self, matrix: List[List[int]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int longestIncreasingPath(vector<vector<int>>& matrix) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int longestIncreasingPath(int[][] matrix) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13617,9 +13617,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} board, words\n * @return {any}\n */\nvar findWords = function(board, words) {\n    \n};",
-      "python": "class Solution:\n    def findWords(self, board, words):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findWords\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findWords\n}"
+      "python": "class Solution:\n    def findWords(self, board: List[List[str]], words: List[str]) -> List[str]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String[] findWords(char[][] board, String[] words) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13721,9 +13721,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} beginWord, endWord, wordList\n * @return {any}\n */\nvar findLadders = function(beginWord, endWord, wordList) {\n    \n};",
-      "python": "class Solution:\n    def findLadders(self, beginWord, endWord, wordList):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement findLadders\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement findLadders\n}"
+      "python": "class Solution:\n    def findLadders(self, beginWord: str, endWord: str, wordList: List[str]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> findLadders(string& beginWord, string& endWord, vector<string>& wordList) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] findLadders(String beginWord, String endWord, String[] wordList) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13808,9 +13808,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} num, target\n * @return {any}\n */\nvar addOperators = function(num, target) {\n    \n};",
-      "python": "class Solution:\n    def addOperators(self, num, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement addOperators\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement addOperators\n}"
+      "python": "class Solution:\n    def addOperators(self, num: str, target: int) -> List[str]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<string> addOperators(string& num, int target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public String[] addOperators(String num, int target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -13884,9 +13884,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} heightMap\n * @return {any}\n */\nvar trapRainWater = function(heightMap) {\n    \n};",
-      "python": "class Solution:\n    def trapRainWater(self, heightMap):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement trapRainWater\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement trapRainWater\n}"
+      "python": "class Solution:\n    def trapRainWater(self, heightMap: List[List[int]]) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int trapRainWater(vector<vector<int>>& heightMap) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int trapRainWater(int[][] heightMap) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -14008,9 +14008,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} buildings\n * @return {any}\n */\nvar getSkyline = function(buildings) {\n    \n};",
-      "python": "class Solution:\n    def getSkyline(self, buildings):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement getSkyline\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement getSkyline\n}"
+      "python": "class Solution:\n    def getSkyline(self, buildings: List[List[int]]) -> List[List[int]]:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> getSkyline(vector<vector<int>>& buildings) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int[][] getSkyline(int[][] buildings) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -14144,9 +14144,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} stickers, target\n * @return {any}\n */\nvar minStickers = function(stickers, target) {\n    \n};",
-      "python": "class Solution:\n    def minStickers(self, stickers, target):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement minStickers\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement minStickers\n}"
+      "python": "class Solution:\n    def minStickers(self, stickers: List[str], target: str) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int minStickers(vector<string>& stickers, string& target) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int minStickers(String[] stickers, String target) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {
@@ -14227,9 +14227,9 @@ export const DSA_150_PROBLEMS: Record<string, ProblemDefinition> = {
     ],
     "starterCode": {
       "javascript": "/**\n * @param {any} nums, k\n * @return {any}\n */\nvar splitArray = function(nums, k) {\n    \n};",
-      "python": "class Solution:\n    def splitArray(self, nums, k):\n        pass",
-      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    // Implement splitArray\n};",
-      "java": "import java.util.*;\n\nclass Solution {\n    // Implement splitArray\n}"
+      "python": "class Solution:\n    def splitArray(self, nums: List[int], k: int) -> int:\n        # Write your code here\n        pass",
+      "cpp": "#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    int splitArray(vector<int>& nums, int k) {\n        // Write your code here\n        \n    }\n};",
+      "java": "import java.util.*;\n\nclass Solution {\n    public int splitArray(int[] nums, int k) {\n        // Write your code here\n        \n    }\n}"
     },
     "publicTestCases": [
       {

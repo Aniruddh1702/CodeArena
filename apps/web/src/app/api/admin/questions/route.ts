@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
 import { ProblemDefinition } from "@/lib/problems-data";
+import { ensureProblemStarterCode } from "@/lib/starter-templates";
 import {
   saveCustomProblemServer,
   deleteCustomProblemServer,
@@ -132,7 +133,7 @@ export async function POST(req: NextRequest) {
           publicTestCases: publicCases,
           hiddenTestCases: hiddenCases
         };
-        saveCustomProblemServer(problemDef);
+        saveCustomProblemServer(ensureProblemStarterCode(problemDef));
       } catch (err: any) {
         errors.push({ question: q.title, error: err.message });
       }

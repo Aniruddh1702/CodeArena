@@ -1,5 +1,6 @@
 import { DSA_150_PROBLEMS } from "./dsa-150-database";
 import { BASIC_PRACTICE_PROBLEMS } from "./basic-problems-database";
+import { ensureProblemStarterCode } from "./starter-templates";
 
 export interface TestCase {
   input: string; // raw display string
@@ -132,14 +133,15 @@ export function getCustomProblems(): Record<string, ProblemDefinition> {
 export function saveCustomProblem(problem: ProblemDefinition): void {
   if (typeof window === "undefined") return;
   try {
+    const normalized = ensureProblemStarterCode(problem);
     const current = getCustomProblems();
-    current[problem.slug] = problem;
+    current[normalized.slug] = normalized;
     localStorage.setItem(CUSTOM_PROBLEMS_KEY, JSON.stringify(current));
 
     // If it was previously marked deleted, un-delete it
     const deleted = getDeletedProblemSlugs();
-    if (deleted.has(problem.slug)) {
-      deleted.delete(problem.slug);
+    if (deleted.has(normalized.slug)) {
+      deleted.delete(normalized.slug);
       localStorage.setItem(DELETED_PROBLEMS_KEY, JSON.stringify(Array.from(deleted)));
     }
 
@@ -225,19 +227,18 @@ export function getProblem(slug: string): ProblemDefinition | null {
 
   // Check custom problems first
   const custom = getCustomProblems();
+  let found: ProblemDefinition | null = null;
   if (custom[normSlug]) {
-    return custom[normSlug];
-  }
-  if (custom[slug]) {
-    return custom[slug];
-  }
-
-  // Check alias for bar entry
-  if (normSlug === "check-bar-entry-status" || normSlug === "check-bar-entry" || normSlug === "bar-entry") {
-    return BASIC_PRACTICE_PROBLEMS["check-bar-entry-status"];
+    found = custom[normSlug];
+  } else if (custom[slug]) {
+    found = custom[slug];
+  } else if (normSlug === "check-bar-entry-status" || normSlug === "check-bar-entry" || normSlug === "bar-entry") {
+    found = BASIC_PRACTICE_PROBLEMS["check-bar-entry-status"];
+  } else {
+    found = PROBLEMS_DATABASE[normSlug] || PROBLEMS_DATABASE[slug] || null;
   }
 
-  return PROBLEMS_DATABASE[normSlug] || PROBLEMS_DATABASE[slug] || null;
+  return found ? ensureProblemStarterCode(found) : null;
 }
 
 const BASIC_SLUGS_ORDER = [
@@ -282,7 +283,7 @@ export function getAllProblems(): ProblemDefinition[] {
     map.set(p.slug, p);
   }
 
-  const allList = Array.from(map.values());
+  const allList = Array.from(map.values()).map((p) => ensureProblemStarterCode(p));
   const customOrder = getQuestionOrder();
 
   const diffScore: Record<string, number> = { EASY: 1, MEDIUM: 2, HARD: 3 };

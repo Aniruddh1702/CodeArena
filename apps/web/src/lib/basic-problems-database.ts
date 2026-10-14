@@ -1,4 +1,4 @@
-import { ProblemDefinition } from "./problems-data";
+import type { ProblemDefinition } from "./problems-data";
 
 export const BASIC_PRACTICE_PROBLEMS: Record<string, ProblemDefinition> = {
   "check-bar-entry-status": {

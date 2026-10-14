@@ -16,6 +16,7 @@ import {
   registerUserForContest
 } from "@/lib/contests-data";
 import { getAllProblems, ProblemDefinition, PROBLEMS_DATABASE } from "@/lib/problems-data";
+import { getStarterCode, isStarterCodeStubOrEmpty } from "@/lib/starter-templates";
 import { evaluateJavaScript, ExecutionSummary, TestResult } from "@/lib/code-runner";
 import { getActiveAccount } from "@/lib/auth-session";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -242,16 +243,40 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
   useEffect(() => {
     if (!activeContestProblem) return;
     const slug = activeContestProblem.problemSlug;
-    if (codePerProblem[slug]?.[language]) {
-      setCode(codePerProblem[slug][language]);
+    const userCode = codePerProblem[slug]?.[language];
+    if (userCode && !isStarterCodeStubOrEmpty(userCode, language)) {
+      setCode(userCode);
     } else if (activeProblemDef) {
-      const starter = activeProblemDef.starterCode?.[language] || `// Write your code here in ${language}`;
+      const starter = getStarterCode(activeProblemDef, language);
       setCode(starter);
     }
     setRunResult(null);
     clearEditorMarkers();
     setSubmissionFeedback(null);
   }, [selectedProblemIndex, language, activeProblemDef, activeContestProblem]);
+
+  const handleResetCode = () => {
+    if (!activeProblemDef) return;
+    const langDisplay = language === "cpp" ? "C++" : language.toUpperCase();
+    if (typeof window !== "undefined" && !window.confirm(`Reset your ${langDisplay} code back to the original starter code?`)) {
+      return;
+    }
+    const starter = getStarterCode(activeProblemDef, language);
+    setCode(starter);
+    if (activeContestProblem) {
+      const slug = activeContestProblem.problemSlug;
+      setCodePerProblem((prev) => ({
+        ...prev,
+        [slug]: {
+          ...(prev[slug] || {}),
+          [language]: starter,
+        },
+      }));
+    }
+    clearEditorMarkers();
+    setRunResult(null);
+    setSubmissionFeedback(null);
+  };
 
   const handleCodeChange = (newVal: string | undefined) => {
     const val = newVal || "";
@@ -973,6 +998,14 @@ function parseCustomArgs(raw: string): any[] {
                   <option value="cpp">C++ (GCC 11)</option>
                   <option value="java">Java (OpenJDK 17)</option>
                 </select>
+                <button
+                  type="button"
+                  onClick={handleResetCode}
+                  title="Reset to starter template"
+                  className="px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary rounded border border-border/60 transition-colors"
+                >
+                  ↺ Reset
+                </button>
               </div>
 
               <div className="flex items-center gap-2">

@@ -12,6 +12,7 @@ import {
   UserAccount 
 } from "@/lib/auth-session";
 import { getProblem, ProblemDefinition } from "@/lib/problems-data";
+import { getStarterCode, isStarterCodeStubOrEmpty } from "@/lib/starter-templates";
 import { evaluateJavaScript, ExecutionSummary } from "@/lib/code-runner";
 
 type SupportedLanguage = "javascript" | "python" | "cpp" | "java";
@@ -113,11 +114,30 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
   // Language & Code Cache
   const [language, setLanguage] = useState<SupportedLanguage>("javascript");
   const [codes, setCodes] = useState<Record<SupportedLanguage, string>>({
-    javascript: problem?.starterCode?.javascript || DEFAULT_PROBLEM.starterCode.javascript,
-    python: problem?.starterCode?.python || DEFAULT_PROBLEM.starterCode.python,
-    cpp: problem?.starterCode?.cpp || DEFAULT_PROBLEM.starterCode.cpp,
-    java: problem?.starterCode?.java || DEFAULT_PROBLEM.starterCode.java,
+    javascript: getStarterCode(problem, "javascript"),
+    python: getStarterCode(problem, "python"),
+    cpp: getStarterCode(problem, "cpp"),
+    java: getStarterCode(problem, "java"),
   });
+
+  const handleLanguageChange = (lang: SupportedLanguage) => {
+    setCodes((prev) => {
+      if (!prev[lang] || isStarterCodeStubOrEmpty(prev[lang], lang)) {
+        return { ...prev, [lang]: getStarterCode(problem, lang) };
+      }
+      return prev;
+    });
+    setLanguage(lang);
+  };
+
+  const handleResetCode = () => {
+    const langDisplay = language === "cpp" ? "C++" : language.toUpperCase();
+    if (typeof window !== "undefined" && !window.confirm(`Reset your ${langDisplay} code back to the original starter code?`)) {
+      return;
+    }
+    const starter = getStarterCode(problem, language);
+    setCodes((prev) => ({ ...prev, [language]: starter }));
+  };
 
   // Battle State
   const [timeLeft, setTimeLeft] = useState(900); // 15 mins
@@ -620,7 +640,7 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
                 {(["javascript", "python", "cpp", "java"] as SupportedLanguage[]).map((lang) => (
                   <button
                     key={lang}
-                    onClick={() => setLanguage(lang)}
+                    onClick={() => handleLanguageChange(lang)}
                     className={`px-2.5 py-1 rounded-md capitalize font-semibold transition-all ${
                       language === lang
                         ? "bg-primary text-primary-foreground shadow-sm"
@@ -631,6 +651,14 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
                   </button>
                 ))}
               </div>
+              <button
+                type="button"
+                onClick={handleResetCode}
+                title="Reset to starter template"
+                className="px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary rounded border border-border/60 transition-colors"
+              >
+                ↺ Reset
+              </button>
             </div>
 
             {/* Execution Controls */}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Editor from "@monaco-editor/react";
 import { Button, Card, CardHeader, CardTitle, CardContent, Tabs, TabsList, TabsTrigger, TabsContent } from "@codearena/ui";
 import { getProblem, PROBLEMS_DATABASE, ProblemDefinition, TestCase, syncProblemsWithServer } from "@/lib/problems-data";
+import { getStarterCode, isStarterCodeStubOrEmpty, SupportedLanguage } from "@/lib/starter-templates";
 import { evaluateJavaScript, ExecutionSummary, TestResult } from "@/lib/code-runner";
 import { getActiveAccount, getUserStats, getUserProblemSubmissions, saveUserProblemSubmission, recordUserSolve } from "@/lib/auth-session";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
@@ -265,9 +266,10 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     }
 
     // 2. Load the student's previously written code for target language, or fallback to starter code
-    const nextCode = updatedCache[val] !== undefined
-      ? updatedCache[val]
-      : (question.starterCode?.[val] || question.starterCode?.javascript || "");
+    const existing = updatedCache[val];
+    const nextCode = (existing && !isStarterCodeStubOrEmpty(existing, val))
+      ? existing
+      : getStarterCode(question, val);
 
     setLanguage(val);
     setCode(nextCode);
@@ -282,7 +284,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
     if (typeof window !== "undefined" && !window.confirm(`Reset your ${langDisplay} code back to the original starter code?`)) {
       return;
     }
-    const starter = question.starterCode?.[language] || question.starterCode?.javascript || "";
+    const starter = getStarterCode(question, language);
     setCode(starter);
     saveCodeForLanguage(language, starter);
     clearEditorMarkers();
@@ -326,21 +328,20 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         }
       } catch (e) {}
 
-      // Seed starter codes for any languages not yet written
+      // Seed starter codes for all 4 languages and purge any old stubs or empty strings
       if (prob) {
-        const defaultCodes: Record<string, string> = {
-          javascript: prob.starterCode?.javascript || "",
-          python: prob.starterCode?.python || "",
-          cpp: prob.starterCode?.cpp || "",
-          java: prob.starterCode?.java || "",
-        };
-        loadedCodes = { ...defaultCodes, ...loadedCodes };
+        const languages: SupportedLanguage[] = ["javascript", "python", "cpp", "java"];
+        for (const lang of languages) {
+          if (!loadedCodes[lang] || isStarterCodeStubOrEmpty(loadedCodes[lang], lang)) {
+            loadedCodes[lang] = getStarterCode(prob, lang);
+          }
+        }
       }
 
       setCodePerLanguage(loadedCodes);
-      const initialCode = loadedCodes[language] !== undefined
+      const initialCode = (loadedCodes[language] && !isStarterCodeStubOrEmpty(loadedCodes[language], language))
         ? loadedCodes[language]
-        : (prob?.starterCode?.[language] || prob?.starterCode?.javascript || "");
+        : getStarterCode(prob, language);
       setCode(initialCode);
 
       // 2. Load submissions strictly scoped to active account (never leak other users)
