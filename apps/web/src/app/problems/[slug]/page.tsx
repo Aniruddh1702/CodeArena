@@ -167,6 +167,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
 
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
+  const currentUserIdRef = useRef<string | null>(null);
 
   // Synchronize red squiggly error markers in Monaco editor
   const updateEditorMarkers = (result: ExecutionSummary | null, currentCode: string) => {
@@ -315,6 +316,7 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         return;
       }
       setCurrentUser(activeAcc);
+      currentUserIdRef.current = activeAcc.id || "default";
       setAuthChecked(true);
       const activeId = activeAcc.id || "default";
       const safeId = activeId.replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -360,6 +362,19 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
           router.push(`/login?redirect=/problems/${params.slug}`);
           return;
         }
+
+        // If it's the SAME student (e.g. solve recorded, rating update, profile change), do NOT wipe code or runResult!
+        if (currentUserIdRef.current && currentUserIdRef.current === currentAcc.id) {
+          setCurrentUser(currentAcc);
+          const currentId = currentAcc.id || "default";
+          const subs = getUserProblemSubmissions(currentId, params.slug);
+          setSubmissions(subs);
+          const s = getUserStats(currentId);
+          setIsProblemSolved(s.solvedProblems.some((p: any) => p.slug === params.slug));
+          return;
+        }
+
+        currentUserIdRef.current = currentAcc.id || "default";
         setCurrentUser(currentAcc);
         const currentId = currentAcc.id || "default";
         const currentSafeId = currentId.replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -665,6 +680,31 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
         });
       }
     } catch (e: any) {
+      const allCases = [...question.publicTestCases, ...question.hiddenTestCases];
+      const targetCases = allCases.length > 0 ? allCases : [{ input: "N/A", output: "N/A" }];
+      const fallbackSummary: ExecutionSummary = {
+        status: "Runtime Error",
+        statusColor: "text-amber-500",
+        runtime: "0ms",
+        memory: "0MB",
+        totalTestCases: targetCases.length,
+        passedTestCases: 0,
+        failedTestCaseIndex: 0,
+        testResults: targetCases.map((tc, idx) => ({
+          caseIndex: idx,
+          passed: false,
+          input: tc.input || "N/A",
+          expectedOutput: tc.output || "N/A",
+          actualOutput: "",
+          stdout: "",
+          error: e?.message || "Execution error occurred."
+        })),
+        errorDetails: e?.message || "Execution error occurred while testing your code."
+      };
+      setRunResult(fallbackSummary);
+      setActiveTestCase(0);
+      updateEditorMarkers(fallbackSummary, code);
+
       setSubmitFeedback({
         status: "Execution Failed",
         message: e.message || "An unexpected error occurred while testing your code.",
@@ -1440,7 +1480,16 @@ export default function ProblemWorkspace({ params }: { params: { slug: string } 
                       </div>
                     )}
                   </div>
-                ) : null}
+                ) : (
+                  <div className="space-y-4 animate-in fade-in duration-300">
+                    <div className="p-4 rounded-xl border border-rose-500/40 bg-[#160b0e] text-rose-300 text-xs font-mono">
+                      <div className="font-bold mb-1 flex items-center gap-2 text-rose-400">
+                        <span>⚠️</span> Execution Failed
+                      </div>
+                      <p>{submitFeedback?.message || "Execution or evaluation encountered an issue. Please try running again."}</p>
+                    </div>
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </div>

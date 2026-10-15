@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
           testResults: [],
           errorDetails: `Problem not found for slug '${slug}'.`
         },
-        { status: 404 }
+        { status: 200 }
       );
     }
 
@@ -83,13 +83,24 @@ export async function POST(req: NextRequest) {
         statusColor: "text-amber-500",
         runtime: "0ms",
         memory: "0MB",
-        totalTestCases: 0,
+        totalTestCases: 1,
         passedTestCases: 0,
         failedTestCaseIndex: 0,
-        testResults: [],
+        testResults: [
+          {
+            caseIndex: 0,
+            passed: false,
+            input: "Standard input",
+            expectedOutput: "",
+            actualOutput: "Execution Failed",
+            stdout: "",
+            error: err.message || "Execution failed",
+            diffExplanation: err.message || "An unexpected error occurred during execution."
+          }
+        ],
         errorDetails: err.message || "Execution failed"
       },
-      { status: 500 }
+      { status: 200 }
     );
   }
 }

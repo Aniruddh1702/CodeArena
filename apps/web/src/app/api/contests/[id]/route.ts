@@ -21,9 +21,21 @@ export async function GET(
       );
     }
 
+    const checkEmail = (
+      req.nextUrl.searchParams.get("userEmail") ||
+      req.nextUrl.searchParams.get("email") ||
+      ""
+    ).toLowerCase().trim();
+
+    const hasSubmitted = Boolean(
+      checkEmail &&
+      (contest.submittedUsers || []).map((e) => e.toLowerCase().trim()).includes(checkEmail)
+    );
+
     return NextResponse.json({
       success: true,
       contest,
+      hasSubmitted,
     });
   } catch (err: any) {
     return NextResponse.json(

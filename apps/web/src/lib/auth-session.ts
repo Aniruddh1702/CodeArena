@@ -9,6 +9,7 @@ export interface UserAccount {
   name: string;
   password?: string;
   role: string;
+  isAdmin?: boolean;
   status?: "ACTIVE" | "ONLINE" | "SUSPENDED" | "BANNED";
   isBanned?: boolean;
   avatarUrl?: string;

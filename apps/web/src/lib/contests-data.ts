@@ -450,7 +450,20 @@ export function getAllContestSubmissions(contestId?: string): ContestSubmission[
   }
 }
 
+export function isUserContestSubmitted(contest?: Contest | null, userEmail?: string | null): boolean {
+  if (!contest || !userEmail) return false;
+  const cleanEmail = userEmail.toLowerCase().trim();
+  const submittedSet = new Set((contest.submittedUsers || []).map((e) => e.toLowerCase().trim()));
+  return submittedSet.has(cleanEmail);
+}
+
 export function recordContestSubmission(submission: ContestSubmission): void {
+  const contest = getContestById(submission.contestId);
+  if (contest && isUserContestSubmitted(contest, submission.userEmail)) {
+    console.warn("User has already submitted the assignment. Ignoring problem submission.");
+    return;
+  }
+
   if (typeof window !== "undefined") {
     try {
       const key = `${SUBMISSIONS_PREFIX}${submission.contestId}`;

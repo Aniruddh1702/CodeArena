@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Editor from "@monaco-editor/react";
 import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, Badge } from "@codearena/ui";
-import { getActiveAccount, saveUserAssessment, UserAccount } from "@/lib/auth-session";
+import { getActiveAccount, saveUserAssessment, getUserAssessments, UserAccount, UserAssessmentRecord } from "@/lib/auth-session";
 import { getProblem, ProblemDefinition, PROBLEMS_DATABASE } from "@/lib/problems-data";
 import { evaluateJavaScript, ExecutionSummary } from "@/lib/code-runner";
 
@@ -22,6 +22,7 @@ interface AssessmentQuestionItem {
 export default function ExamEnvironment({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [activeAccount, setActiveAccount] = useState<UserAccount | null>(null);
+  const [alreadySubmittedRecord, setAlreadySubmittedRecord] = useState<UserAssessmentRecord | null>(null);
   const [test, setTest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [warnings, setWarnings] = useState(0);
@@ -69,6 +70,11 @@ export default function ExamEnvironment({ params }: { params: { id: string } }) 
 
     // Fetch test details or build from standard assessments
     const loadTest = async () => {
+      const prior = getUserAssessments(active.id).find((r) => r.testId === params.id);
+      if (prior) {
+        setAlreadySubmittedRecord(prior);
+      }
+
       try {
         const res = await fetch("/api/org/tests");
         let testData: any = null;
@@ -416,6 +422,56 @@ export default function ExamEnvironment({ params }: { params: { id: string } }) 
       performSubmission(false);
     }
   };
+
+  if (alreadySubmittedRecord && !activeAccount?.isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-lg border-emerald-500/40 bg-card/90 shadow-2xl">
+          <CardHeader className="text-center space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+              ✓
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+                Assessment Completed
+              </span>
+              <CardTitle className="text-2xl font-black text-foreground pt-1">
+                You have already submitted the assignment
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground max-w-sm mx-auto">
+                Your submission for &quot;{alreadySubmittedRecord.testTitle || test?.title || "Assessment"}&quot; has been recorded and verified. Re-taking this assessment is not allowed.
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-secondary/40 border border-border/80 text-center font-mono">
+              <div>
+                <span className="text-[10px] text-muted-foreground uppercase block font-semibold">Your Score</span>
+                <span className="text-xl font-black text-emerald-400">{alreadySubmittedRecord.score}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-muted-foreground uppercase block font-semibold">Max Points</span>
+                <span className="text-xl font-black text-foreground">{alreadySubmittedRecord.totalPoints}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-muted-foreground uppercase block font-semibold">Verdict</span>
+                <span className="text-base font-bold text-primary">{alreadySubmittedRecord.status}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button className="flex-1 font-bold bg-primary text-primary-foreground" onClick={() => router.push("/assessments")}>
+                ← Back to Assessments
+              </Button>
+              <Button className="flex-1 font-semibold" variant="outline" onClick={() => router.push("/dashboard")}>
+                Go to Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -167,19 +167,35 @@ export default function AssessmentsPage() {
                             View Org Report
                           </Button>
                         </Link>
-                        <Button
-                          onClick={() => {
-                            if (activeAccount?.status === "BANNED" || activeAccount?.isBanned) {
-                              alert("Your account has been suspended by an Administrator. Assessment access is disabled.");
-                              return;
-                            }
-                            router.push(`/assessments/${test.id}`);
-                          }}
-                          disabled={isScheduledFuture}
-                          className="h-9 px-5 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm shadow-primary/25"
-                        >
-                          {isScheduledFuture ? "Locked (Upcoming)" : "Enter Proctored Exam 🚀"}
-                        </Button>
+                        {recent.some((r) => r.testId === test.id) ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                              <span>✓</span> You have already submitted the assignment
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => router.push(`/assessments/${test.id}`)}
+                              className="h-9 px-4 text-xs font-bold"
+                            >
+                              View Result
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            onClick={() => {
+                              if (activeAccount?.status === "BANNED" || activeAccount?.isBanned) {
+                                alert("Your account has been suspended by an Administrator. Assessment access is disabled.");
+                                return;
+                              }
+                              router.push(`/assessments/${test.id}`);
+                            }}
+                            disabled={isScheduledFuture}
+                            className="h-9 px-5 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm shadow-primary/25"
+                          >
+                            {isScheduledFuture ? "Locked (Upcoming)" : "Enter Proctored Exam 🚀"}
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>

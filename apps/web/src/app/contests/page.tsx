@@ -348,12 +348,20 @@ export default function ContestsPage() {
               const isUpcoming = contest.status === "UPCOMING";
               const isRegistered = currentUser && contest.registeredUsers.includes(currentUser.email);
               const totalPoints = contest.problems.reduce((sum, p) => sum + p.points, 0);
+              const hasSubmitted = Boolean(
+                currentUser?.email &&
+                (contest.submittedUsers || [])
+                  .map((e) => e.toLowerCase().trim())
+                  .includes(currentUser.email.toLowerCase().trim())
+              );
 
               return (
                 <Card
                   key={contest.id}
                   className={`overflow-hidden border transition-all duration-200 hover:shadow-lg ${
-                    isLive
+                    hasSubmitted
+                      ? "border-emerald-500/40 bg-card/90"
+                      : isLive
                       ? "border-emerald-500/50 bg-gradient-to-br from-card via-card to-emerald-950/10 shadow-emerald-500/5"
                       : isUpcoming
                       ? "border-blue-500/30 hover:border-blue-500/50"
@@ -363,7 +371,12 @@ export default function ContestsPage() {
                   <CardHeader className="pb-3 space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        {isLive ? (
+                        {hasSubmitted ? (
+                          <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-[10px] px-2.5 py-0.5 gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                            ASSIGNMENT SUBMITTED
+                          </Badge>
+                        ) : isLive ? (
                           <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] px-2.5 py-0.5 gap-1.5 animate-pulse">
                             <span className="w-1.5 h-1.5 rounded-full bg-white" />
                             LIVE NOW
@@ -461,7 +474,18 @@ export default function ContestsPage() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {isLive ? (
+                        {hasSubmitted ? (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                              <span>✓</span> You have already submitted the assignment
+                            </span>
+                            <Link href={`/contests/${contest.id}`}>
+                              <Button size="sm" variant="outline" className="h-8 text-xs font-bold gap-1 text-foreground border-border/80 hover:bg-secondary">
+                                <span>📊</span> View Results
+                              </Button>
+                            </Link>
+                          </div>
+                        ) : isLive ? (
                           <Link href={`/contests/${contest.id}`}>
                             <Button size="sm" className="h-8 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-md shadow-emerald-600/20">
                               <span>🚀</span> Enter Arena

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getServerSubmissions,
   saveServerSubmission,
+  getServerContests,
   ContestSubmission,
 } from "@/lib/server-contest-store";
 
@@ -38,6 +39,23 @@ export async function POST(
         { success: false, message: "User Email and Problem Slug are required" },
         { status: 400 }
       );
+    }
+
+    const contests = getServerContests();
+    const contest = contests.find((c) => c.id === params.id);
+    if (contest) {
+      const email = String(body.userEmail).toLowerCase().trim();
+      const submittedUsers = (contest.submittedUsers || []).map((e) => e.toLowerCase().trim());
+      if (submittedUsers.includes(email)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "You have already submitted the assignment. Further submissions are disabled.",
+            alreadySubmitted: true,
+          },
+          { status: 403 }
+        );
+      }
     }
 
     const newSub: ContestSubmission = {

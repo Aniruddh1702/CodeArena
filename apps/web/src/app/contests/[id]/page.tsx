@@ -65,8 +65,15 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
   const [isSubmitWholeModalOpen, setIsSubmitWholeModalOpen] = useState(false);
   const [isSubmittingWhole, setIsSubmittingWhole] = useState(false);
 
+  const hasUserSubmittedContest = Boolean(
+    currentUser?.email &&
+    (contest?.submittedUsers || []).map((e) => e.toLowerCase().trim()).includes(currentUser.email.toLowerCase().trim())
+  );
+
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
+  const prevProblemSlugRef = useRef<string | null>(null);
+  const prevLanguageRef = useRef<string | null>(null);
 
   // Synchronize red squiggly error markers in Monaco editor
   const updateEditorMarkers = (result: ExecutionSummary | null, currentCode: string) => {
@@ -124,7 +131,16 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
 
     // Initial local load
     const c = getContestById(contestId);
-    if (c) setContest(c);
+    if (c) {
+      setContest(c);
+      const isAlreadySubmitted = Boolean(
+        user.email &&
+        (c.submittedUsers || []).map((e) => e.toLowerCase().trim()).includes(user.email.toLowerCase().trim())
+      );
+      if (isAlreadySubmitted && !user.isAdmin) {
+        setActiveWorkspaceView("standings");
+      }
+    }
 
     // Load problems map
     const probs = getAllProblems();
@@ -141,12 +157,21 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     }
     setAllProblemsMap(map);
 
-    // Fetch fresh contest data directly from server API
-    fetch(`/api/contests/${contestId}`)
+    // Fetch fresh contest data directly from server API (checking database for submission)
+    const userEmailParam = user.email ? `?userEmail=${encodeURIComponent(user.email)}` : "";
+    fetch(`/api/contests/${contestId}${userEmailParam}`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && data.contest) {
           setContest(data.contest);
+          const isAlreadySubmitted = Boolean(
+            data.hasSubmitted ||
+            (user.email &&
+              (data.contest.submittedUsers || []).map((e: string) => e.toLowerCase().trim()).includes(user.email.toLowerCase().trim()))
+          );
+          if (isAlreadySubmitted && !user.isAdmin) {
+            setActiveWorkspaceView("standings");
+          }
           if (data.contest.problems) {
             setAllProblemsMap((prev) => {
               const updated = { ...prev };
@@ -182,7 +207,20 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
       setNow(Date.now());
       const updated = getContestById(contestId);
       if (updated) {
-        setContest(updated);
+        setContest((prev) => {
+          if (!prev) return updated;
+          if (
+            prev.status !== updated.status ||
+            prev.endTime !== updated.endTime ||
+            prev.startTime !== updated.startTime ||
+            prev.participantsCount !== updated.participantsCount ||
+            (prev.submittedUsers?.length || 0) !== (updated.submittedUsers?.length || 0) ||
+            (prev.problems?.length || 0) !== (updated.problems?.length || 0)
+          ) {
+            return updated;
+          }
+          return prev;
+        });
         if (updated.problems) {
           setAllProblemsMap((prev) => {
             let changed = false;
@@ -210,7 +248,21 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
           .then((res) => res.json())
           .then((data) => {
             if (data?.success && data.contest) {
-              setContest(data.contest);
+              const serverC = data.contest;
+              setContest((prev) => {
+                if (!prev) return serverC;
+                if (
+                  prev.status !== serverC.status ||
+                  prev.endTime !== serverC.endTime ||
+                  prev.startTime !== serverC.startTime ||
+                  prev.participantsCount !== serverC.participantsCount ||
+                  (prev.submittedUsers?.length || 0) !== (serverC.submittedUsers?.length || 0) ||
+                  (prev.problems?.length || 0) !== (serverC.problems?.length || 0)
+                ) {
+                  return serverC;
+                }
+                return prev;
+              });
               if (data.contest.problems) {
                 setAllProblemsMap((prev) => {
                   const updated = { ...prev };
@@ -248,6 +300,15 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
   useEffect(() => {
     if (!activeContestProblem) return;
     const slug = activeContestProblem.problemSlug;
+    const hasProblemChanged = prevProblemSlugRef.current !== slug;
+    const hasLanguageChanged = prevLanguageRef.current !== language;
+
+    if (!hasProblemChanged && !hasLanguageChanged) {
+      return;
+    }
+    prevProblemSlugRef.current = slug;
+    prevLanguageRef.current = language;
+
     const userCode = codePerProblem[slug]?.[language];
     if (userCode && !isStarterCodeStubOrEmpty(userCode, language)) {
       setCode(userCode);
@@ -258,10 +319,14 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     setRunResult(null);
     clearEditorMarkers();
     setSubmissionFeedback(null);
-  }, [selectedProblemIndex, language, activeProblemDef, activeContestProblem]);
+  }, [selectedProblemIndex, language, activeProblemDef, activeContestProblem, codePerProblem]);
 
   const handleResetCode = () => {
     if (!activeProblemDef) return;
+    if (hasUserSubmittedContest && !currentUser?.isAdmin) {
+      alert("You have already submitted the assignment. Code editing is disabled.");
+      return;
+    }
     const langDisplay = language === "cpp" ? "C++" : language.toUpperCase();
     if (typeof window !== "undefined" && !window.confirm(`Reset your ${langDisplay} code back to the original starter code?`)) {
       return;
@@ -284,6 +349,9 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
   };
 
   const handleCodeChange = (newVal: string | undefined) => {
+    if (hasUserSubmittedContest && !currentUser?.isAdmin) {
+      return;
+    }
     const val = newVal || "";
     setCode(val);
     if (activeContestProblem) {
@@ -327,6 +395,10 @@ function parseCustomArgs(raw: string): any[] {
   // Run Code on Public Test Cases (Real Multi-Language Execution)
   const handleRunCode = async () => {
     if (!activeProblemDef) return;
+    if (hasUserSubmittedContest && !currentUser?.isAdmin) {
+      alert("You have already submitted the assignment. Code execution is disabled.");
+      return;
+    }
     if (currentUser?.status === "BANNED" || currentUser?.isBanned) {
       alert("Your account has been suspended by an Administrator. Code execution is disabled.");
       return;
@@ -441,6 +513,10 @@ function parseCustomArgs(raw: string): any[] {
   // Submit for Contest (Real Multi-Language Evaluation Against All Test Cases)
   const handleSubmitCode = async () => {
     if (!activeProblemDef || !activeContestProblem || !contest) return;
+    if (hasUserSubmittedContest && !currentUser?.isAdmin) {
+      alert("You have already submitted the assignment. Contest submissions are disabled.");
+      return;
+    }
     if (!currentUser) {
       alert("Please log in to submit contest solutions!");
       router.push(`/login?redirect=/contests/${contestId}`);
@@ -556,6 +632,30 @@ function parseCustomArgs(raw: string): any[] {
         });
       }
     } catch (err: any) {
+      const allCases = activeProblemDef
+        ? [...activeProblemDef.publicTestCases, ...activeProblemDef.hiddenTestCases]
+        : [];
+      const fallbackSummary: ExecutionSummary = {
+        status: "Runtime Error",
+        statusColor: "text-rose-400",
+        runtime: "0 ms",
+        memory: "0 MB",
+        totalTestCases: allCases.length || 1,
+        passedTestCases: 0,
+        failedTestCaseIndex: 0,
+        errorDetails: err.message || "Execution error occurred during contest submission.",
+        testResults: (allCases.length > 0 ? allCases : [{ input: "Standard test cases", output: "" }]).map((tc, idx) => ({
+          caseIndex: idx + 1,
+          passed: false,
+          input: tc.input,
+          expectedOutput: tc.output,
+          actualOutput: "Execution Error",
+          stdout: "",
+          error: err.message || "Runtime Error",
+          diffExplanation: err.message || "An unexpected error occurred while executing your solution."
+        })),
+      };
+      setRunResult(fallbackSummary);
       setSubmissionFeedback({
         status: "RUNTIME_ERROR",
         message: `Execution Error: ${err.message}`,
@@ -614,11 +714,7 @@ function parseCustomArgs(raw: string): any[] {
   const userScore = currentUser ? standings.find((s) => s.userEmail === currentUser.email)?.score || 0 : 0;
   const isRegistered = currentUser && contest.registeredUsers.includes(currentUser.email);
   const totalPoints = contest.problems.reduce((sum, p) => sum + p.points, 0);
-  const isContestSubmitted = Boolean(
-    (currentUser &&
-      (contest.submittedUsers || []).map((e) => e.toLowerCase()).includes(currentUser.email?.toLowerCase())) ||
-      contest.status === "ENDED"
-  );
+  const isContestSubmitted = Boolean(hasUserSubmittedContest || contest.status === "ENDED");
 
   // Question attempt status breakdown for current student
   const myStanding = currentUser ? standings.find((s) => s.userEmail === currentUser.email) : undefined;
@@ -817,7 +913,8 @@ function parseCustomArgs(raw: string): any[] {
               onClick={() => setActiveWorkspaceView("editor")}
               className="h-8 text-xs font-bold gap-1"
             >
-              <span>💻</span> Problem IDE
+              <span>{hasUserSubmittedContest && !currentUser?.isAdmin ? "📝" : "💻"}</span>{" "}
+              {hasUserSubmittedContest && !currentUser?.isAdmin ? "View Submitted Code (Read-Only)" : "Problem IDE"}
             </Button>
 
             <Button
@@ -826,10 +923,14 @@ function parseCustomArgs(raw: string): any[] {
               onClick={() => setActiveWorkspaceView("standings")}
               className="h-8 text-xs font-bold gap-1"
             >
-              <span>📊</span> Leaderboard
+              <span>📊</span> Leaderboard & Results
             </Button>
 
-            {isContestSubmitted ? (
+            {hasUserSubmittedContest && !currentUser?.isAdmin ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold shadow-sm">
+                <span>✓</span> You have already submitted the assignment
+              </span>
+            ) : isContestSubmitted ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold shadow-sm">
                 <span>✓</span> Contest Submitted
               </span>
@@ -887,7 +988,75 @@ function parseCustomArgs(raw: string): any[] {
       {/* Main Content Area */}
       {activeWorkspaceView === "standings" ? (
         /* Standings Matrix View */
-        <main className="container mx-auto px-4 py-6 flex-1 space-y-4">
+        <main className="container mx-auto px-4 py-6 flex-1 space-y-6">
+          {hasUserSubmittedContest && (
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-card to-card border border-emerald-500/40 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-2xl font-black shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                    ✓
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+                        Submission Verified
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-black text-foreground mt-0.5">
+                      You have already submitted the assignment
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Your test submission has been recorded in the database. Re-attending the contest or submitting new answers is disabled.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setActiveWorkspaceView("editor")}
+                    className="h-8 text-xs font-semibold gap-1.5"
+                  >
+                    <span>👀</span> Review Code (Read-Only)
+                  </Button>
+                  <Link href="/contests">
+                    <Button size="sm" className="h-8 text-xs font-bold bg-primary text-primary-foreground">
+                      All Contests &rarr;
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Performance Summary Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-border/60">
+                <div className="p-3 rounded-xl bg-secondary/50 border border-border/60">
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold block">Your Rank</span>
+                  <span className="text-lg font-black text-primary font-mono">
+                    {userRank !== "-" ? `#${userRank}` : "Unranked"}
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-secondary/50 border border-border/60">
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold block">Final Score</span>
+                  <span className="text-lg font-black text-emerald-400 font-mono">
+                    {userScore} / {totalPoints} pts
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-secondary/50 border border-border/60">
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold block">Questions Solved</span>
+                  <span className="text-lg font-black text-foreground font-mono">
+                    {solvedProblemsCount} / {totalProblemsCount}
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-secondary/50 border border-border/60">
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold block">Total Attempts</span>
+                  <span className="text-lg font-black text-muted-foreground font-mono">
+                    {attemptedProblemsCount}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold">Live Contest Standings</h2>
@@ -1051,6 +1220,20 @@ function parseCustomArgs(raw: string): any[] {
           {/* Right Column: Code Editor & Execution Console (7 cols) */}
           <div className="lg:col-span-7 flex flex-col max-h-[calc(100vh-115px)] bg-background">
             {/* Editor Toolbar */}
+            {hasUserSubmittedContest && !currentUser?.isAdmin && (
+              <div className="px-4 py-2 bg-emerald-500/10 border-b border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span>🔒</span> You have already submitted the assignment (Read-Only Mode).
+                </span>
+                <button
+                  onClick={() => setActiveWorkspaceView("standings")}
+                  className="underline hover:text-white font-bold"
+                >
+                  View Leaderboard & Results &rarr;
+                </button>
+              </div>
+            )}
+
             <div className="p-2.5 border-b border-border/80 bg-secondary/40 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-muted-foreground">Language:</span>
@@ -1064,35 +1247,45 @@ function parseCustomArgs(raw: string): any[] {
                   <option value="cpp">C++ (GCC 11)</option>
                   <option value="java">Java (OpenJDK 17)</option>
                 </select>
-                <button
-                  type="button"
-                  onClick={handleResetCode}
-                  title="Reset to starter template"
-                  className="px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary rounded border border-border/60 transition-colors"
-                >
-                  ↺ Reset
-                </button>
+                {!hasUserSubmittedContest && (
+                  <button
+                    type="button"
+                    onClick={handleResetCode}
+                    title="Reset to starter template"
+                    className="px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary rounded border border-border/60 transition-colors"
+                  >
+                    ↺ Reset
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleRunCode}
-                  disabled={isRunning || isSubmitting}
-                  className="h-8 text-xs font-bold gap-1.5"
-                >
-                  <span>▶</span> {isRunning ? "Running..." : "Run Tests"}
-                </Button>
+                {hasUserSubmittedContest && !currentUser?.isAdmin ? (
+                  <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-md flex items-center gap-1.5">
+                    <span>✓</span> You have already submitted the assignment
+                  </span>
+                ) : (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleRunCode}
+                      disabled={isRunning || isSubmitting}
+                      className="h-8 text-xs font-bold gap-1.5"
+                    >
+                      <span>▶</span> {isRunning ? "Running..." : "Run Tests"}
+                    </Button>
 
-                <Button
-                  size="sm"
-                  onClick={handleSubmitCode}
-                  disabled={isRunning || isSubmitting}
-                  className="h-8 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-md shadow-emerald-600/20"
-                >
-                  <span>🚀</span> {isSubmitting ? "Evaluating..." : "Submit Solution"}
-                </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSubmitCode}
+                      disabled={isRunning || isSubmitting}
+                      className="h-8 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-md shadow-emerald-600/20"
+                    >
+                      <span>🚀</span> {isSubmitting ? "Evaluating..." : "Submit Solution"}
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -1109,6 +1302,8 @@ function parseCustomArgs(raw: string): any[] {
                   monacoRef.current = monaco;
                 }}
                 options={{
+                  readOnly: Boolean(hasUserSubmittedContest && !currentUser?.isAdmin),
+                  domReadOnly: Boolean(hasUserSubmittedContest && !currentUser?.isAdmin),
                   minimap: { enabled: false },
                   fontSize: 13,
                   lineNumbers: "on",
@@ -1248,7 +1443,14 @@ function parseCustomArgs(raw: string): any[] {
 
                 {consoleBottomTab === "result" && (
                   <div>
-                    {!runResult ? (
+                    {isRunning || isSubmitting ? (
+                      <div className="flex flex-col items-center justify-center py-8 space-y-3 text-muted-foreground">
+                        <div className="h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                        <span className="text-xs font-medium">
+                          {isSubmitting ? "Evaluating test cases against judge..." : "Running test cases..."}
+                        </span>
+                      </div>
+                    ) : !runResult ? (
                       <p className="text-muted-foreground text-[11px] text-center py-6">
                         Click 'Run Tests' or 'Submit Solution' to view execution results.
                       </p>
