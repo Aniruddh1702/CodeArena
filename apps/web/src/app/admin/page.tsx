@@ -422,7 +422,7 @@ export default function AdminPortalPage() {
       title: "Chief System Architect & Root Judge",
       avatar: "⚡",
       bio: "Root master authority of CodeArena 2026. Managing quad-engine compilation fabrics, live competition telemetry, and algorithmic sandbox isolation.",
-      securityLevel: "CLASSIFIED LEVEL 5 [SUPER-ADMIN ROOT]",
+      securityLevel: "ADMINISTRATOR CLEARANCE",
       themeColor: "emerald",
       sessionTimeout: "8h",
     };
@@ -438,7 +438,7 @@ export default function AdminPortalPage() {
   const [auditLogs, setAuditLogs] = useState<Array<{ id: string; time: string; type: "system" | "question" | "contest" | "security"; message: string }>>([
     { id: "log-1", time: "Just now", type: "system", message: "Quad-engine test runners verified healthy (V8/Py3/g++/Java21)." },
     { id: "log-2", time: "2m ago", type: "question", message: "Synchronized question bank repository with in-memory execution store." },
-    { id: "log-3", time: "5m ago", type: "security", message: "Super-Admin session established with AES-256 encrypted token guard." },
+    { id: "log-3", time: "5m ago", type: "security", message: "Administrator session established via verified authorization token." },
     { id: "log-4", time: "12m ago", type: "contest", message: "Contest Studio telemetry watcher loaded active tournament queues." },
     { id: "log-5", time: "18m ago", type: "system", message: "Memory limits and execution process isolation guards validated." },
   ]);
@@ -5705,8 +5705,8 @@ export default function AdminPortalPage() {
                         <span className="text-emerald-300 font-bold">{adminProfile.securityLevel}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400">HARDWARE_CIPHER:</span>
-                        <span className="text-cyan-300 font-bold">AES-256-GCM / QUAD-RUN</span>
+                        <span className="text-slate-400">SECURITY_PROTOCOL:</span>
+                        <span className="text-cyan-300 font-bold">TLS 1.3 / JWT AUTHORIZATION</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-slate-400">SESSION_EXPIRY:</span>
@@ -5833,12 +5833,12 @@ export default function AdminPortalPage() {
                 {/* Form 2: Passcode & Master Access Key Management */}
                 <div className="relative rounded-2xl bg-slate-900/40 border border-white/10 border-t-white/25 p-5 md:p-6 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.4)]">
                   <div className="pb-4 border-b border-white/[0.08]">
-                    <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-1">// SECURITY_CIPHER // HARDWARE_KEY</div>
+                    <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-1">// SECURITY_CONFIG // ACCESS_KEY</div>
                     <h3 className="text-base font-bold font-mono text-white flex items-center gap-2">
                       <span>🔑</span> Passcode & Security Authorization
                     </h3>
                     <p className="text-xs font-mono text-slate-400 mt-0.5">
-                      Rotate root access passcodes and set hardware session timeout policies
+                      Rotate administrator passcodes and configure session timeout policies
                     </p>
                   </div>
 

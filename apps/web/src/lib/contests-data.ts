@@ -159,10 +159,16 @@ export function getContests(): Contest[] {
       const parsed: Contest[] = JSON.parse(raw);
       // Active purge of legacy ongoing dummy contest from browser storage
       const sanitized = parsed.filter((c) => c.id !== "contest-weekly-clash-1");
-      if (sanitized.length !== parsed.length) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+      if (sanitized.length === 0) {
+        const enriched = DEFAULT_CONTESTS.map(enrichContestProblems);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched));
+        contests = enriched;
+      } else {
+        if (sanitized.length !== parsed.length) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+        }
+        contests = sanitized.map(enrichContestProblems);
       }
-      contests = sanitized.map(enrichContestProblems);
     }
 
     // Auto update status based on current time

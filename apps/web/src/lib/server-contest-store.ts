@@ -127,11 +127,15 @@ export function getServerContests(): Contest[] {
     }
   }
 
-  // Ensure legacy contest-weekly-clash-1 is never returned
+  // Ensure legacy contest-weekly-clash-1 is never returned and contests never remain empty
   if (global.__codearena_server_contests) {
     const prevLength = global.__codearena_server_contests.length;
     global.__codearena_server_contests = global.__codearena_server_contests.filter((c) => c.id !== "contest-weekly-clash-1");
-    if (global.__codearena_server_contests.length !== prevLength) {
+    if (global.__codearena_server_contests.length === 0) {
+      const defaultContest = getOfficialScheduledContest();
+      global.__codearena_server_contests = [defaultContest];
+      writeToFile([defaultContest]);
+    } else if (global.__codearena_server_contests.length !== prevLength) {
       writeToFile(global.__codearena_server_contests);
     }
   }

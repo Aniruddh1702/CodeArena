@@ -192,14 +192,20 @@ export function getLeaderboards(
     return a.username.localeCompare(b.username);
   });
 
-  // Assign global ranks and medals
-  const globalRanked: LeaderboardUser[] = allGlobal.map((u, index) => ({
-    ...u,
-    rank: index + 1,
-    badge: index === 0 ? "👑" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""
-  }));
+  // Assign global ranks and medals strictly to competitors with valid solves (> 0)
+  let currentRank = 1;
+  const globalRanked: LeaderboardUser[] = allGlobal.map((u) => {
+    const isRanked = u.problemsSolved > 0;
+    const rank = isRanked ? currentRank++ : 0;
+    return {
+      ...u,
+      rank,
+      badge: rank === 1 ? "👑" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "",
+    };
+  });
 
-  const currentUserGlobalRank = globalRanked.find((u) => u.isCurrentUser)?.rank || (allGlobal.length > 0 ? 0 : 0);
+  const myGlobalUser = globalRanked.find((u) => u.isCurrentUser);
+  const currentUserGlobalRank = myGlobalUser && myGlobalUser.problemsSolved > 0 ? (myGlobalUser.rank || 0) : 0;
 
   // 4. Filter and rank within active user's organization
   const targetOrgLower = activeOrg.trim().toLowerCase();
@@ -207,13 +213,19 @@ export function getLeaderboards(
     (u) => u.isCurrentUser || u.org.trim().toLowerCase() === targetOrgLower
   );
 
-  const orgRanked: LeaderboardUser[] = allOrg.map((u, index) => ({
-    ...u,
-    rank: index + 1,
-    badge: index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""
-  }));
+  let currentOrgRankCounter = 1;
+  const orgRanked: LeaderboardUser[] = allOrg.map((u) => {
+    const isRanked = u.problemsSolved > 0;
+    const rank = isRanked ? currentOrgRankCounter++ : 0;
+    return {
+      ...u,
+      rank,
+      badge: rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "",
+    };
+  });
 
-  const currentUserOrgRank = orgRanked.find((u) => u.isCurrentUser)?.rank || (allOrg.length > 0 ? 0 : 0);
+  const myOrgUser = orgRanked.find((u) => u.isCurrentUser);
+  const currentUserOrgRank = myOrgUser && myOrgUser.problemsSolved > 0 ? (myOrgUser.rank || 0) : 0;
 
   return {
     globalRanked,
@@ -235,14 +247,16 @@ export function getPublicProfileData(
     org?: string;
     score?: number;
     problemsSolved?: number;
+    accuracy?: number;
   }
 ): LeaderboardUser | null {
   const normalized = (username || "").toLowerCase();
 
   // 1. Check if it's the current user
   if (currentUser && (normalized === (currentUser.username || "").toLowerCase() || normalized === "you")) {
-    const score = currentUser.score ?? 1450;
+    const score = currentUser.score ?? 1200;
     const problemsSolved = currentUser.problemsSolved ?? 0;
+    const accuracy = problemsSolved > 0 ? (typeof currentUser.accuracy === "number" ? currentUser.accuracy : 100.0) : 0.0;
     return {
       userId: "current_user",
       username: currentUser.username || "student",
@@ -250,7 +264,7 @@ export function getPublicProfileData(
       org: currentUser.org || "CodeArena Academy",
       score,
       problemsSolved,
-      accuracy: problemsSolved > 0 ? 85.5 : 0.0,
+      accuracy,
       isCurrentUser: true,
       tier: getTierFromRating(score),
       bio: "Passionate competitive programmer & software engineer on CodeArena.",
@@ -266,6 +280,8 @@ export function getPublicProfileData(
       const match = accounts.find((a) => a.username.toLowerCase() === normalized || a.id === username);
       if (match) {
         const stats = getUserStats(match.id);
+        const totalSubs = Math.max(stats.problemsSolved, (stats.recentActivity || []).length);
+        const acc = stats.problemsSolved > 0 ? Math.round((stats.problemsSolved / totalSubs) * 1000) / 10 : 0.0;
         return {
           userId: match.id,
           username: match.username,
@@ -273,7 +289,7 @@ export function getPublicProfileData(
           org: match.college || "CodeArena Academy",
           score: stats.dsaRating,
           problemsSolved: stats.problemsSolved,
-          accuracy: stats.problemsSolved > 0 ? 85.5 : 0.0,
+          accuracy: acc,
           isCurrentUser: active ? (match.id === active.id) : false,
           avatarUrl: match.avatarUrl,
           tier: getTierFromRating(stats.dsaRating),

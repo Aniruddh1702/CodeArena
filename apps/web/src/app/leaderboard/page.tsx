@@ -11,7 +11,7 @@ import { NotificationCenter } from "@/components/NotificationCenter";
 
 export default function LeaderboardPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("global");
@@ -293,7 +293,7 @@ export default function LeaderboardPage() {
                   ) : (activeTab === "global" ? displayedGlobal : displayedOrg).length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
-                        No competitors match "{searchQuery}".
+                        {searchQuery ? `No competitors match "${searchQuery}".` : "No ranked competitors yet. Solve problems to claim your position on the leaderboard!"}
                       </td>
                     </tr>
                   ) : (
@@ -319,12 +319,14 @@ export default function LeaderboardPage() {
                           {/* Rank */}
                           <td className="px-5 py-4 font-bold font-mono">
                             <span className="flex items-center gap-1.5">
-                              {leader.badge ? (
-                                <span className="text-base">{leader.badge}</span>
+                              {leader.rank && leader.rank > 0 ? (
+                                <>
+                                  {leader.badge && <span className="text-base">{leader.badge}</span>}
+                                  <span className={leader.badge ? "text-xs font-semibold" : "text-muted-foreground"}>#{leader.rank}</span>
+                                </>
                               ) : (
-                                <span className="text-muted-foreground">#{leader.rank}</span>
+                                <span className="text-muted-foreground text-xs italic">Unranked</span>
                               )}
-                              {leader.badge && <span className="text-xs font-semibold">#{leader.rank}</span>}
                             </span>
                           </td>
 
