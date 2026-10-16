@@ -18,10 +18,13 @@ export async function GET(req: NextRequest) {
     const deletedSlugs = getServerDeletedProblemSlugs();
     let backendItems: any[] = [];
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
       const res = await fetch(`${apiUrl}/api/questions?pageSize=100`, {
         headers: { "Content-Type": "application/json" },
         cache: "no-store",
-      });
+        signal: controller.signal,
+      }).finally(() => clearTimeout(timeoutId));
       const data = await res.json().catch(() => null);
       backendItems = data?.data?.items || data?.items || [];
     } catch (e) {}

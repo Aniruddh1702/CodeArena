@@ -1,13 +1,14 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
+import crypto from "crypto";
 
 export interface PlatformUserRecord {
   id: string;
   username: string;
   email: string;
   name: string;
-  password?: string;
+  passwordHash?: string;
   role: "STUDENT" | "SUPER_ADMIN" | "ADMIN" | "INSTRUCTOR";
   college?: string;
   score: number;
@@ -18,6 +19,36 @@ export interface PlatformUserRecord {
 }
 
 const REGISTRY_FILE = path.join(os.tmpdir(), "codearena_platform_users.json");
+
+/**
+ * Secure password hashing using Node crypto scrypt with random salt
+ */
+export function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
+/**
+ * Timing-safe password verification
+ */
+export function verifyPassword(password: string, storedHash?: string): boolean {
+  if (!password || !storedHash) return false;
+  try {
+    if (storedHash.includes(":")) {
+      const [salt, originalHash] = storedHash.split(":");
+      const calculated = crypto.scryptSync(password, salt, 64).toString("hex");
+      return crypto.timingSafeEqual(Buffer.from(originalHash), Buffer.from(calculated));
+    }
+    // Fallback comparison for legacy unhashed entries (auto-upgrades on next login)
+    return crypto.timingSafeEqual(
+      Buffer.from(password.padEnd(32)),
+      Buffer.from(storedHash.padEnd(32))
+    );
+  } catch (e) {
+    return false;
+  }
+}
 
 // In-memory cache
 declare global {
@@ -33,6 +64,11 @@ function loadUsersFromFile(): Map<string, PlatformUserRecord> {
       if (Array.isArray(list)) {
         for (const u of list) {
           if (u && u.username) {
+            // Auto-upgrade legacy plaintext passwords to hash
+            if ((u as any).password && !u.passwordHash) {
+              u.passwordHash = hashPassword((u as any).password);
+              delete (u as any).password;
+            }
             map.set(u.username.toLowerCase(), u);
             if (u.email) {
               map.set(u.email.toLowerCase(), u);
@@ -49,9 +85,14 @@ function loadUsersFromFile(): Map<string, PlatformUserRecord> {
 
 function saveUsersToFile(map: Map<string, PlatformUserRecord>): void {
   try {
-    // Unique list by id / username
     const unique = Array.from(new Set(Array.from(map.values())));
-    fs.writeFileSync(REGISTRY_FILE, JSON.stringify(unique, null, 2), "utf-8");
+    // Strip any residual raw password fields before saving
+    const sanitized = unique.map((u) => {
+      const copy: any = { ...u };
+      delete copy.password;
+      return copy;
+    });
+    fs.writeFileSync(REGISTRY_FILE, JSON.stringify(sanitized, null, 2), "utf-8");
   } catch (e) {
     console.error("Error writing registry file:", e);
   }
@@ -93,19 +134,26 @@ export function deleteUserFromRegistry(identifier: string): boolean {
   return found;
 }
 
-export function recordUserLoginEvent(user: Partial<PlatformUserRecord> & { username: string; email?: string }): PlatformUserRecord {
+export function recordUserLoginEvent(user: Partial<PlatformUserRecord> & { username: string; email?: string; password?: string }): PlatformUserRecord {
   const map = getUserRegistry();
   const unameKey = user.username.toLowerCase();
   const emailKey = (user.email || `${user.username}@codearena.dev`).toLowerCase();
   
   const existing = map.get(unameKey) || map.get(emailKey);
 
+  let passwordHash = existing?.passwordHash;
+  if (user.password) {
+    passwordHash = hashPassword(user.password);
+  } else if ((user as any).passwordHash) {
+    passwordHash = (user as any).passwordHash;
+  }
+
   const updated: PlatformUserRecord = {
     id: user.id || existing?.id || `usr_${Date.now()}`,
     username: user.username,
     email: user.email || existing?.email || `${user.username}@codearena.dev`,
-    name: user.name || (user as any).firstName ? `${(user as any).firstName || ""} ${(user as any).lastName || ""}`.trim() : existing?.name || user.username,
-    password: user.password || existing?.password,
+    name: user.name || ((user as any).firstName ? `${(user as any).firstName || ""} ${(user as any).lastName || ""}`.trim() : existing?.name || user.username),
+    passwordHash,
     role: (user.role as any) || existing?.role || "STUDENT",
     college: user.college || existing?.college || "CodeArena Academy",
     score: user.score !== undefined ? user.score : (existing?.score || 1450),
@@ -125,7 +173,7 @@ export function recordUserLoginEvent(user: Partial<PlatformUserRecord> & { usern
 const RESET_TOKENS_FILE = path.join(os.tmpdir(), "codearena_reset_tokens.json");
 
 interface ResetTokenRecord {
-  token: string;
+  tokenHash: string;
   email: string;
   expiresAt: number;
 }
@@ -139,8 +187,8 @@ function loadResetTokens(): Map<string, ResetTokenRecord> {
       if (Array.isArray(list)) {
         const now = Date.now();
         for (const item of list) {
-          if (item && item.token && item.expiresAt > now) {
-            map.set(item.token, item);
+          if (item && item.tokenHash && item.expiresAt > now) {
+            map.set(item.tokenHash, item);
           }
         }
       }
@@ -162,8 +210,9 @@ function saveResetTokens(map: Map<string, ResetTokenRecord>): void {
 
 export function savePasswordResetToken(token: string, email: string): void {
   const tokens = loadResetTokens();
-  tokens.set(token, {
-    token,
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  tokens.set(tokenHash, {
+    tokenHash,
     email: email.toLowerCase().trim(),
     expiresAt: Date.now() + 3600 * 1000, // 1 hour expiry
   });
@@ -172,20 +221,22 @@ export function savePasswordResetToken(token: string, email: string): void {
 
 export function verifyAndConsumeResetToken(token: string, newPassword: string): { success: boolean; email?: string } {
   const tokens = loadResetTokens();
-  const record = tokens.get(token);
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  const record = tokens.get(tokenHash);
   if (!record || record.expiresAt < Date.now()) {
     return { success: false };
   }
 
   // Consume token
-  tokens.delete(token);
+  tokens.delete(tokenHash);
   saveResetTokens(tokens);
 
-  // Update password in user registry
+  // Update password in user registry with secure hash
   const registry = getUserRegistry();
   const user = registry.get(record.email);
   if (user) {
-    user.password = newPassword;
+    user.passwordHash = hashPassword(newPassword);
+    delete (user as any).password;
     registry.set(user.username.toLowerCase(), user);
     registry.set(user.email.toLowerCase(), user);
     saveUsersToFile(registry);

@@ -5,6 +5,7 @@ import {
   clearAllServerContests,
   Contest,
 } from "@/lib/server-contest-store";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 // GET /api/contests - Returns all platform contests
 export async function GET(req: NextRequest) {
@@ -23,9 +24,16 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/contests - Create or update a contest with embedded problems
+// POST /api/contests - Create or update a contest with embedded problems (Admin Only)
 export async function POST(req: NextRequest) {
   try {
+    if (!checkAdminAuth(req)) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized. Admin privileges required to manage contests." },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     if (!body || !body.id || !body.title) {
       return NextResponse.json(
@@ -48,9 +56,24 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE /api/contests - Clear all contests
+// DELETE /api/contests - Clear all contests (Admin Only with confirmation)
 export async function DELETE(req: NextRequest) {
   try {
+    if (!checkAdminAuth(req)) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized. Admin privileges required." },
+        { status: 403 }
+      );
+    }
+
+    const confirm = req.nextUrl.searchParams.get("confirm");
+    if (confirm !== "CLEAR_ALL") {
+      return NextResponse.json(
+        { success: false, message: "Dangerous operation: confirm=CLEAR_ALL query parameter required." },
+        { status: 400 }
+      );
+    }
+
     clearAllServerContests();
     return NextResponse.json({
       success: true,

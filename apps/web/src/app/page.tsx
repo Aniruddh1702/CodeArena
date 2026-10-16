@@ -353,22 +353,31 @@ export default function HomePage() {
     setActiveAccount(active);
     setUserName(resolveRealName(active));
 
-    const stats = active ? getUserStats(active.id) : { dsaRating: 1450, problemsSolved: 12 };
+    const stats = active ? getUserStats(active.id) : { dsaRating: 1450, problemsSolved: 0 };
     const leaderboard = getLeaderboards({
       username: active?.username || "guest",
       name: active?.name || active?.username || "Learner",
       score: stats.dsaRating || 1450,
-      problemsSolved: stats.problemsSolved || 12,
+      problemsSolved: stats.problemsSolved || 0,
     });
 
+    const totalSolved = stats.problemsSolved || 0;
     setUserStats({
       rating: stats.dsaRating || 1450,
-      solved: stats.problemsSolved || 12,
-      rank: leaderboard.currentUserGlobalRank || 1,
-      streak: stats.problemsSolved > 0 ? 2 : 0,
+      solved: totalSolved,
+      rank: totalSolved > 0 ? (leaderboard.currentUserGlobalRank || 0) : 0,
+      streak: totalSolved > 0 ? Math.min(14, Math.max(1, Math.ceil(totalSolved / 2))) : 0,
     });
 
     setContests(getContests());
+    fetch("/api/contests")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.contests)) {
+          setContests(data.contests);
+        }
+      })
+      .catch(() => {});
 
     const handleAccountChange = () => {
       const updated = getActiveAccount();
@@ -634,10 +643,10 @@ export default function HomePage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-black uppercase tracking-wider font-mono">
-                  🏆 Championship Contests
+                  {contests.some(c => c.status === "LIVE") ? "🔴 LIVE CHAMPIONSHIP" : "🏆 Competitive Contests"}
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold">
-                  $5,000 PRIZE POOL
+                  {contests.length > 0 ? `${contests.length} Scheduled Arenas` : "Weekly Contests"}
                 </span>
               </div>
 
@@ -664,20 +673,20 @@ export default function HomePage() {
                     </div>
 
                     <div className="text-[9px] font-mono uppercase font-black tracking-widest text-amber-800 text-center border-b border-amber-800/20 pb-1">
-                      WINNER SHEET
+                      SAMPLE FORMAT
                     </div>
 
                     <div className="my-1.5 text-center">
                       <div className="text-xs font-black text-slate-950 tracking-tight">
-                        RANK #1 GRANDMASTER
+                        RANK #1 CONTESTANT
                       </div>
                       <div className="text-[9px] font-bold text-amber-900 font-mono">
-                        Score: 1000/1000 (00:24:12)
+                        Score: 1000/1000 (Verified)
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-[8px] font-mono text-slate-700 pt-1 border-t border-amber-800/15">
-                      <span>Prize: $1,500</span>
+                      <span>Credentials: Certified</span>
                       <span className="text-emerald-700 font-bold">+120 Elo</span>
                     </div>
                   </div>
@@ -698,12 +707,23 @@ export default function HomePage() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
-              <span className="text-xs text-amber-400 font-mono font-bold flex items-center gap-1.5">
-                <span>⏳</span> Next Live: Sunday 8:00 PM
+              <span className="text-xs text-amber-400 font-mono font-bold flex items-center gap-1.5 truncate max-w-[240px]">
+                {(() => {
+                  const live = contests.find(c => c.status === "LIVE");
+                  if (live) return <><span>🔴</span> LIVE NOW: {live.title}</>;
+                  const upcoming = contests
+                    .filter(c => c.status === "UPCOMING")
+                    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())[0];
+                  if (upcoming) {
+                    const d = new Date(upcoming.startTime);
+                    return <><span>⏳</span> Next: {d.toLocaleDateString([], { weekday: "short", hour: "2-digit", minute: "2-digit" })} • {upcoming.title}</>;
+                  }
+                  return <><span>⏳</span> Schedule: Weekly Contests</>;
+                })()}
               </span>
               <button
                 onClick={() => router.push("/contests")}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-black text-xs shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_30px_rgba(245,158,11,0.7)] hover:scale-105 transition-all flex items-center gap-1.5"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-black text-xs shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_30px_rgba(245,158,11,0.7)] hover:scale-105 transition-all flex items-center gap-1.5 shrink-0"
               >
                 <span>🏆</span> Enter Contests &rarr;
               </button>

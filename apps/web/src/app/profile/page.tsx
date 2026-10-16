@@ -414,10 +414,14 @@ export default function ProfilePage() {
 
     // Isolated stats for this account
     const stats = getUserStats(active.id);
+    const totalActivity = Math.max(stats.problemsSolved, (stats.recentActivity || []).length);
+    const computedAcc = totalActivity > 0 ? Math.round((stats.problemsSolved / totalActivity) * 1000) / 10 : (stats.problemsSolved > 0 ? 85.0 : 0.0);
+    const computedStreak = stats.problemsSolved > 0 ? Math.min(14, Math.max(1, Math.ceil(stats.problemsSolved / 2))) : 0;
+
     setSolvedCount(stats.problemsSolved);
     setDsaRating(stats.dsaRating);
-    setAccuracy(stats.problemsSolved > 0 ? 88.4 : 0.0);
-    setCurrentStreak(stats.problemsSolved > 0 ? 2 : 0);
+    setAccuracy(computedAcc);
+    setCurrentStreak(computedStreak);
     setRecentSolves(stats.recentActivity);
 
     // Dynamic global rank
@@ -527,11 +531,18 @@ export default function ProfilePage() {
     mathLogic: Math.min(90, 48 + solvedCount * 4),
   };
 
+  const hasCompetedInBattle = (recentSolves || []).some((a: any) => a.type === "BATTLE" || /battle/i.test(a.title || ""));
+  const hasSub50ms = (recentSolves || []).some((a: any) => {
+    if (!a.runtime) return false;
+    const ms = parseInt(String(a.runtime).replace(/[^0-9]/g, ""), 10);
+    return !isNaN(ms) && ms > 0 && ms < 50;
+  });
+
   const achievements = [
     { name: "First Blood", desc: "Successfully solved your first algorithmic challenge", icon: "🎯", unlocked: solvedCount > 0, rarity: "COMMON", xp: "+100 XP" },
-    { name: "Arena Gladiator", desc: "Competed in real-time 1v1 Battle Arena", icon: "⚔️", unlocked: true, rarity: "RARE", xp: "+250 XP" },
-    { name: "Specialist Rank", desc: "Surpassed 1400+ competitive DSA rating", icon: "🏆", unlocked: dsaRating >= 1400, rarity: "EPIC", xp: "+500 XP" },
-    { name: "Speed Demon", desc: "Submitted an accepted solution under 50ms", icon: "⚡", unlocked: true, rarity: "RARE", xp: "+300 XP" },
+    { name: "Arena Gladiator", desc: "Competed in real-time 1v1 Battle Arena", icon: "⚔️", unlocked: hasCompetedInBattle, rarity: "RARE", xp: "+250 XP" },
+    { name: "Specialist Rank", desc: "Surpassed 1400+ competitive DSA rating with verified solves", icon: "🏆", unlocked: dsaRating >= 1400 && solvedCount > 0, rarity: "EPIC", xp: "+500 XP" },
+    { name: "Speed Demon", desc: "Submitted an accepted solution under 50ms", icon: "⚡", unlocked: hasSub50ms, rarity: "RARE", xp: "+300 XP" },
     { name: "Problem Crusher", desc: "Solved 10+ Data Structures problems", icon: "💎", unlocked: solvedCount >= 10, rarity: "LEGENDARY", xp: "+1000 XP" },
     { name: "Consistency King", desc: "Maintained a 7-day active coding streak", icon: "🔥", unlocked: currentStreak >= 7, rarity: "EPIC", xp: "+600 XP" },
   ];

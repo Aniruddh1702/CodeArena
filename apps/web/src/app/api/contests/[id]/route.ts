@@ -5,6 +5,7 @@ import {
   deleteServerContest,
   Contest,
 } from "@/lib/server-contest-store";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 // GET /api/contests/[id] - Get a single contest with all embedded problems
 export async function GET(
@@ -61,9 +62,24 @@ export async function PATCH(
       );
     }
 
+    const isAdmin = checkAdminAuth(req);
+
+    // If non-admin is sending updates, strictly restrict to registration & submission tracking
+    if (!isAdmin) {
+      const allowedKeys = ["registerUserEmail", "submittedUserEmail", "submittedUsers"];
+      const requestedKeys = Object.keys(body);
+      const unauthorizedKeys = requestedKeys.filter(k => !allowedKeys.includes(k));
+      if (unauthorizedKeys.length > 0) {
+        return NextResponse.json(
+          { success: false, message: `Unauthorized: Modifying ${unauthorizedKeys.join(", ")} requires administrator privileges.` },
+          { status: 403 }
+        );
+      }
+    }
+
     const updated: Contest = {
       ...contest,
-      ...body,
+      ...(isAdmin ? body : {}),
       id: contest.id, // Preserve ID
     };
 
@@ -107,12 +123,19 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/contests/[id] - Delete a contest
+// DELETE /api/contests/[id] - Delete a contest (Admin Only)
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!checkAdminAuth(req)) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized. Admin privileges required to delete contests." },
+        { status: 403 }
+      );
+    }
+
     deleteServerContest(params.id);
     return NextResponse.json({
       success: true,

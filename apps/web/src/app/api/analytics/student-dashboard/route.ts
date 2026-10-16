@@ -21,10 +21,15 @@ export async function GET(req: NextRequest) {
       headers["Authorization"] = authHeader;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
     const res = await fetch(`${apiUrl}/api/analytics/student-dashboard`, {
       method: "GET",
       headers,
-    });
+      signal: controller.signal,
+      cache: "no-store",
+    }).finally(() => clearTimeout(timeoutId));
 
     const data = await res.json().catch(() => null);
 
@@ -37,9 +42,15 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (err: any) {
+    const isTimeout = err.name === "AbortError";
     return NextResponse.json(
-      { message: err.message || "Failed to connect to analytics service" },
-      { status: 500 }
+      {
+        message: isTimeout
+          ? "Analytics service timed out (cold start in progress)"
+          : err.message || "Failed to connect to analytics service",
+        data: null,
+      },
+      { status: isTimeout ? 504 : 503 }
     );
   }
 }

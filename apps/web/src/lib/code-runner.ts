@@ -201,24 +201,53 @@ export function evaluateJavaScript(
     }
   };
 
-  // Compile user code in a function constructor sandbox
-  let userFn: any;
-  try {
-    const wrappedCode = `
-      "use strict";
-      ${code}
-      if (typeof ${problem.methodName} === 'function') {
-        return ${problem.methodName};
-      }
-      if (typeof Solution !== 'undefined' && typeof (new Solution())[ '${problem.methodName}' ] === 'function') {
-        const sol = new Solution();
-        return sol[ '${problem.methodName}' ].bind(sol);
-      }
-      throw new Error("Function '${problem.methodName}' not found. Please do not change the function name.");
-    `;
+  // Check if Node.js vm module is available (server-side evaluation)
+  let vmModule: any = null;
+  if (typeof window === "undefined") {
+    try {
+      vmModule = eval('require("vm")');
+    } catch (e) {}
+  }
 
-    const factory = new Function("console", wrappedCode);
-    userFn = factory(customConsole);
+  // Compile user code in a function constructor sandbox or VM script
+  let userFn: any;
+  let vmScript: any = null;
+  const wrappedCode = `
+    "use strict";
+    ${code}
+    var __entryPoint;
+    if (typeof ${problem.methodName} === 'function') {
+      __entryPoint = ${problem.methodName};
+    } else if (typeof Solution !== 'undefined' && typeof (new Solution())[ '${problem.methodName}' ] === 'function') {
+      var sol = new Solution();
+      __entryPoint = sol[ '${problem.methodName}' ].bind(sol);
+    } else {
+      throw new Error("Function '${problem.methodName}' not found. Please do not change the function name.");
+    }
+    function __runTestCase(__args) {
+      return __entryPoint(...__args);
+    }
+  `;
+
+  try {
+    if (vmModule) {
+      vmScript = new vmModule.Script(wrappedCode);
+    } else {
+      const fallbackCode = `
+        "use strict";
+        ${code}
+        if (typeof ${problem.methodName} === 'function') {
+          return ${problem.methodName};
+        }
+        if (typeof Solution !== 'undefined' && typeof (new Solution())[ '${problem.methodName}' ] === 'function') {
+          const sol = new Solution();
+          return sol[ '${problem.methodName}' ].bind(sol);
+        }
+        throw new Error("Function '${problem.methodName}' not found. Please do not change the function name.");
+      `;
+      const factory = new Function("console", fallbackCode);
+      userFn = factory(customConsole);
+    }
   } catch (err: any) {
     const isSyntax = err.name === "SyntaxError";
     const errLine = extractJsErrorLine(err, code) || 1;
@@ -256,7 +285,35 @@ export function evaluateJavaScript(
       // Deep clone arguments so user modifications don't leak between cases
       const clonedArgs = JSON.parse(JSON.stringify(tc.args));
       
-      const result = userFn(...clonedArgs);
+      let result: any;
+      if (vmModule && vmScript) {
+        const sandbox: any = {
+          console: customConsole,
+          Math,
+          JSON,
+          Array,
+          Object,
+          String,
+          Number,
+          Boolean,
+          Date,
+          RegExp,
+          Map,
+          Set,
+          parseInt,
+          parseFloat,
+          Infinity,
+          NaN,
+          undefined,
+          __args: clonedArgs,
+        };
+        const context = vmModule.createContext(sandbox);
+        vmScript.runInContext(context, { timeout: 2000 });
+        const runInvocation = new vmModule.Script(`__runTestCase(__args)`);
+        result = runInvocation.runInContext(context, { timeout: 2000 });
+      } else {
+        result = userFn(...clonedArgs);
+      }
       const caseElapsed = Math.round(performance.now() - caseStartTime);
 
       // Compare actual vs expected
@@ -319,15 +376,19 @@ export function evaluateJavaScript(
         });
       }
     } catch (err: any) {
+      const isTimeout = err?.code === "ERR_SCRIPT_EXECUTION_TIMEOUT" || 
+        (err?.message && (err.message.includes("timed out") || err.message.includes("Time Limit Exceeded")));
       const errLine = extractJsErrorLine(err, code) || findRelevantCodeLine(code, problem.methodName);
-      const errMsg = `${err.name}: ${err.message}`;
+      const errMsg = isTimeout ? "Time Limit Exceeded (2000ms timeout)" : `${err.name}: ${err.message}`;
 
       if (firstFailIndex === -1) {
         firstFailIndex = i;
-        globalStatus = "Runtime Error";
-        globalErrorType = err.name;
+        globalStatus = isTimeout ? "Time Limit Exceeded" : "Runtime Error";
+        globalErrorType = isTimeout ? "TimeLimitExceeded" : err.name;
         globalErrorLine = errLine;
-        globalErrorDetails = `Runtime Error [${err.name}]: ${err.message}\nOccurred on Test Case ${i + 1}\nInput: ${tc.input}\nLine ${errLine}: ${err.message}`;
+        globalErrorDetails = isTimeout
+          ? `Time Limit Exceeded: Execution took longer than 2000ms on Test Case ${i + 1}. Check for infinite loops or high algorithmic complexity.`
+          : `Runtime Error [${err.name}]: ${err.message}\nOccurred on Test Case ${i + 1}\nInput: ${tc.input}\nLine ${errLine}: ${err.message}`;
       }
       testResults.push({
         caseIndex: i,
@@ -337,9 +398,26 @@ export function evaluateJavaScript(
         actualOutput: "",
         stdout: capturedLogs.join("\n"),
         error: errMsg,
-        diffExplanation: `Runtime exception thrown during execution: ${errMsg} (Line ${errLine})`,
-        runtimeMs: Math.round(performance.now() - caseStartTime)
+        diffExplanation: isTimeout
+          ? "Execution timed out after 2000ms. Ensure your loops terminate and recursion has a base case."
+          : `Runtime exception thrown during execution: ${errMsg} (Line ${errLine})`,
+        runtimeMs: isTimeout ? 2000 : Math.round(performance.now() - caseStartTime)
       });
+
+      if (isTimeout) {
+        for (let j = i + 1; j < testCases.length; j++) {
+          testResults.push({
+            caseIndex: j,
+            passed: false,
+            input: testCases[j].input,
+            expectedOutput: testCases[j].output,
+            actualOutput: "",
+            stdout: "",
+            error: "Skipped due to prior Time Limit Exceeded"
+          });
+        }
+        break;
+      }
     }
   }
 

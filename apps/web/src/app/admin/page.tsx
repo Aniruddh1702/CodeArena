@@ -136,11 +136,21 @@ function parseCustomArgs(raw: string): any[] {
     } catch (e) {}
 
     if (!parsed) {
-      try {
-        const fn = new Function(`return (${valStr});`);
-        results.push(fn());
-        parsed = true;
-      } catch (e) {}
+      if (valStr === "true") { results.push(true); parsed = true; }
+      else if (valStr === "false") { results.push(false); parsed = true; }
+      else if (valStr === "null" || valStr === "undefined") { results.push(null); parsed = true; }
+      else if (!isNaN(Number(valStr)) && valStr !== "") { results.push(Number(valStr)); parsed = true; }
+      else {
+        try {
+          const jsonized = valStr
+            .replace(/'([^'\\]*(?:\\.[^'\\]*)*)'/g, '"$1"')
+            .replace(/\bNone\b/g, "null")
+            .replace(/\bTrue\b/g, "true")
+            .replace(/\bFalse\b/g, "false");
+          results.push(JSON.parse(jsonized));
+          parsed = true;
+        } catch (e) {}
+      }
     }
 
     if (!parsed) {

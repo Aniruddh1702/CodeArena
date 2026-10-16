@@ -386,8 +386,12 @@ function parseCustomArgs(raw: string): any[] {
     return Array.isArray(single) ? [single] : [single];
   } catch (e) {}
   try {
-    const fn = new Function(`return [${trimmed}];`);
-    return fn();
+    const jsonized = `[${trimmed}]`
+      .replace(/'([^'\\]*(?:\\.[^'\\]*)*)'/g, '"$1"')
+      .replace(/\bNone\b/g, "null")
+      .replace(/\bTrue\b/g, "true")
+      .replace(/\bFalse\b/g, "false");
+    return JSON.parse(jsonized);
   } catch (e) {}
   return [trimmed];
 }

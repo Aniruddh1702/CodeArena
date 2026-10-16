@@ -34,19 +34,15 @@ export async function POST(req: NextRequest) {
     const token = crypto.randomBytes(32).toString("hex");
     savePasswordResetToken(token, email);
 
-    if (backendRes && backendRes.ok) {
-      return NextResponse.json({
-        success: true,
-        message: backendData?.message || "Password reset instructions sent to your email.",
-        token,
-      });
+    // In local development, log to server console for testing convenience without leaking over HTTP
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[Auth Security] Password reset token for ${email}: ${token}`);
     }
 
-    // Return standard success response for privacy & security
+    // Always return safe, privacy-preserving success message without leaking token or account existence
     return NextResponse.json({
       success: true,
-      message: "If an account with that email exists, a password reset link has been dispatched.",
-      token,
+      message: "If an account with that email exists, instructions to reset your password have been dispatched.",
     });
   } catch (err: any) {
     return NextResponse.json(

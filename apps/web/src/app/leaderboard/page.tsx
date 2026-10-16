@@ -235,13 +235,13 @@ export default function LeaderboardPage() {
             <div className="text-right">
               <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Global Standing</p>
               <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
-                #{userGlobalRank}
+                {userGlobalRank > 0 ? `#${userGlobalRank}` : "Unranked"}
               </p>
             </div>
             <div className="text-right border-l pl-4 border-border">
               <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Org Standing</p>
               <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">
-                #{userOrgRank}
+                {userOrgRank > 0 ? `#${userOrgRank}` : "Unranked"}
               </p>
             </div>
           </div>

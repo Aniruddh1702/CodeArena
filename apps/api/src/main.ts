@@ -13,15 +13,22 @@ async function bootstrap() {
   app.use(cookieParser(process.env.COOKIE_SECRET));
 
   // CORS
+  const defaultOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    process.env.FRONTEND_URL,
+    process.env.NEXT_PUBLIC_APP_URL,
+  ].filter(Boolean) as string[];
+
   const corsOrigins = process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
-    : true; // In production/cloud, allow configured origins or reflect request origin
+    : (process.env.NODE_ENV === 'production' && defaultOrigins.length > 0 ? defaultOrigins : true);
 
   app.enableCors({
     origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-admin-token'],
   });
 
   // Global prefix

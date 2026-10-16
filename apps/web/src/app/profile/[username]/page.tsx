@@ -404,9 +404,9 @@ export default function PublicProfilePage({ params }: { params: { username: stri
 
   const achievements = [
     { name: "First Blood", desc: "Solved an algorithm challenge", icon: "🎯", unlocked: profile.problemsSolved > 0, xp: "+100 XP" },
-    { name: "Specialist Rank", desc: "Reached 1400+ competitive rating", icon: "🏆", unlocked: profile.score >= 1400, xp: "+500 XP" },
+    { name: "Specialist Rank", desc: "Reached 1400+ competitive rating with verified solves", icon: "🏆", unlocked: profile.score >= 1400 && profile.problemsSolved > 0, xp: "+500 XP" },
     { name: "Algorithm Master", desc: "Solved multiple core DSA challenges", icon: "💎", unlocked: profile.problemsSolved >= 5, xp: "+800 XP" },
-    { name: "Arena Contender", desc: "Competed in live arena matches", icon: "⚔️", unlocked: true, xp: "+300 XP" },
+    { name: "Arena Contender", desc: "Competed in live arena matches", icon: "⚔️", unlocked: Boolean((profile as any).hasBattled || profile.problemsSolved >= 3), xp: "+300 XP" },
   ];
 
   return (

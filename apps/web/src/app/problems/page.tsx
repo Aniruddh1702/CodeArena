@@ -75,39 +75,68 @@ function ProblemsContent() {
   const [authChecked, setAuthChecked] = useState<boolean>(false);
   const [solvedSlugs, setSolvedSlugs] = useState<string[]>([]);
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const loadAllProblems = () => {
-    const list = getAllProblems();
-    const mapped: Problem[] = list.map((p, idx) => {
-      const mock = ALL_MOCK_QUESTIONS.find((m) => m.slug === p.slug);
-      return {
-        id: p.id || String(idx + 1),
-        slug: p.slug,
-        title: p.title,
-        difficulty: p.difficulty,
-        solveCount: mock ? mock.solveCount : 0,
-        topics: p.topics || [{ name: "Algorithms" }],
-      };
-    });
-    setAllAvailableProblems(mapped);
+    try {
+      setLoadError(null);
+      const list = getAllProblems();
+      const mapped: Problem[] = list.map((p, idx) => {
+        const mock = ALL_MOCK_QUESTIONS.find((m) => m.slug === p.slug);
+        return {
+          id: p.id || String(idx + 1),
+          slug: p.slug,
+          title: p.title,
+          difficulty: p.difficulty,
+          solveCount: mock ? mock.solveCount : 0,
+          topics: p.topics || [{ name: "Algorithms" }],
+        };
+      });
+      setAllAvailableProblems(mapped);
+    } catch (err: any) {
+      setLoadError("Failed to parse problems database. Please retry.");
+    }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await syncProblemsWithServer();
+      loadAllProblems();
+    } catch (err: any) {
+      setLoadError("Unable to reach problem server. Showing cached problems.");
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   useEffect(() => {
+    let isMounted = true;
     loadAllProblems();
-    syncProblemsWithServer().catch(() => {});
+
+    syncProblemsWithServer()
+      .then(() => {
+        if (isMounted) loadAllProblems();
+      })
+      .catch(() => {});
 
     const handleProblemsUpdated = () => {
-      loadAllProblems();
+      if (isMounted) loadAllProblems();
     };
 
     const probPollInterval = setInterval(() => {
       syncProblemsWithServer()
-        .then(() => loadAllProblems())
+        .then(() => {
+          if (isMounted) loadAllProblems();
+        })
         .catch(() => {});
-    }, 5000);
+    }, 15000);
 
     window.addEventListener("codearena_problems_updated", handleProblemsUpdated);
     window.addEventListener("storage", handleProblemsUpdated);
     return () => {
+      isMounted = false;
       clearInterval(probPollInterval);
       window.removeEventListener("codearena_problems_updated", handleProblemsUpdated);
       window.removeEventListener("storage", handleProblemsUpdated);
@@ -196,6 +225,21 @@ function ProblemsContent() {
     router.replace("/problems");
   };
 
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center animate-spin">
+            <span className="text-primary font-bold text-lg">C</span>
+          </div>
+          <p className="text-xs font-semibold text-muted-foreground animate-pulse tracking-wide font-mono">
+            Loading problem bank & authentic progress...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (authChecked && !currentUser) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
@@ -267,6 +311,15 @@ function ProblemsContent() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              disabled={isRefreshing}
+              className="gap-2 text-xs"
+            >
+              <span className={isRefreshing ? "animate-spin" : ""}>🔄</span>
+              {isRefreshing ? "Syncing..." : "Sync Bank"}
+            </Button>
             <Button onClick={() => router.push('/battles')} variant="outline" className="gap-2">
               <span>⚔️</span> 1v1 Battle
             </Button>
@@ -275,6 +328,19 @@ function ProblemsContent() {
             </Button>
           </div>
         </div>
+
+        {/* Error / Offline Banner with Retry */}
+        {loadError && (
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-4 animate-in fade-in">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">⚠️</span>
+              <p className="text-sm text-amber-200">{loadError}</p>
+            </div>
+            <Button size="sm" variant="outline" onClick={handleRefresh} className="text-xs">
+              Retry Sync
+            </Button>
+          </div>
+        )}
 
         {/* Focus Area Banner (if filtered by a topic) */}
         {selectedTopic !== "ALL" && (

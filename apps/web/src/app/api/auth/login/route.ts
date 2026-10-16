@@ -1,55 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
-import { getUserRegistry, recordUserLoginEvent } from "@/lib/userActivity";
+import { getUserRegistry, recordUserLoginEvent, verifyPassword } from "@/lib/userActivity";
+
+// In-memory rate limiter for login brute force protection (5 failed attempts per 15 minutes)
+const loginAttempts = new Map<string, { count: number; lockedUntil: number }>();
+
+function checkRateLimit(identifier: string): { allowed: boolean; remainingSecs: number } {
+  const now = Date.now();
+  const record = loginAttempts.get(identifier);
+  if (!record) return { allowed: true, remainingSecs: 0 };
+  if (record.lockedUntil > now) {
+    return { allowed: false, remainingSecs: Math.ceil((record.lockedUntil - now) / 1000) };
+  }
+  if (now - record.lockedUntil > 15 * 60 * 1000) {
+    loginAttempts.delete(identifier);
+    return { allowed: true, remainingSecs: 0 };
+  }
+  return { allowed: true, remainingSecs: 0 };
+}
+
+function recordFailedAttempt(identifier: string) {
+  const now = Date.now();
+  const record = loginAttempts.get(identifier) || { count: 0, lockedUntil: 0 };
+  record.count += 1;
+  if (record.count >= 5) {
+    record.lockedUntil = now + 15 * 60 * 1000; // Lock for 15 minutes
+  }
+  loginAttempts.set(identifier, record);
+}
+
+function clearFailedAttempts(identifier: string) {
+  loginAttempts.delete(identifier);
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const apiUrl = getBackendApiUrl();
-
+    const body = await req.json().catch(() => ({}));
     const emailLower = (body.email || body.username || "").toLowerCase().trim();
-    const isAniruddhPass = body.password === "Aniruddh#1702" || body.password === "codearena-admin-2026" || body.password === "admin123" || body.password === "codearena2026" || body.password === "Admin@123!";
+    const password = body.password || "";
 
-    // Direct super admin authentication
-    if ((emailLower.includes("admin") || emailLower === "aniruddh" || emailLower === "aniruddhshukla") && isAniruddhPass) {
-      const adminUser = {
-        id: "admin_master_1",
-        username: "admin",
-        email: "admin@codearena.dev",
-        firstName: "System",
-        lastName: "Administrator",
-        role: "SUPER_ADMIN",
-      };
-      const resObj = NextResponse.json({
-        success: true,
-        data: {
-          user: adminUser,
-          accessToken: "admin_jwt_session_" + Date.now(),
-        },
-      });
-      resObj.cookies.set("codearena_admin_auth", "true", { path: "/", maxAge: 86400, sameSite: "lax" });
-      resObj.cookies.set("token", "admin_jwt_session_" + Date.now(), { path: "/", maxAge: 86400 * 7, sameSite: "lax" });
-      return resObj;
+    if (!emailLower || !password) {
+      return NextResponse.json(
+        { message: "Email/username and password are required." },
+        { status: 400 }
+      );
     }
 
+    // Rate limiting check
+    const clientIp = req.headers.get("x-forwarded-for") || "client_ip";
+    const rateLimitKey = `${clientIp}_${emailLower}`;
+    const rateCheck = checkRateLimit(rateLimitKey);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          message: `Too many failed login attempts. Please wait ${rateCheck.remainingSecs} seconds before trying again.`,
+        },
+        { status: 429 }
+      );
+    }
+
+    const apiUrl = getBackendApiUrl();
     let res: Response | null = null;
     let data: any = null;
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
       res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      });
-
-      if (!res.ok && !apiUrl.includes("onrender.com") && apiUrl.includes("codearena-api")) {
-        const fallbackUrl = `https://${apiUrl.replace(/https?:\/\//, "")}.onrender.com`;
-        res = await fetch(`${fallbackUrl}/api/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-      }
+        signal: controller.signal,
+      }).finally(() => clearTimeout(timeoutId));
 
       data = await res.json().catch(() => null);
     } catch (networkErr: any) {
@@ -57,12 +79,15 @@ export async function POST(req: NextRequest) {
     }
 
     if (res && res.ok && data) {
+      clearFailedAttempts(rateLimitKey);
       const response = NextResponse.json(data);
       const token = data?.data?.accessToken || data?.accessToken;
       if (token) {
         response.cookies.set("token", token, {
           path: "/",
           maxAge: 7 * 24 * 60 * 60,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         });
       }
@@ -91,21 +116,26 @@ export async function POST(req: NextRequest) {
     );
 
     if (registeredUser) {
-      // Strictly enforce password matching
-      if (registeredUser.password && registeredUser.password !== body.password) {
+      // Strictly enforce secure timing-safe password verification
+      const isValid = verifyPassword(password, registeredUser.passwordHash);
+      if (!isValid) {
+        recordFailedAttempt(rateLimitKey);
         return NextResponse.json(
-          { message: "Invalid password. Please check your password and try again." },
+          { message: "Invalid email or password. Please check your credentials and try again." },
           { status: 401 }
         );
       }
 
-      const token = `token_jwt_${Date.now()}`;
+      clearFailedAttempts(rateLimitKey);
+
+      // Generate secure session token
+      const crypto = await import("crypto");
+      const token = `token_jwt_${crypto.randomBytes(24).toString("hex")}`;
       const recorded = recordUserLoginEvent({
         id: registeredUser.id,
         username: registeredUser.username,
         email: registeredUser.email,
         name: registeredUser.name,
-        password: registeredUser.password,
         role: registeredUser.role,
         college: registeredUser.college,
         score: registeredUser.score,
@@ -113,10 +143,15 @@ export async function POST(req: NextRequest) {
         status: "ONLINE",
       });
 
+      // Strip sensitive password hash before returning
+      const safeUser: any = { ...recorded };
+      delete safeUser.password;
+      delete safeUser.passwordHash;
+
       const response = NextResponse.json({
         success: true,
         data: {
-          user: recorded,
+          user: safeUser,
           accessToken: token,
         },
       });
@@ -124,12 +159,15 @@ export async function POST(req: NextRequest) {
       response.cookies.set("token", token, {
         path: "/",
         maxAge: 7 * 24 * 60 * 60,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
       });
 
       return response;
     }
 
+    recordFailedAttempt(rateLimitKey);
     let message = "Invalid email or password. Please register if you don't have an account.";
     if (data && data.message) {
       message = Array.isArray(data.message) ? data.message.join(", ") : data.message;

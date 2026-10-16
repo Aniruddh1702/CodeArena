@@ -7,6 +7,49 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
+// Helper for safe environment variables (stripping host secrets like DATABASE_URL, JWT_SECRET, etc.)
+function getCleanEnv(tmpDir: string): NodeJS.ProcessEnv {
+  return {
+    NODE_ENV: (process.env.NODE_ENV || "production") as any,
+    PATH: process.env.PATH || "/usr/bin:/bin:/usr/local/bin:/opt/homebrew/bin",
+    LANG: "en_US.UTF-8",
+    LC_ALL: "en_US.UTF-8",
+    HOME: tmpDir,
+    TMPDIR: tmpDir,
+  };
+}
+
+// Redact hidden test case inputs and expected outputs during contest/problem submissions
+function redactHiddenCases(summary: ExecutionSummary, publicCount: number, isSubmission: boolean): ExecutionSummary {
+  if (!isSubmission || !summary || !summary.testResults) return summary;
+
+  const sanitizedResults = summary.testResults.map((r, idx) => {
+    if (idx >= publicCount) {
+      return {
+        ...r,
+        input: "[Hidden Test Case]",
+        expectedOutput: "[Hidden]",
+        actualOutput: r.passed ? "[Hidden]" : "[Hidden]",
+        diffExplanation: r.passed ? undefined : "Hidden test case failed. Check your logic for edge cases and boundary conditions.",
+        error: r.passed ? undefined : "Hidden test case failed.",
+        stdout: "", // Suppress user print statements from hidden test cases
+      };
+    }
+    return r;
+  });
+
+  let sanitizedErrorDetails = summary.errorDetails;
+  if (summary.failedTestCaseIndex >= publicCount && summary.status !== "Accepted") {
+    sanitizedErrorDetails = `Failed on Hidden Test Case ${summary.failedTestCaseIndex + 1}. Check edge cases, large inputs, or boundary values.`;
+  }
+
+  return {
+    ...summary,
+    testResults: sanitizedResults,
+    errorDetails: sanitizedErrorDetails,
+  };
+}
+
 // Helper for timeout execution with child_process
 function execPromise(command: string, options: any): Promise<{ stdout: string; stderr: string; error?: any }> {
   return new Promise((resolve) => {
@@ -47,35 +90,24 @@ export async function POST(req: NextRequest) {
           ? [...(problem.publicTestCases || []), ...(problem.hiddenTestCases || [])]
           : (problem.publicTestCases || []));
 
+    const publicCount = (problem.publicTestCases || []).length;
     const lang = String(language || "javascript").toLowerCase().trim();
+    let summary: ExecutionSummary;
 
     // 1. JavaScript Engine
     if (lang === "javascript" || lang === "js") {
-      const summary = evaluateJavaScript(code, problem, testCases);
-      return NextResponse.json(summary);
+      summary = evaluateJavaScript(code, problem, testCases);
+    } else if (lang === "python" || lang === "python3" || lang === "py") {
+      summary = await executePython(code, problem, testCases);
+    } else if (lang === "cpp" || lang === "c++" || lang === "c") {
+      summary = await executeCpp(code, problem, testCases);
+    } else if (lang === "java") {
+      summary = await executeJava(code, problem, testCases);
+    } else {
+      summary = evaluateJavaScript(code, problem, testCases);
     }
 
-    // 2. Python Engine (Runs using native python3)
-    if (lang === "python" || lang === "python3" || lang === "py") {
-      const summary = await executePython(code, problem, testCases);
-      return NextResponse.json(summary);
-    }
-
-    // 3. C++ Engine (Compiles & runs using native g++)
-    if (lang === "cpp" || lang === "c++" || lang === "c") {
-      const summary = await executeCpp(code, problem, testCases);
-      return NextResponse.json(summary);
-    }
-
-    // 4. Java Engine (Transpiles & evaluates real testcases)
-    if (lang === "java") {
-      const summary = await executeJava(code, problem, testCases);
-      return NextResponse.json(summary);
-    }
-
-    // Default fallback
-    const summary = evaluateJavaScript(code, problem, testCases);
-    return NextResponse.json(summary);
+    return NextResponse.json(redactHiddenCases(summary, publicCount, Boolean(isSubmission)));
   } catch (err: any) {
     return NextResponse.json(
       {
@@ -332,7 +364,8 @@ print(json.dumps({"results": results}))
     await fs.promises.writeFile(scriptPath, pythonHarness, "utf8");
     const { stdout, stderr, error } = await execPromise(`python3 "${scriptPath}"`, {
       timeout: 5000,
-      maxBuffer: 1024 * 1024
+      maxBuffer: 1024 * 1024,
+      env: getCleanEnv(tmpDir),
     });
 
     if (error && error.killed) {
@@ -751,7 +784,8 @@ ${caseBlocks}
     await fs.promises.writeFile(srcPath, cppHarness, "utf8");
     // Compile using g++
     const compileRes = await execPromise(`g++ -O2 -std=c++17 "${srcPath}" -o "${binPath}"`, {
-      timeout: 6000
+      timeout: 6000,
+      env: getCleanEnv(tmpDir),
     });
 
     if (compileRes.error || compileRes.stderr.includes("error:")) {
@@ -805,7 +839,8 @@ ${caseBlocks}
     // Run compiled binary
     const runRes = await execPromise(`"${binPath}"`, {
       timeout: 5000,
-      maxBuffer: 1024 * 1024
+      maxBuffer: 1024 * 1024,
+      env: getCleanEnv(tmpDir),
     });
 
     if (runRes.error && runRes.error.killed) {
