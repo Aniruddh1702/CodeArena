@@ -368,44 +368,42 @@ export default function ProfilePage() {
   const loadProfile = () => {
     if (typeof window === "undefined") return;
     const active = getActiveAccount();
-    if (!active) {
-      router.push("/login?redirect=/profile");
-      return;
-    }
 
-    let authenticName = active.name;
-    if (!authenticName || authenticName === "CodeArena Student") {
-      try {
-        const rawProf = localStorage.getItem("userProfile");
-        if (rawProf) {
-          const p = JSON.parse(rawProf);
-          if (p.name && p.name !== "CodeArena Student" && p.name.trim() !== "") authenticName = p.name.trim();
-        }
-      } catch {}
+    let authenticName = active?.name || "Guest Learner";
+    if (active) {
       if (!authenticName || authenticName === "CodeArena Student") {
         try {
-          const rawUser = localStorage.getItem("user");
-          if (rawUser) {
-            const u = JSON.parse(rawUser);
-            const fullName = `${u.firstName || ""} ${u.lastName || ""}`.trim();
-            if (fullName) authenticName = fullName;
-            else if (u.username) authenticName = u.username;
+          const rawProf = localStorage.getItem("userProfile");
+          if (rawProf) {
+            const p = JSON.parse(rawProf);
+            if (p.name && p.name !== "CodeArena Student" && p.name.trim() !== "") authenticName = p.name.trim();
           }
         } catch {}
+        if (!authenticName || authenticName === "CodeArena Student") {
+          try {
+            const rawUser = localStorage.getItem("user");
+            if (rawUser) {
+              const u = JSON.parse(rawUser);
+              const fullName = `${u.firstName || ""} ${u.lastName || ""}`.trim();
+              if (fullName) authenticName = fullName;
+              else if (u.username) authenticName = u.username;
+            }
+          } catch {}
+        }
       }
-    }
-    if (!authenticName || authenticName === "CodeArena Student") {
-      if (active.username && active.username !== "student") authenticName = active.username;
-      else authenticName = active.name || active.username || "Student";
+      if (!authenticName || authenticName === "CodeArena Student") {
+        if (active.username && active.username !== "student") authenticName = active.username;
+        else authenticName = active.name || active.username || "Student";
+      }
     }
 
     const activeProfile: UserProfile = {
       name: authenticName,
-      username: active.username,
-      email: active.email,
-      bio: active.bio || "Competitive Programmer & DSA Enthusiast",
-      organization: active.college || "CodeArena University",
-      github: active.github || active.username,
+      username: active?.username || "guest",
+      email: active?.email || "guest@codearena.internal",
+      bio: active?.bio || (active ? "Competitive Programmer & DSA Enthusiast" : "Guest Learner exploring DSA problems"),
+      organization: active?.college || "CodeArena Open Campus",
+      github: active?.github || "",
       joinedDate: "October 2026",
     };
 
@@ -413,7 +411,7 @@ export default function ProfilePage() {
     setEditForm(activeProfile);
 
     // Isolated stats for this account
-    const stats = getUserStats(active.id);
+    const stats = active ? getUserStats(active.id) : { solvedProblems: [], problemsSolved: 0, dsaRating: 1200, recentActivity: [] };
     const totalActivity = Math.max(stats.problemsSolved, (stats.recentActivity || []).length);
     const computedAcc = totalActivity > 0 ? Math.round((stats.problemsSolved / totalActivity) * 1000) / 10 : (stats.problemsSolved > 0 ? 85.0 : 0.0);
     const computedStreak = stats.problemsSolved > 0 ? Math.min(14, Math.max(1, Math.ceil(stats.problemsSolved / 2))) : 0;
@@ -426,7 +424,7 @@ export default function ProfilePage() {
 
     // Dynamic global rank
     const lb = getLeaderboards({
-      username: active.username,
+      username: active?.username || "guest",
       name: authenticName,
       org: activeProfile.organization,
       score: stats.dsaRating,

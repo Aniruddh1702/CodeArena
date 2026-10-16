@@ -174,7 +174,7 @@ function ProblemsContent() {
         const acc = getActiveAccount();
         if (!acc) {
           setCurrentUser(null);
-          router.push("/login?redirect=/problems");
+          setSolvedSlugs([]);
           return;
         }
         setCurrentUser(acc);

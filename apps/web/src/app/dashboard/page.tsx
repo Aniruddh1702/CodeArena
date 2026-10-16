@@ -540,22 +540,17 @@ export default function DashboardPage() {
     try {
       setError("");
       const active = getActiveAccount();
-      if (!active) {
-        setLoading(false);
-        router.push("/login?redirect=/dashboard");
-        return;
-      }
-
       setActiveAccount(active);
-      const currentUserName = active.name || active.username || "Learner";
+      const currentUserName = active ? (active.name || active.username || "Learner") : "Guest Learner";
+      const activeId = active?.id || "guest";
 
-      const userStats = getUserStats(active.id);
-      let solvedCount = userStats.problemsSolved;
-      let currentRating = userStats.dsaRating || 1450;
+      const userStats = getUserStats(activeId);
+      let solvedCount = userStats.problemsSolved || 0;
+      let currentRating = userStats.dsaRating || (active ? 1450 : 1200);
       let activities = userStats.recentActivity || [];
 
       const leaderboardStandings = getLeaderboards({
-        username: active.username,
+        username: active?.username || "guest",
         name: currentUserName,
         score: currentRating,
         problemsSolved: solvedCount,
@@ -568,14 +563,15 @@ export default function DashboardPage() {
       const currentStreak = solvedCount > 0 ? Math.min(14, Math.max(1, Math.ceil(solvedCount / 2))) : 0;
 
       const roadmap = calculateTopicMilestones(userStats.solvedProblems);
-      const arraysCount = roadmap[0].solvedCount;
-      const treesCount = roadmap[1].solvedCount;
-      const graphsCount = roadmap[2].solvedCount;
-      const dpCount = roadmap[3].solvedCount;
+      const arraysCount = roadmap[0]?.solvedCount || 0;
+      const treesCount = roadmap[1]?.solvedCount || 0;
+      const graphsCount = roadmap[2]?.solvedCount || 0;
+      const dpCount = roadmap[3]?.solvedCount || 0;
 
       // Populate immediately with valid local telemetry so user never waits on cold start
       const initialPayload = {
-        greeting: `Welcome back, ${currentUserName}!`,
+        isGuest: !active,
+        greeting: active ? `Welcome back, ${currentUserName}!` : `Welcome to CodeArena, ${currentUserName}!`,
         currentUserName,
         dsaRating: currentRating,
         userRank: dynamicUserRank,
@@ -597,6 +593,10 @@ export default function DashboardPage() {
 
       setData(initialPayload);
       setLoading(false);
+
+      if (!active) {
+        return;
+      }
 
       // Background query to server analytics without blocking UI
       try {
@@ -813,6 +813,25 @@ export default function DashboardPage() {
             <span className="px-2 py-0.5 rounded bg-rose-500/30 text-rose-200 border border-rose-500/50 text-[10px] uppercase font-bold shrink-0">
               RESTRICTED
             </span>
+          </div>
+        </div>
+      )}
+
+      {/* Guest Mode Banner */}
+      {data?.isGuest && (
+        <div className="bg-indigo-500/10 border-b border-indigo-500/20 px-6 py-2.5">
+          <div className="container mx-auto flex items-center justify-between gap-4 text-xs font-mono">
+            <div className="flex items-center gap-2 text-indigo-300">
+              <span>👤</span>
+              <span className="font-bold">GUEST LEARNER MODE:</span>
+              <span className="text-slate-300">You are browsing in guest mode. Sign in to save solve records, earn Elo rating, and appear on global leaderboards.</span>
+            </div>
+            <button
+              onClick={() => router.push("/login?redirect=/dashboard")}
+              className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold shrink-0 transition-all shadow-md shadow-indigo-600/30"
+            >
+              Sign In / Register &rarr;
+            </button>
           </div>
         </div>
       )}
