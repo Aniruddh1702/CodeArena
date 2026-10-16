@@ -226,8 +226,9 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     if (c) {
       const st = getContestStandings(c.id);
       setStandings(st);
-      if (user) {
-        const myStanding = st.find((s) => s.userEmail === user.email);
+      if (user && user.email) {
+        const myEmail = user.email.toLowerCase().trim();
+        const myStanding = st.find((s) => s.userEmail.toLowerCase().trim() === myEmail);
         if (myStanding) {
           const solved = new Set<string>();
           Object.entries(myStanding.problemResults).forEach(([slug, res]) => {
@@ -771,17 +772,18 @@ function parseCustomArgs(raw: string): any[] {
   const regUsers = Array.isArray(contest.registeredUsers) ? contest.registeredUsers : [];
   const probList = Array.isArray(contest.problems) ? contest.problems : [];
 
-  const userRank = currentUser ? standings.find((s) => s.userEmail === currentUser.email)?.rank || "-" : "-";
-  const userScore = currentUser ? standings.find((s) => s.userEmail === currentUser.email)?.score || 0 : 0;
+  const currentNormalizedEmail = (currentUser?.email || "").toLowerCase().trim();
+  const userRank = currentNormalizedEmail ? standings.find((s) => s.userEmail.toLowerCase().trim() === currentNormalizedEmail)?.rank || "-" : "-";
+  const userScore = currentNormalizedEmail ? standings.find((s) => s.userEmail.toLowerCase().trim() === currentNormalizedEmail)?.score || 0 : 0;
   const isRegistered = Boolean(
-    currentUser &&
-    regUsers.map((e) => (typeof e === "string" ? e.toLowerCase().trim() : "")).includes(currentUser.email.toLowerCase().trim())
+    currentNormalizedEmail &&
+    regUsers.map((e) => (typeof e === "string" ? e.toLowerCase().trim() : "")).includes(currentNormalizedEmail)
   );
   const totalPoints = probList.reduce((sum, p) => sum + (p?.points || 0), 0);
   const isContestSubmitted = Boolean(hasUserSubmittedContest || isEnded);
 
   // Question attempt status breakdown for current student
-  const myStanding = currentUser ? standings.find((s) => s.userEmail === currentUser.email) : undefined;
+  const myStanding = currentNormalizedEmail ? standings.find((s) => s.userEmail.toLowerCase().trim() === currentNormalizedEmail) : undefined;
   const totalProblemsCount = probList.length;
   let solvedProblemsCount = 0;
   let attemptedProblemsCount = 0;
@@ -1140,57 +1142,71 @@ function parseCustomArgs(raw: string): any[] {
                     <th className="py-3 px-4">Contestant</th>
                     <th className="py-3 px-4 text-center">Total Score</th>
                     <th className="py-3 px-4 text-center">Penalty Time</th>
-                    {contest.problems.map((p, i) => (
-                      <th key={i} className="py-3 px-4 text-center">
+                    {probList.map((p, i) => (
+                      <th key={p.problemSlug || i} className="py-3 px-4 text-center">
                         Q{i + 1} ({p.points}pts)
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
-                  {standings.map((s) => {
-                    const isMe = currentUser && s.userEmail === currentUser.email;
-                    return (
-                      <tr key={s.userEmail} className={isMe ? "bg-primary/5 font-semibold" : "hover:bg-muted/30"}>
-                        <td className="py-3 px-4 font-mono font-bold">
-                          {s.rank === 1 ? "🥇 1" : s.rank === 2 ? "🥈 2" : s.rank === 3 ? "🥉 3" : `#${s.rank}`}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold">
-                              {s.userName[0]?.toUpperCase()}
-                            </span>
-                            <span>{s.userName}</span>
-                            {isMe && <Badge className="text-[9px] px-1.5 py-0 bg-primary/20 text-primary">YOU</Badge>}
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-center font-mono font-bold text-primary">
-                          {s.score}
-                        </td>
-                        <td className="py-3 px-4 text-center font-mono text-muted-foreground">
-                          {s.penaltyMinutes}m
-                        </td>
-                        {contest.problems.map((p, i) => {
-                          const res = s.problemResults[p.problemSlug];
-                          return (
-                            <td key={i} className="py-3 px-4 text-center font-mono">
-                              {res?.solved ? (
-                                <span className="inline-block px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
-                                  +{res.points} ({res.timeMinutes}m)
-                                </span>
-                              ) : res?.attempts ? (
-                                <span className="inline-block px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                                  -{res.attempts}
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground/30">-</span>
-                              )}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
+                  {standings.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={4 + probList.length}
+                        className="py-12 text-center text-muted-foreground"
+                      >
+                        <p className="text-sm font-semibold text-foreground">No submissions recorded yet</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Standings will populate in real time as participants submit solutions.
+                        </p>
+                      </td>
+                    </tr>
+                  ) : (
+                    standings.map((s) => {
+                      const isMe = Boolean(currentNormalizedEmail && s.userEmail.toLowerCase().trim() === currentNormalizedEmail);
+                      return (
+                        <tr key={s.userEmail} className={isMe ? "bg-primary/5 font-semibold" : "hover:bg-muted/30"}>
+                          <td className="py-3 px-4 font-mono font-bold">
+                            {s.rank === 1 ? "🥇 1" : s.rank === 2 ? "🥈 2" : s.rank === 3 ? "🥉 3" : `#${s.rank}`}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold">
+                                {s.userName[0]?.toUpperCase()}
+                              </span>
+                              <span>{s.userName}</span>
+                              {isMe && <Badge className="text-[9px] px-1.5 py-0 bg-primary/20 text-primary">YOU</Badge>}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-center font-mono font-bold text-primary">
+                            {s.score}
+                          </td>
+                          <td className="py-3 px-4 text-center font-mono text-muted-foreground">
+                            {s.penaltyMinutes}m
+                          </td>
+                          {probList.map((p, i) => {
+                            const res = s.problemResults[p.problemSlug];
+                            return (
+                              <td key={p.problemSlug || i} className="py-3 px-4 text-center font-mono">
+                                {res?.solved ? (
+                                  <span className="inline-block px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
+                                    +{res.points} ({res.timeMinutes}m)
+                                  </span>
+                                ) : res?.attempts ? (
+                                  <span className="inline-block px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                    -{res.attempts}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground/30">-</span>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>

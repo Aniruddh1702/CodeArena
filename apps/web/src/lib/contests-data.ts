@@ -1,5 +1,6 @@
 import { saveNotification, checkContest1HourReminders } from "./notifications";
 import { PROBLEMS_DATABASE, getCustomProblems, ProblemDefinition } from "./problems-data";
+import { getAllAccounts } from "./auth-session";
 
 export interface ContestProblem {
   problemSlug: string;
@@ -606,48 +607,21 @@ export function getContestStandings(contestId: string): ContestStanding[] {
   // Map of email -> Standing
   const userMap: Record<string, ContestStanding> = {};
 
-  // Initialize with registered users if any
-  (contest.registeredUsers || []).forEach((email) => {
-    userMap[email] = {
-      rank: 1,
-      userEmail: email,
-      userName: email.split("@")[0],
-      score: 0,
-      penaltyMinutes: 0,
-      problemsSolved: 0,
-      problemResults: {},
-    };
-  });
+  // Cache known real accounts from the browser session
+  const allAccounts = typeof window !== "undefined" ? getAllAccounts() : [];
 
-  // Seed with realistic demo contestants for lively contest feel
-  const demoContestants = [
-    { email: "alex.dev@gmail.com", name: "AlexDev", score: 800, penalty: 42, solved: 3 },
-    { email: "sarah.coder@outlook.com", name: "SarahK", score: 600, penalty: 35, solved: 2 },
-    { email: "vikram.singh@iit.ac.in", name: "VikramAlgo", score: 600, penalty: 48, solved: 2 },
-    { email: "elena.rostova@yandex.ru", name: "ElenaR", score: 300, penalty: 18, solved: 1 },
-  ];
-
-  demoContestants.forEach((dc) => {
-    if (!userMap[dc.email]) {
-      userMap[dc.email] = {
-        rank: 1,
-        userEmail: dc.email,
-        userName: dc.name,
-        score: dc.score,
-        penaltyMinutes: dc.penalty,
-        problemsSolved: dc.solved,
-        problemResults: {},
-      };
-    }
-  });
-
-  // Process real submissions
+  // Process ONLY real submissions from participants who actually took the test
   submissions.forEach((sub) => {
-    if (!userMap[sub.userEmail]) {
-      userMap[sub.userEmail] = {
+    const email = (sub.userEmail || "").toLowerCase().trim();
+    if (!email) return;
+
+    if (!userMap[email]) {
+      const known = allAccounts.find((a) => a.email.toLowerCase().trim() === email);
+      const authenticName = sub.userName || known?.name || known?.username || email.split("@")[0];
+      userMap[email] = {
         rank: 1,
-        userEmail: sub.userEmail,
-        userName: sub.userName || sub.userEmail.split("@")[0],
+        userEmail: email,
+        userName: authenticName,
         score: 0,
         penaltyMinutes: 0,
         problemsSolved: 0,
@@ -655,7 +629,7 @@ export function getContestStandings(contestId: string): ContestStanding[] {
       };
     }
 
-    const u = userMap[sub.userEmail];
+    const u = userMap[email];
     if (!u.problemResults[sub.problemSlug]) {
       u.problemResults[sub.problemSlug] = {
         solved: false,
@@ -682,6 +656,25 @@ export function getContestStandings(contestId: string): ContestStanding[] {
     }
   });
 
+  // Also include users who submitted the contest even if 0 points were scored
+  (contest.submittedUsers || []).forEach((submittedEmail) => {
+    const email = (submittedEmail || "").toLowerCase().trim();
+    if (!email) return;
+    if (!userMap[email]) {
+      const known = allAccounts.find((a) => a.email.toLowerCase().trim() === email);
+      const authenticName = known?.name || known?.username || email.split("@")[0];
+      userMap[email] = {
+        rank: 1,
+        userEmail: email,
+        userName: authenticName,
+        score: 0,
+        penaltyMinutes: 0,
+        problemsSolved: 0,
+        problemResults: {},
+      };
+    }
+  });
+
   // Convert to array and sort: score desc, penalty asc
   const standings = Object.values(userMap);
   standings.sort((a, b) => {
@@ -695,9 +688,9 @@ export function getContestStandings(contestId: string): ContestStanding[] {
   });
 
   // Mark whether user has submitted the whole contest
-  const submittedSet = new Set((contest.submittedUsers || []).map((e) => e.toLowerCase()));
+  const submittedSet = new Set((contest.submittedUsers || []).map((e) => e.toLowerCase().trim()));
   standings.forEach((s) => {
-    s.isContestSubmitted = submittedSet.has(s.userEmail.toLowerCase()) || contest.status === "ENDED";
+    s.isContestSubmitted = submittedSet.has(s.userEmail.toLowerCase().trim()) || contest.status === "ENDED";
   });
 
   return standings;
