@@ -12,17 +12,18 @@ RUN turbo prune --scope=@codearena/api --docker
 # Add lockfile and package.json's of isolated subworkspace
 FROM node:20-alpine AS installer
 WORKDIR /app
+RUN npm install -g pnpm
 
 # First install dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm install
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install
 
 # Build the project and its dependencies
 COPY --from=builder /app/out/full/ .
 # Generate Prisma Client
 RUN cd packages/database && npx prisma generate
-RUN npm run build --workspace=@codearena/api
+RUN pnpm --filter @codearena/api build
 
 # Final production image
 FROM node:20-alpine AS runner
