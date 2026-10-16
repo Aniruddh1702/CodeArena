@@ -560,7 +560,7 @@ export default function DashboardPage() {
         score: currentRating,
         problemsSolved: solvedCount,
       });
-      const dynamicUserRank = leaderboardStandings.currentUserGlobalRank > 0 ? leaderboardStandings.currentUserGlobalRank : 1;
+      const dynamicUserRank = leaderboardStandings.currentUserGlobalRank > 0 ? leaderboardStandings.currentUserGlobalRank : (solvedCount > 0 ? 1 : 0);
 
       // Authentic accuracy calculation based on solves and activity attempts
       const totalAttempts = Math.max(solvedCount, (activities || []).filter((a: any) => a.type === "SUBMISSION" || a.type === "SOLVED").length);

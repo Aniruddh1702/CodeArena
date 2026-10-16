@@ -64,8 +64,41 @@ export interface ContestStanding {
 const STORAGE_KEY = "codearena_contests";
 const SUBMISSIONS_PREFIX = "codearena_contest_subs_";
 
-// Contests are empty by default - contests only exist when scheduled/created by admin
-const DEFAULT_CONTESTS: Contest[] = [];
+function getOfficialScheduledContest(): Contest {
+  const now = new Date();
+  const daysUntilSunday = (7 - now.getUTCDay()) % 7 || 7;
+  const sunday = new Date(now.getTime() + daysUntilSunday * 24 * 60 * 60 * 1000);
+  sunday.setUTCHours(14, 0, 0, 0);
+  const end = new Date(sunday.getTime() + 90 * 60 * 1000);
+
+  return {
+    id: "weekly-contest-42",
+    title: "CodeArena Weekly Championship 42",
+    description: "Official weekly competitive programming arena. 4 algorithmic challenges across Arrays, Dynamic Programming, and Graph Theory.",
+    startTime: sunday.toISOString(),
+    durationMinutes: 90,
+    endTime: end.toISOString(),
+    status: "UPCOMING",
+    problems: [
+      { problemSlug: "two-sum", title: "Two Sum", difficulty: "EASY", points: 100 },
+      { problemSlug: "reverse-linked-list", title: "Reverse Linked List", difficulty: "EASY", points: 200 },
+      { problemSlug: "maximum-subarray", title: "Maximum Subarray", difficulty: "MEDIUM", points: 300 },
+      { problemSlug: "number-of-islands", title: "Number of Islands", difficulty: "MEDIUM", points: 400 },
+    ],
+    participantsCount: 0,
+    registeredUsers: [],
+    isRated: true,
+    rules: [
+      "Standard competitive programming rules apply.",
+      "Each problem has a 2000ms time limit.",
+      "Penalties are 10 minutes per rejected submission.",
+      "Scores are verified and locked server-side upon contest end."
+    ],
+    createdAt: new Date().toISOString(),
+  };
+}
+
+const DEFAULT_CONTESTS: Contest[] = [getOfficialScheduledContest()];
 
 const DEFAULT_SUBMISSIONS: Record<string, ContestSubmission[]> = {};
 

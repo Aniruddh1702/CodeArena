@@ -160,15 +160,15 @@ function ProblemsContent() {
       if (!active) {
         setCurrentUser(null);
         setAuthChecked(true);
-        router.push("/login?redirect=/problems");
-        return;
+        setSolvedSlugs([]);
+      } else {
+        setCurrentUser(active);
+        setAuthChecked(true);
+        const activeId = active.id || "default";
+        const stats = getUserStats(activeId);
+        const uniqueSlugs = stats.solvedProblems.map((item: any) => item.slug).filter(Boolean);
+        setSolvedSlugs(uniqueSlugs);
       }
-      setCurrentUser(active);
-      setAuthChecked(true);
-      const activeId = active.id || "default";
-      const stats = getUserStats(activeId);
-      const uniqueSlugs = stats.solvedProblems.map((item: any) => item.slug).filter(Boolean);
-      setSolvedSlugs(uniqueSlugs);
 
       const handleAccountChange = () => {
         const acc = getActiveAccount();
@@ -226,44 +226,7 @@ function ProblemsContent() {
   };
 
   if (!authChecked) {
-    return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-6">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center animate-spin">
-            <span className="text-primary font-bold text-lg">C</span>
-          </div>
-          <p className="text-xs font-semibold text-muted-foreground animate-pulse tracking-wide font-mono">
-            Loading problem bank & authentic progress...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (authChecked && !currentUser) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
-        <div className="max-w-md p-8 rounded-3xl border border-border/80 bg-card/90 backdrop-blur-xl shadow-2xl space-y-6 animate-in fade-in zoom-in-95">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mx-auto shadow-inner">
-            🔒
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-black tracking-tight">Student Login Required</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              You must be registered and signed in to access the practice problem bank, view solutions, and track your coding progress.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Button onClick={() => router.push('/login?redirect=/problems')} className="flex-1 font-bold h-11">
-              Sign In &rarr;
-            </Button>
-            <Button onClick={() => router.push('/register?redirect=/problems')} variant="outline" className="flex-1 font-bold h-11">
-              Register
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+    return <ProblemsTableSkeleton />;
   }
 
   return (

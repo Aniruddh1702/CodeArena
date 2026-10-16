@@ -19,10 +19,6 @@ export default function ContestsPage() {
 
   useEffect(() => {
     const user = getActiveAccount();
-    if (!user) {
-      router.push("/login?redirect=/contests");
-      return;
-    }
     setCurrentUser(user);
     setContests(getContests());
 

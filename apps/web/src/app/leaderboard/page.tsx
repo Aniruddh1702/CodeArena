@@ -18,8 +18,8 @@ export default function LeaderboardPage() {
 
   const [globalLeaders, setGlobalLeaders] = useState<LeaderboardUser[]>([]);
   const [orgLeaders, setOrgLeaders] = useState<LeaderboardUser[]>([]);
-  const [userGlobalRank, setUserGlobalRank] = useState(1);
-  const [userOrgRank, setUserOrgRank] = useState(1);
+  const [userGlobalRank, setUserGlobalRank] = useState(0);
+  const [userOrgRank, setUserOrgRank] = useState(0);
   const [userOrgName, setUserOrgName] = useState("CodeArena Academy");
   const [currentRating, setCurrentRating] = useState(1450);
   const [currentSolved, setCurrentSolved] = useState(0);
@@ -29,16 +29,12 @@ export default function LeaderboardPage() {
   const loadLeaderboard = useCallback((extraDbUsers?: LeaderboardUser[]) => {
     if (typeof window === "undefined") return;
     const active = getActiveAccount();
-    if (!active) {
-      router.push("/login?redirect=/leaderboard");
-      return;
-    }
-    const activeId = active.id || "default";
-    const stats = getUserStats(activeId);
+    const activeId = active?.id || "default";
+    const stats = active ? getUserStats(activeId) : { problemsSolved: 0, dsaRating: 1450 };
 
-    const pName = active.name || "CodeArena Student";
-    const pUsername = active.username || "student";
-    const pOrg = active.college || "CodeArena Academy";
+    const pName = active?.name || (active?.username ? active.username : "Guest Coder");
+    const pUsername = active?.username || "guest";
+    const pOrg = active?.college || "Global Arena";
 
     setCurrentSolved(stats.problemsSolved);
     setCurrentRating(stats.dsaRating);
@@ -48,20 +44,22 @@ export default function LeaderboardPage() {
 
     // Calculate authentic standings from real users only
     const results = getLeaderboards(
-      {
-        username: pUsername,
-        name: pName,
-        org: pOrg,
-        score: stats.dsaRating,
-        problemsSolved: stats.problemsSolved,
-      },
+      active
+        ? {
+            username: pUsername,
+            name: pName,
+            org: pOrg,
+            score: stats.dsaRating,
+            problemsSolved: stats.problemsSolved,
+          }
+        : undefined,
       extraDbUsers || getCachedDbUsers()
     );
 
     setGlobalLeaders(results.globalRanked);
     setOrgLeaders(results.orgRanked);
-    setUserGlobalRank(results.currentUserGlobalRank);
-    setUserOrgRank(results.currentUserOrgRank);
+    setUserGlobalRank(active && stats.problemsSolved > 0 ? (results.currentUserGlobalRank || 0) : 0);
+    setUserOrgRank(active && stats.problemsSolved > 0 ? (results.currentUserOrgRank || 0) : 0);
     setUserOrgName(results.orgName);
     setLoading(false);
   }, []);

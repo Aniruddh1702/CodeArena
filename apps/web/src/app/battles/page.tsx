@@ -20,12 +20,13 @@ export default function BattlesLobbyPage() {
       const loadUser = () => {
         const active = getActiveAccount();
         if (!active) {
-          router.push("/login?redirect=/battles");
+          setRating(1200);
+          setUserName("Guest Coder");
           return;
         }
         const activeId = active.id || "default";
         const stats = getUserStats(activeId);
-        setRating(stats.dsaRating);
+        setRating(stats.dsaRating || 1200);
         setUserName(active.name || active.username || "You");
       };
 
@@ -164,9 +165,14 @@ export default function BattlesLobbyPage() {
                       <div className="space-y-6">
                           <div className="bg-secondary/50 p-4 rounded-lg inline-block text-sm font-medium">
                               Your Rating: <span className="text-primary font-bold">{rating}</span>
+                              {userName === "Guest Coder" && (
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  Unranked Guest — Sign in to record ranked matches
+                                </div>
+                              )}
                           </div>
                           <Button size="lg" className="w-full text-lg h-14" onClick={findMatch}>
-                              Find Match
+                              {userName === "Guest Coder" ? "Sign In to Enter Arena" : "Find Match"}
                           </Button>
                       </div>
                   )}

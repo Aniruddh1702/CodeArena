@@ -356,10 +356,10 @@ export default function ProfilePage() {
   });
 
   const [dsaRating, setDsaRating] = useState(1450);
-  const [globalRank, setGlobalRank] = useState(1);
+  const [globalRank, setGlobalRank] = useState(0);
   const [solvedCount, setSolvedCount] = useState(0);
-  const [accuracy, setAccuracy] = useState(85.5);
-  const [currentStreak, setCurrentStreak] = useState(1);
+  const [accuracy, setAccuracy] = useState(0.0);
+  const [currentStreak, setCurrentStreak] = useState(0);
   const [recentSolves, setRecentSolves] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<UserProfile>(profile);
@@ -432,7 +432,7 @@ export default function ProfilePage() {
       score: stats.dsaRating,
       problemsSolved: stats.problemsSolved,
     });
-    setGlobalRank(lb.currentUserGlobalRank);
+    setGlobalRank(stats.problemsSolved > 0 ? (lb.currentUserGlobalRank || 0) : 0);
   };
 
   useEffect(() => {
@@ -633,7 +633,7 @@ export default function ProfilePage() {
                     ✦ {tier.title}
                   </span>
                   <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold">
-                    Global Rank #{globalRank}
+                    {globalRank > 0 ? `Global Rank #${globalRank}` : "Unranked (0 Solves)"}
                   </span>
                 </div>
 

@@ -160,12 +160,17 @@ export function saveAccount(account: UserAccount, setAsActive: boolean = true): 
 /**
  * Set an account as the active session
  */
-export function setActiveAccount(accountId: string): UserAccount | null {
-  if (typeof window === "undefined") return null;
+export function setActiveAccount(accountOrId: string | UserAccount | null | undefined): UserAccount | null {
+  if (typeof window === "undefined" || !accountOrId) return null;
   const accounts = getAllAccounts();
+  const accountId = typeof accountOrId === "string" 
+    ? accountOrId 
+    : accountOrId.id || accountOrId.username || accountOrId.email || "";
+  if (!accountId) return null;
+
   const target = accounts.find(
-    (a) => a.id === accountId || a.username.toLowerCase() === accountId.toLowerCase() || a.email.toLowerCase() === accountId.toLowerCase()
-  );
+    (a) => a.id === accountId || (a.username && a.username.toLowerCase() === accountId.toLowerCase()) || (a.email && a.email.toLowerCase() === accountId.toLowerCase())
+  ) || (typeof accountOrId === "object" ? accountOrId : null);
 
   if (!target) return null;
 

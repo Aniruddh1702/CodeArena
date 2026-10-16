@@ -309,7 +309,7 @@ export default function HomePage() {
   const router = useRouter();
   const [activeAccount, setActiveAccount] = useState<UserAccount | null>(null);
   const [userName, setUserName] = useState<string>("Coder");
-  const [userStats, setUserStats] = useState({ rating: 1450, solved: 24, rank: 1, streak: 2 });
+  const [userStats, setUserStats] = useState({ rating: 1200, solved: 0, rank: 0, streak: 0 });
   const [matchmakingActive, setMatchmakingActive] = useState(false);
   const [matchmakingTime, setMatchmakingTime] = useState(0);
   const [contests, setContests] = useState<Contest[]>([]);
@@ -353,17 +353,17 @@ export default function HomePage() {
     setActiveAccount(active);
     setUserName(resolveRealName(active));
 
-    const stats = active ? getUserStats(active.id) : { dsaRating: 1450, problemsSolved: 0 };
+    const stats = active ? getUserStats(active.id) : { dsaRating: 1200, problemsSolved: 0 };
     const leaderboard = getLeaderboards({
       username: active?.username || "guest",
       name: active?.name || active?.username || "Learner",
-      score: stats.dsaRating || 1450,
+      score: stats.dsaRating || 1200,
       problemsSolved: stats.problemsSolved || 0,
     });
 
     const totalSolved = stats.problemsSolved || 0;
     setUserStats({
-      rating: stats.dsaRating || 1450,
+      rating: stats.dsaRating || 1200,
       solved: totalSolved,
       rank: totalSolved > 0 ? (leaderboard.currentUserGlobalRank || 0) : 0,
       streak: totalSolved > 0 ? Math.min(14, Math.max(1, Math.ceil(totalSolved / 2))) : 0,
@@ -581,7 +581,7 @@ export default function HomePage() {
                 {/* Fighter Overlay */}
                 <div className="absolute top-2.5 inset-x-4 flex items-center justify-between text-[11px] font-mono">
                   <span className="bg-black/60 px-2 py-0.5 rounded border border-cyan-500/30 text-cyan-300">
-                    {activeAccount?.username || "Player_1"} ({userStats.rating})
+                    {activeAccount?.username || "You"} ({userStats.rating})
                   </span>
                   <span className="font-black text-rose-400 text-xs">VS</span>
                   <span className="bg-black/60 px-2 py-0.5 rounded border border-rose-500/30 text-rose-300">
@@ -591,7 +591,7 @@ export default function HomePage() {
 
                 <div className="absolute bottom-2 inset-x-4 flex items-center justify-between text-[10px] font-mono text-slate-400 bg-black/50 px-2.5 py-1 rounded-md border border-white/5">
                   <span>Format: 1v1 Real-Time Speed Duel</span>
-                  <span className="text-emerald-400 font-bold">Queue: Ready</span>
+                  <span className="text-cyan-400 font-bold">[INTERACTIVE PREVIEW]</span>
                 </div>
               </div>
 
@@ -673,21 +673,21 @@ export default function HomePage() {
                     </div>
 
                     <div className="text-[9px] font-mono uppercase font-black tracking-widest text-amber-800 text-center border-b border-amber-800/20 pb-1">
-                      SAMPLE FORMAT
+                      [DEMO PREVIEW]
                     </div>
 
                     <div className="my-1.5 text-center">
                       <div className="text-xs font-black text-slate-950 tracking-tight">
-                        RANK #1 CONTESTANT
+                        TOURNAMENT SAMPLE
                       </div>
                       <div className="text-[9px] font-bold text-amber-900 font-mono">
-                        Score: 1000/1000 (Verified)
+                        Max Score: 1000 Pts
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-[8px] font-mono text-slate-700 pt-1 border-t border-amber-800/15">
-                      <span>Credentials: Certified</span>
-                      <span className="text-emerald-700 font-bold">+120 Elo</span>
+                      <span>Live Results</span>
+                      <span className="text-emerald-700 font-bold">Elo Adjusted</span>
                     </div>
                   </div>
                 </div>
@@ -926,13 +926,13 @@ export default function HomePage() {
                   <span className="text-amber-400 opacity-0 group-hover/rank:opacity-100 transition-opacity">→</span>
                 </div>
                 <span className="text-base sm:text-lg font-black text-amber-400 font-mono">
-                  #{userStats.rank}
+                  {userStats.rank > 0 ? `#${userStats.rank}` : "Unranked"}
                 </span>
               </Link>
               <div className="p-3 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col">
                 <span className="text-[10px] font-mono text-slate-400 uppercase">Active Streak</span>
                 <span className="text-base sm:text-lg font-black text-rose-400 font-mono">
-                  {userStats.streak} Days 🔥
+                  {userStats.streak > 0 ? `${userStats.streak} Days 🔥` : "0 Days"}
                 </span>
               </div>
             </div>

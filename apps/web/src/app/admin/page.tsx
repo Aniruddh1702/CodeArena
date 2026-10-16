@@ -2053,16 +2053,16 @@ export default function AdminPortalPage() {
               </div>
               <div className="flex items-center gap-1.5 text-[10px] text-slate-300 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-                <span>SECURE // AES-256</span>
+                <span>ADMIN ACCESS GATEWAY</span>
               </div>
             </div>
 
             {/* Terminal Output Banner */}
             <div className="p-6 space-y-4">
               <div className="space-y-1.5 p-3.5 rounded-xl bg-black/30 border border-white/10 backdrop-blur-xl text-[11px] text-cyan-300/90 leading-relaxed font-mono shadow-inner">
-                <div>&gt; HOST: CODEARENA_CORE_MAIN // 127.0.0.1</div>
-                <div>&gt; CLEARANCE: LEVEL 5 (ROOT AUTHORITY) REQUIRED</div>
-                <div>&gt; GLASS_AEROSPACE: HARDWARE TOKEN VERIFIED</div>
+                <div>&gt; HOST: CODEARENA_CORE_MAIN</div>
+                <div>&gt; CLEARANCE: ADMINISTRATOR AUTHORIZATION REQUIRED</div>
+                <div>&gt; AUTH STATUS: AWAITING VERIFIED CREDENTIALS</div>
                 <div className="text-cyan-200 font-bold">&gt; ENTER AUTHORIZATION MASTER KEY TO ENGAGE CONSOLE_</div>
               </div>
 
@@ -2070,7 +2070,7 @@ export default function AdminPortalPage() {
                 <div className="space-y-1.5">
                   <Label htmlFor="passcode" className="text-[11px] font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center justify-between">
                     <span>Root Authorization Passcode</span>
-                    <span className="text-cyan-400 text-[10px] font-normal">ENCRYPTED STREAM</span>
+                    <span className="text-cyan-400 text-[10px] font-normal">HMAC PROTECTED</span>
                   </Label>
                   <Input
                     id="passcode"
@@ -2105,8 +2105,8 @@ export default function AdminPortalPage() {
               </form>
 
               <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                <span>IDENTITY: SUPER-ADMINISTRATOR</span>
-                <span className="text-cyan-400">STATUS: READY</span>
+                <span>IDENTITY: UNAUTHENTICATED</span>
+                <span className="text-cyan-400">STATUS: AUTHENTICATION REQUIRED</span>
               </div>
             </div>
           </div>
