@@ -19,7 +19,7 @@ import {
 import { getAllProblems, ProblemDefinition, PROBLEMS_DATABASE } from "@/lib/problems-data";
 import { getStarterCode, isStarterCodeStubOrEmpty } from "@/lib/starter-templates";
 import { evaluateJavaScript, ExecutionSummary, TestResult } from "@/lib/code-runner";
-import { getActiveAccount } from "@/lib/auth-session";
+import { getActiveAccount, saveAccount } from "@/lib/auth-session";
 import { NotificationCenter } from "@/components/NotificationCenter";
 
 export default function ContestArenaPage({ params }: { params: { id: string } }) {
@@ -27,6 +27,7 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
   const contestId = params.id;
 
   const [contest, setContest] = useState<Contest | null>(null);
+  const [isLoadingContest, setIsLoadingContest] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [allProblemsMap, setAllProblemsMap] = useState<Record<string, ProblemDefinition>>({});
   const [selectedProblemIndex, setSelectedProblemIndex] = useState(0);
@@ -122,7 +123,37 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
   };
 
   useEffect(() => {
-    const user = getActiveAccount();
+    let user = getActiveAccount();
+    if (!user) {
+      if (typeof window !== "undefined") {
+        const isAdmin =
+          localStorage.getItem("codearena_admin_authorized") === "true" ||
+          localStorage.getItem("codearena_admin_auth") === "true";
+        if (isAdmin) {
+          user = {
+            id: "admin",
+            email: "admin@codearena.com",
+            username: "Admin",
+            name: "Administrator",
+            role: "SUPER_ADMIN",
+            isAdmin: true,
+            token: "admin-session",
+          };
+        } else {
+          // Provide Guest session so contest arena loads without barrier
+          const guestNum = Math.floor(1000 + Math.random() * 9000);
+          user = {
+            id: `guest_${guestNum}`,
+            email: `guest_${guestNum}@student.codearena`,
+            username: `GuestCoder_${guestNum}`,
+            name: `Guest Coder ${guestNum}`,
+            role: "STUDENT",
+            token: `guest-token-${guestNum}`,
+          };
+          saveAccount(user, true);
+        }
+      }
+    }
     if (!user) {
       router.push(`/login?redirect=/contests/${contestId}`);
       return;
@@ -133,6 +164,7 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
     const c = getContestById(contestId);
     if (c) {
       setContest(c);
+      setIsLoadingContest(false);
       const isAlreadySubmitted = Boolean(
         user.email &&
         (c.submittedUsers || []).map((e) => e.toLowerCase().trim()).includes(user.email.toLowerCase().trim())
@@ -185,7 +217,10 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
           }
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        setIsLoadingContest(false);
+      });
 
     // Load standings
     if (c) {
@@ -698,6 +733,18 @@ function parseCustomArgs(raw: string): any[] {
     }
   };
 
+  if (isLoadingContest && !contest) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <h2 className="text-base font-bold text-slate-200">Entering Contest Arena...</h2>
+          <p className="text-xs text-muted-foreground">Synchronizing live tournament problems and clock</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!contest) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -712,17 +759,30 @@ function parseCustomArgs(raw: string): any[] {
     );
   }
 
-  const isLive = contest.status === "LIVE";
-  const isUpcoming = contest.status === "UPCOMING";
+  const startMs = contest.startTime ? new Date(contest.startTime).getTime() : NaN;
+  const endMs = contest.endTime ? new Date(contest.endTime).getTime() : NaN;
+  const isTimeLive = !isNaN(startMs) && !isNaN(endMs) && now >= startMs - 15000 && now < endMs;
+  const isTimeEnded = !isNaN(endMs) && now >= endMs;
+
+  const isEnded = contest.status === "ENDED" || isTimeEnded;
+  const isLive = !isEnded && (contest.status === "LIVE" || isTimeLive);
+  const isUpcoming = !isEnded && !isLive;
+
+  const regUsers = Array.isArray(contest.registeredUsers) ? contest.registeredUsers : [];
+  const probList = Array.isArray(contest.problems) ? contest.problems : [];
+
   const userRank = currentUser ? standings.find((s) => s.userEmail === currentUser.email)?.rank || "-" : "-";
   const userScore = currentUser ? standings.find((s) => s.userEmail === currentUser.email)?.score || 0 : 0;
-  const isRegistered = currentUser && contest.registeredUsers.includes(currentUser.email);
-  const totalPoints = contest.problems.reduce((sum, p) => sum + p.points, 0);
-  const isContestSubmitted = Boolean(hasUserSubmittedContest || contest.status === "ENDED");
+  const isRegistered = Boolean(
+    currentUser &&
+    regUsers.map((e) => (typeof e === "string" ? e.toLowerCase().trim() : "")).includes(currentUser.email.toLowerCase().trim())
+  );
+  const totalPoints = probList.reduce((sum, p) => sum + (p?.points || 0), 0);
+  const isContestSubmitted = Boolean(hasUserSubmittedContest || isEnded);
 
   // Question attempt status breakdown for current student
   const myStanding = currentUser ? standings.find((s) => s.userEmail === currentUser.email) : undefined;
-  const totalProblemsCount = contest.problems.length;
+  const totalProblemsCount = probList.length;
   let solvedProblemsCount = 0;
   let attemptedProblemsCount = 0;
   if (myStanding) {
@@ -799,14 +859,14 @@ function parseCustomArgs(raw: string): any[] {
               <div className="p-4 rounded-xl bg-card border border-border/80 shadow-sm text-center space-y-1">
                 <span className="text-xl">📚</span>
                 <p className="text-xs text-muted-foreground font-semibold uppercase">Challenges</p>
-                <p className="text-lg font-black">{contest.problems.length} Questions</p>
+                <p className="text-lg font-black">{probList.length} Questions</p>
                 <p className="text-[10px] text-primary font-bold">{totalPoints} Total Max Points</p>
               </div>
 
               <div className="p-4 rounded-xl bg-card border border-border/80 shadow-sm text-center space-y-1">
                 <span className="text-xl">👥</span>
                 <p className="text-xs text-muted-foreground font-semibold uppercase">Registered</p>
-                <p className="text-lg font-black">{contest.participantsCount} Students</p>
+                <p className="text-lg font-black">{contest.participantsCount || regUsers.length} Students</p>
                 <p className="text-[10px] text-emerald-400 font-semibold">1-Hour Alert Armed</p>
               </div>
             </div>

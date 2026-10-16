@@ -163,26 +163,33 @@ export function getServerContests(): Contest[] {
 }
 
 export function saveServerContest(contest: Contest): Contest {
-  if (contest.status === "LIVE") {
+  const safeContest: Contest = {
+    ...contest,
+    problems: Array.isArray(contest.problems) ? contest.problems : [],
+    registeredUsers: Array.isArray(contest.registeredUsers) ? contest.registeredUsers : [],
+    submittedUsers: Array.isArray(contest.submittedUsers) ? contest.submittedUsers : [],
+    participantsCount: contest.participantsCount || (Array.isArray(contest.registeredUsers) ? contest.registeredUsers.length : 0),
+  };
+  if (safeContest.status === "LIVE") {
     const now = Date.now();
-    const durationMs = (contest.durationMinutes || 90) * 60 * 1000;
-    const currentStart = new Date(contest.startTime).getTime();
+    const durationMs = (safeContest.durationMinutes || 90) * 60 * 1000;
+    const currentStart = new Date(safeContest.startTime).getTime();
     if (isNaN(currentStart) || currentStart > now) {
-      contest.startTime = new Date(now - 1000).toISOString();
-      contest.endTime = new Date(now + durationMs).toISOString();
+      safeContest.startTime = new Date(now - 1000).toISOString();
+      safeContest.endTime = new Date(now + durationMs).toISOString();
     }
   }
   const current = getServerContests();
-  const existingIdx = current.findIndex((c) => c.id === contest.id);
+  const existingIdx = current.findIndex((c) => c.id === safeContest.id);
   if (existingIdx >= 0) {
-    current[existingIdx] = { ...current[existingIdx], ...contest };
+    current[existingIdx] = { ...current[existingIdx], ...safeContest };
   } else {
-    current.unshift(contest);
+    current.unshift(safeContest);
   }
   global.__codearena_server_contests = current;
   global.__codearena_server_contests_initialized = true;
   writeToFile(current);
-  return contest;
+  return safeContest;
 }
 
 const SUBMISSIONS_FILE = path.join(process.cwd(), ".data_contest_submissions.json");

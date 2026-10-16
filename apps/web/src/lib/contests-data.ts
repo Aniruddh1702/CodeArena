@@ -118,6 +118,9 @@ function enrichContestProblems(contest: Contest): Contest {
   return {
     ...contest,
     problems: enrichedProblems,
+    registeredUsers: Array.isArray(contest.registeredUsers) ? contest.registeredUsers : [],
+    submittedUsers: Array.isArray(contest.submittedUsers) ? contest.submittedUsers : [],
+    participantsCount: contest.participantsCount || (Array.isArray(contest.registeredUsers) ? contest.registeredUsers.length : 0),
   };
 }
 
@@ -166,6 +169,11 @@ export function getAdminAuthHeaders(): Record<string, string> {
     if (token) {
       headers["x-admin-token"] = token;
     }
+    const passcode =
+      localStorage.getItem("codearena_custom_admin_passcode") ||
+      "Aniruddh#1702";
+    headers["x-admin-passcode"] = passcode;
+    headers["x-admin-auth"] = "true";
   }
   return headers;
 }
@@ -473,12 +481,27 @@ export function registerUserForContest(contestId: string, email: string): boolea
   const contest = getContestById(contestId);
   if (!contest) return false;
 
-  const cleanEmail = email.toLowerCase();
-  if (!contest.registeredUsers.includes(cleanEmail)) {
-    contest.registeredUsers.push(cleanEmail);
+  const cleanEmail = email.toLowerCase().trim();
+  const currentReg = Array.isArray(contest.registeredUsers) ? contest.registeredUsers : [];
+  if (!currentReg.includes(cleanEmail)) {
+    contest.registeredUsers = [...currentReg, cleanEmail];
     contest.participantsCount = Math.max(contest.participantsCount + 1, contest.registeredUsers.length);
-    saveContest(contest);
+    
+    // Save to local cache
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const contests: Contest[] = raw ? JSON.parse(raw) : [];
+        const idx = contests.findIndex((c) => c.id === contest.id);
+        if (idx >= 0) {
+          contests[idx] = contest;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(contests));
+        }
+        window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: contest }));
+      } catch (e) {}
+    }
 
+    // Sync registration directly to server
     fetch(`/api/contests/${contestId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

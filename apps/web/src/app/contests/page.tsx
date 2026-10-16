@@ -107,9 +107,19 @@ export default function ContestsPage() {
     setTimeout(() => setReminderNoticedId(null), 3000);
   };
 
-  const liveContests = contests.filter(c => c.status === "LIVE");
-  const upcomingContests = contests.filter(c => c.status === "UPCOMING");
-  const pastContests = contests.filter(c => c.status === "ENDED");
+  const getDynamicContestStatus = (c: Contest): "LIVE" | "UPCOMING" | "ENDED" => {
+    if (c.status === "ENDED") return "ENDED";
+    const startMs = c.startTime ? new Date(c.startTime).getTime() : NaN;
+    const endMs = c.endTime ? new Date(c.endTime).getTime() : NaN;
+    if (!isNaN(endMs) && now >= endMs) return "ENDED";
+    if (c.status === "LIVE") return "LIVE";
+    if (!isNaN(startMs) && !isNaN(endMs) && now >= startMs - 15000 && now < endMs) return "LIVE";
+    return "UPCOMING";
+  };
+
+  const liveContests = contests.filter(c => getDynamicContestStatus(c) === "LIVE");
+  const upcomingContests = contests.filter(c => getDynamicContestStatus(c) === "UPCOMING");
+  const pastContests = contests.filter(c => getDynamicContestStatus(c) === "ENDED");
 
   // Check if any contest is starting in <= 60 minutes
   const contestStartingSoon = upcomingContests.find(c => {
@@ -119,7 +129,7 @@ export default function ContestsPage() {
 
   const filteredContests = contests.filter(c => {
     if (activeFilter === "ALL") return true;
-    return c.status === activeFilter;
+    return getDynamicContestStatus(c) === activeFilter;
   });
 
   return (
@@ -341,14 +351,21 @@ export default function ContestsPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {filteredContests.map((contest) => {
-              const isLive = contest.status === "LIVE";
-              const isUpcoming = contest.status === "UPCOMING";
-              const isRegistered = currentUser && contest.registeredUsers.includes(currentUser.email);
-              const totalPoints = contest.problems.reduce((sum, p) => sum + p.points, 0);
+              const currentStatus = getDynamicContestStatus(contest);
+              const isLive = currentStatus === "LIVE";
+              const isUpcoming = currentStatus === "UPCOMING";
+              const regUsers = Array.isArray(contest.registeredUsers) ? contest.registeredUsers : [];
+              const isRegistered = Boolean(
+                currentUser?.email &&
+                regUsers.map(e => (typeof e === "string" ? e.toLowerCase().trim() : "")).includes(currentUser.email.toLowerCase().trim())
+              );
+              const probList = Array.isArray(contest.problems) ? contest.problems : [];
+              const totalPoints = probList.reduce((sum, p) => sum + (p?.points || 0), 0);
+              const submittedList = Array.isArray(contest.submittedUsers) ? contest.submittedUsers : [];
               const hasSubmitted = Boolean(
                 currentUser?.email &&
-                (contest.submittedUsers || [])
-                  .map((e) => e.toLowerCase().trim())
+                submittedList
+                  .map((e) => (typeof e === "string" ? e.toLowerCase().trim() : ""))
                   .includes(currentUser.email.toLowerCase().trim())
               );
 
@@ -430,13 +447,13 @@ export default function ContestsPage() {
                     {/* Problem Preview Pills */}
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-                        <span>Problem Challenges ({contest.problems.length})</span>
+                        <span>Problem Challenges ({probList.length})</span>
                         <span className="text-primary font-bold">{totalPoints} Max Points</span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                        {contest.problems.map((prob, idx) => (
+                        {probList.map((prob, idx) => (
                           <div
-                            key={idx}
+                            key={prob.problemSlug || idx}
                             className="p-2 rounded-lg bg-secondary/60 border border-border/60 text-left space-y-0.5"
                           >
                             <div className="flex items-center justify-between">
@@ -446,7 +463,7 @@ export default function ContestsPage() {
                                 prob.difficulty === "MEDIUM" ? "bg-amber-500/10 text-amber-500" :
                                 "bg-rose-500/10 text-rose-500"
                               }`}>
-                                {prob.difficulty[0]}
+                                {prob.difficulty ? prob.difficulty[0] : "M"}
                               </span>
                             </div>
                             <p className="text-[11px] font-medium truncate" title={prob.title}>
@@ -462,11 +479,11 @@ export default function ContestsPage() {
                     <div className="flex items-center justify-between pt-2 border-t border-border/60">
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <span>👥</span> {contest.participantsCount} Registered
+                          <span>👥</span> {contest.participantsCount || regUsers.length} Registered
                         </span>
                         <span className="hidden sm:inline">•</span>
                         <span className="hidden sm:inline text-[11px]">
-                          {new Date(contest.startTime).toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          {contest.startTime ? new Date(contest.startTime).toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Scheduled"}
                         </span>
                       </div>
 
@@ -501,17 +518,31 @@ export default function ContestsPage() {
                             </Button>
 
                             {isRegistered ? (
-                              <Button size="sm" variant="outline" disabled className="h-8 text-xs font-bold border-emerald-500/40 text-emerald-500">
-                                <span>✓</span> Registered
-                              </Button>
+                              <div className="flex items-center gap-1.5">
+                                <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2 py-1">
+                                  ✓ Registered
+                                </Badge>
+                                <Link href={`/contests/${contest.id}`}>
+                                  <Button size="sm" variant="outline" className="h-8 text-xs font-bold border-blue-500/40 text-blue-400 hover:bg-blue-500/10 gap-1">
+                                    <span>⏱️</span> Lobby
+                                  </Button>
+                                </Link>
+                              </div>
                             ) : (
-                              <Button
-                                size="sm"
-                                onClick={() => handleRegister(contest.id)}
-                                className="h-8 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white gap-1"
-                              >
-                                <span>📝</span> Register
-                              </Button>
+                              <div className="flex items-center gap-1.5">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleRegister(contest.id)}
+                                  className="h-8 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white gap-1"
+                                >
+                                  <span>📝</span> Register
+                                </Button>
+                                <Link href={`/contests/${contest.id}`}>
+                                  <Button size="sm" variant="outline" className="h-8 text-xs font-medium text-slate-300 border-border/80 hover:bg-secondary gap-1">
+                                    <span>👁️</span> Details
+                                  </Button>
+                                </Link>
+                              </div>
                             )}
                           </div>
                         ) : (

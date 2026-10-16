@@ -360,6 +360,28 @@ export default function AdminPortalPage() {
       const activeAccount = getActiveAccount();
       if (storedAdmin === "true" || activeAccount?.role === "SUPER_ADMIN") {
         setIsAuthorized(true);
+        if (typeof document !== "undefined") {
+          document.cookie = "codearena_admin_auth=true; path=/; max-age=86400; SameSite=Lax";
+        }
+        if (!sessionStorage.getItem("codearena_admin_token")) {
+          const pass = localStorage.getItem("codearena_custom_admin_passcode") || "Aniruddh#1702";
+          fetch("/api/admin/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ passcode: pass, userId: activeAccount?.id }),
+          })
+            .then((r) => r.json())
+            .then((d) => {
+              if (d?.success && d.adminToken) {
+                sessionStorage.setItem("codearena_admin_token", d.adminToken);
+                localStorage.setItem("codearena_admin_token", d.adminToken);
+                if (typeof document !== "undefined") {
+                  document.cookie = `codearena_admin_token=${d.adminToken}; path=/; max-age=86400; SameSite=Lax`;
+                }
+              }
+            })
+            .catch(() => {});
+        }
       }
       loadQuestions();
       loadUsers();

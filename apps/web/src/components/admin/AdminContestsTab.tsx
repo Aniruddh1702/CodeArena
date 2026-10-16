@@ -186,7 +186,16 @@ export function AdminContestsTab({
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-white">{contest.title}</h4>
+                          <a
+                            href={`/contests/${contest.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-bold text-white hover:text-cyan-400 hover:underline transition-colors flex items-center gap-1.5"
+                            title="Open Contest Arena in new tab"
+                          >
+                            <span>{contest.title}</span>
+                            <span className="text-[10px] text-slate-500 font-normal">↗</span>
+                          </a>
                           <span
                             className={`px-2 py-0.2 rounded-full text-[9px] font-mono font-bold uppercase ${
                               isLive
@@ -276,6 +285,22 @@ export function AdminContestsTab({
                           <span>End Contest</span>
                         </Button>
                       )}
+
+                      <a
+                        href={`/contests/${contest.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs bg-indigo-500/10 text-indigo-300 border-indigo-500/30 hover:bg-indigo-500/20 rounded-lg gap-1"
+                          title="Open Contest Arena"
+                        >
+                          <span>👁️</span>
+                          <span>Arena</span>
+                        </Button>
+                      </a>
 
                       <Button
                         size="sm"
@@ -423,7 +448,7 @@ export function AdminContestsTab({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <Label className="text-xs font-medium text-slate-300">
-                Select Questions ({contestFormData.selectedProblems.length} Chosen)
+                Select Questions ({(contestFormData.selectedProblems || []).length} Chosen)
               </Label>
               <p className="text-[11px] text-slate-400">
                 Pick challenges from the question bank to include in this contest
@@ -454,13 +479,13 @@ export function AdminContestsTab({
           </div>
 
           {/* Selected questions points configuration */}
-          {contestFormData.selectedProblems.length > 0 && (
+          {(contestFormData.selectedProblems || []).length > 0 && (
             <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                 Assigned Problem Weights:
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {contestFormData.selectedProblems.map((prob) => (
+                {(contestFormData.selectedProblems || []).map((prob) => (
                   <div
                     key={prob.problemSlug}
                     className="p-2 rounded-lg bg-black/30 border border-white/5 flex items-center justify-between gap-2 text-xs"
@@ -486,7 +511,7 @@ export function AdminContestsTab({
           {/* Problem Checklist */}
           <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1 border border-white/[0.05] rounded-xl p-2 bg-black/20">
             {filteredPickerQuestions.slice(0, 30).map((q) => {
-              const isSelected = contestFormData.selectedProblems.some(
+              const isSelected = (contestFormData.selectedProblems || []).some(
                 (p) => p.problemSlug === q.slug
               );
               return (
