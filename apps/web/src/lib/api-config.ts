@@ -15,12 +15,19 @@ export function getBackendApiUrl(): string {
     return url;
   }
 
-  // If it's a Render service name (e.g. "codearena-api-4qss" or "codearena-api") without a domain
+  const isServer = typeof window === "undefined";
+
+  // If it's an internal Render service name (e.g. "codearena-api") without a domain
   if (url.includes("codearena-api") && !url.includes(".")) {
-    return `https://${url}.onrender.com`;
+    if (isServer) {
+      // Internal private network communication between Render services
+      const port = process.env.API_PORT || "10000";
+      return url.includes(":") ? `http://${url}` : `http://${url}:${port}`;
+    }
+    return `https://${url.split(":")[0]}.onrender.com`;
   }
 
-  // If it's a domain name (e.g. "codearena-api-4qss.onrender.com")
+  // If it's a domain name (e.g. "codearena-api-4qss.onrender.com" or "localhost")
   if (url.includes(".")) {
     if (url.startsWith("localhost") || url.startsWith("127.0.0.1")) {
       return `http://${url}`;
@@ -28,6 +35,6 @@ export function getBackendApiUrl(): string {
     return `https://${url}`;
   }
 
-  // Fallback: assume https
-  return `https://${url}`;
+  // Fallback
+  return isServer ? `http://${url}` : `https://${url}`;
 }

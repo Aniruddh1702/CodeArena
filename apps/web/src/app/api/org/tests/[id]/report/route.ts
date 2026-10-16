@@ -12,9 +12,27 @@ export async function GET(
 ) {
   try {
     const report = getAssessmentReport(params.id);
+    const checkIdentifier = (
+      req.nextUrl.searchParams.get("studentEmail") ||
+      req.nextUrl.searchParams.get("email") ||
+      req.nextUrl.searchParams.get("studentId") ||
+      ""
+    ).toLowerCase().trim();
+
+    const existingStudent = checkIdentifier 
+      ? report.students.find(s => 
+          s.studentId.toLowerCase() === checkIdentifier || 
+          (s.studentEmail && s.studentEmail.toLowerCase() === checkIdentifier)
+        )
+      : null;
+
+    const hasSubmitted = Boolean(existingStudent && existingStudent.status === "Evaluated");
+
     return NextResponse.json({
       success: true,
-      report
+      report,
+      hasSubmitted,
+      previousResult: existingStudent || null
     });
   } catch (err: any) {
     return NextResponse.json(
@@ -35,6 +53,24 @@ export async function POST(
       return NextResponse.json(
         { success: false, message: "studentId is required" },
         { status: 400 }
+      );
+    }
+
+    // Check if the student has already submitted this test
+    const currentReport = getAssessmentReport(params.id);
+    const existing = currentReport.students.find(
+      (s) => s.studentId === body.studentId || (body.studentEmail && s.studentEmail === body.studentEmail)
+    );
+
+    if (existing && existing.status === "Evaluated" && !body.allowRetake) {
+      return NextResponse.json(
+        {
+          success: false,
+          alreadySubmitted: true,
+          message: "You have already submitted this assignment. Resubmission is not permitted.",
+          result: existing,
+        },
+        { status: 409 }
       );
     }
 

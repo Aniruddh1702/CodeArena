@@ -591,7 +591,7 @@ export default function HomePage() {
 
                 <div className="absolute bottom-2 inset-x-4 flex items-center justify-between text-[10px] font-mono text-slate-400 bg-black/50 px-2.5 py-1 rounded-md border border-white/5">
                   <span>Format: 1v1 Real-Time Speed Duel</span>
-                  <span className="text-emerald-400 font-bold">48 In Queue</span>
+                  <span className="text-emerald-400 font-bold">Queue: Ready</span>
                 </div>
               </div>
 
@@ -744,7 +744,7 @@ export default function HomePage() {
                   💻 Practice 150 DSA
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold font-mono">
-                  0.18ms SPEED
+                  Instant Compile Sandbox
                 </span>
               </div>
 
@@ -769,11 +769,11 @@ export default function HomePage() {
                 {/* Floating Code Snippet 3 (Accepted Benchmark Tag) */}
                 <div className="relative z-10 animate-float-code-3 self-center">
                   <div className="px-3 py-1.5 rounded-lg bg-[#081f18]/95 border border-teal-400/50 backdrop-blur-md shadow-lg flex items-center gap-2 font-mono text-[10px] text-teal-300">
-                    <span className="text-emerald-400 font-black">✓ ALL 150 TEST CASES PASSED</span>
+                    <span className="text-emerald-400 font-black">✓ SAMPLE TEST RUN PASSED</span>
                     <span className="text-slate-400">|</span>
-                    <span className="text-amber-300">0.18ms</span>
+                    <span className="text-amber-300">Sub-millisecond</span>
                     <span className="text-slate-400">|</span>
-                    <span className="text-purple-300">Top 99.4%</span>
+                    <span className="text-purple-300">Monaco IDE</span>
                   </div>
                 </div>
 

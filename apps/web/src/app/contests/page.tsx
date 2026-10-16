@@ -43,9 +43,8 @@ export default function ContestsPage() {
     let tickCount = 0;
     const timer = setInterval(() => {
       setNow(Date.now());
-      setContests(getContests());
       tickCount++;
-      if (tickCount % 3 === 0) {
+      if (tickCount % 20 === 0) {
         fetch("/api/contests", { cache: "no-store" })
           .then((res) => res.json())
           .then((data) => {

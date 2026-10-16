@@ -75,6 +75,31 @@ export default function ExamEnvironment({ params }: { params: { id: string } }) 
         setAlreadySubmittedRecord(prior);
       }
 
+      // Query server for verified submission record to prevent incognito / multi-device retakes
+      try {
+        const reportRes = await fetch(
+          `/api/org/tests/${params.id}/report?studentId=${encodeURIComponent(active.id)}&studentEmail=${encodeURIComponent(active.email || "")}`
+        );
+        if (reportRes.ok) {
+          const reportJson = await reportRes.json();
+          if (reportJson.hasSubmitted && reportJson.previousResult) {
+            setAlreadySubmittedRecord({
+              id: reportJson.previousResult.id,
+              testId: params.id,
+              testTitle: reportJson.report?.testName || "Assessment",
+              score: reportJson.previousResult.score,
+              totalPoints: 100,
+              timeTaken: reportJson.previousResult.timeTakenMinutes || 30,
+              date: new Date(reportJson.previousResult.submittedAt || Date.now()).toLocaleDateString(),
+              passedTestCases: reportJson.previousResult.passedTestCases || 0,
+              totalTestCases: reportJson.previousResult.totalTestCases || 0,
+              status: reportJson.previousResult.status,
+              submittedAt: reportJson.previousResult.submittedAt,
+            });
+          }
+        }
+      } catch (e) {}
+
       try {
         const res = await fetch("/api/org/tests");
         let testData: any = null;

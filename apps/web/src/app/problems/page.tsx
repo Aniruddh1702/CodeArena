@@ -498,9 +498,65 @@ function ProblemsContent() {
   );
 }
 
+function ProblemsTableSkeleton() {
+  return (
+    <div className="min-h-screen bg-background text-foreground animate-pulse">
+      <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl">
+        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="h-9 w-9 rounded-xl bg-slate-800" />
+            <div className="h-5 w-28 bg-slate-800 rounded" />
+          </div>
+          <div className="hidden md:flex gap-6">
+            <div className="h-4 w-12 bg-slate-800 rounded" />
+            <div className="h-4 w-16 bg-slate-800 rounded" />
+            <div className="h-4 w-20 bg-slate-800 rounded" />
+          </div>
+          <div className="h-8 w-24 bg-slate-800 rounded-full" />
+        </div>
+      </header>
+
+      <main className="container mx-auto px-6 py-8 space-y-6 max-w-6xl">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-2">
+            <div className="h-8 w-64 bg-slate-800 rounded" />
+            <div className="h-4 w-96 bg-slate-800/60 rounded" />
+          </div>
+          <div className="flex gap-3">
+            <div className="h-9 w-24 bg-slate-800 rounded" />
+            <div className="h-9 w-28 bg-slate-800 rounded" />
+          </div>
+        </div>
+
+        <div className="h-10 w-full bg-slate-800/40 rounded-lg" />
+        <div className="flex gap-2 overflow-hidden py-1">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="h-7 w-20 bg-slate-800/60 rounded-full shrink-0" />
+          ))}
+        </div>
+
+        <Card className="border border-white/5 bg-slate-900/30 overflow-hidden rounded-xl">
+          <div className="divide-y divide-white/5">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="px-6 py-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="h-4 w-8 bg-slate-800 rounded" />
+                  <div className="h-4 w-48 bg-slate-800 rounded" />
+                </div>
+                <div className="h-5 w-16 bg-slate-800 rounded-full" />
+                <div className="h-8 w-20 bg-slate-800 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </Card>
+      </main>
+    </div>
+  );
+}
+
 export default function ProblemsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">Loading Problems...</div>}>
+    <Suspense fallback={<ProblemsTableSkeleton />}>
       <ProblemsContent />
     </Suspense>
   );

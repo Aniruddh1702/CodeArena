@@ -7,13 +7,12 @@ services:
     runtime: node
     plan: free
     region: oregon
+    healthCheckPath: /api/health
     buildCommand: npm install -g pnpm && pnpm install && pnpm db:generate && pnpm --filter @codearena/api build
     startCommand: node apps/api/dist/main
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
@@ -31,13 +30,12 @@ services:
     runtime: node
     plan: free
     region: oregon
+    healthCheckPath: /api/health
     buildCommand: npm install -g pnpm && pnpm install && pnpm --filter @codearena/web build
     startCommand: pnpm --filter @codearena/web start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
       - key: NEXT_PUBLIC_API_URL
         fromService:
           type: web
@@ -48,6 +46,8 @@ services:
           type: web
           name: codearena-api
           property: host
+      - key: ADMIN_SECRET_KEY
+        generateValue: true
 
 # ---------------------------------------------------------------
 # 3. PostgreSQL Database
