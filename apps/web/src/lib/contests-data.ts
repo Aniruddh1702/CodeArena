@@ -480,6 +480,15 @@ export function registerUserForContest(contestId: string, email: string): boolea
   if (!contest) return false;
 
   const cleanEmail = email.toLowerCase().trim();
+  if (
+    !cleanEmail ||
+    cleanEmail.startsWith("guest_") ||
+    cleanEmail.includes("@student.codearena") ||
+    !cleanEmail.includes("@")
+  ) {
+    return false;
+  }
+
   const currentReg = Array.isArray(contest.registeredUsers) ? contest.registeredUsers : [];
   if (!currentReg.includes(cleanEmail)) {
     contest.registeredUsers = [...currentReg, cleanEmail];
@@ -570,6 +579,17 @@ export function isUserContestSubmitted(contest?: Contest | null, userEmail?: str
 }
 
 export function recordContestSubmission(submission: ContestSubmission): void {
+  const email = (submission.userEmail || "").toLowerCase().trim();
+  if (
+    !email ||
+    email.startsWith("guest_") ||
+    email.includes("@student.codearena") ||
+    !email.includes("@")
+  ) {
+    console.warn("Unauthenticated or guest user cannot submit contest solutions.");
+    return;
+  }
+
   const contest = getContestById(submission.contestId);
   if (contest && isUserContestSubmitted(contest, submission.userEmail)) {
     console.warn("User has already submitted the assignment. Ignoring problem submission.");

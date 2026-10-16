@@ -34,6 +34,19 @@ const ACCOUNTS_KEY = "codearena_accounts";
 const ACTIVE_ACCOUNT_ID_KEY = "codearena_active_account_id";
 
 /**
+ * Check if an account is an authentic, registered user (not a guest session)
+ */
+export function isRealUserAccount(user: UserAccount | null | undefined): boolean {
+  if (!user || !user.email) return false;
+  const email = user.email.toLowerCase().trim();
+  const id = (user.id || "").toLowerCase().trim();
+  if (id.startsWith("guest_") || email.startsWith("guest_") || email.includes("@student.codearena")) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * Get all accounts currently logged in on this browser
  */
 export function getAllAccounts(): UserAccount[] {
@@ -78,8 +91,11 @@ export function getAllAccounts(): UserAccount[] {
       // First-time visitor has no active accounts until they log in
       return [];
     }
+
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed;
+    if (Array.isArray(parsed)) {
+      return parsed.filter((a) => isRealUserAccount(a));
+    }
     return [];
   } catch (e) {
     console.error("Failed to read accounts:", e);
@@ -117,7 +133,15 @@ export function getActiveAccount(): UserAccount | null {
   if (accounts.length === 0) return null;
 
   const found = accounts.find((a) => a.id === activeId || a.username === activeId || a.email === activeId);
-  return found || null;
+  if (!found || !isRealUserAccount(found)) {
+    if (activeId.startsWith("guest_")) {
+      try {
+        localStorage.removeItem(ACTIVE_ACCOUNT_ID_KEY);
+      } catch {}
+    }
+    return null;
+  }
+  return found;
 }
 
 /**

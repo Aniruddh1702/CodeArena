@@ -51,6 +51,22 @@ export async function POST(
     }
 
     const email = String(body.userEmail).toLowerCase().trim();
+    if (
+      !email ||
+      email.startsWith("guest_") ||
+      email.includes("@student.codearena") ||
+      email === "guest" ||
+      !email.includes("@")
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Authentication required: You must be signed in with a registered account to submit contest answers.",
+        },
+        { status: 401 }
+      );
+    }
+
     const submittedUsers = (contest.submittedUsers || []).map((e) => e.toLowerCase().trim());
     if (submittedUsers.includes(email)) {
       return NextResponse.json(

@@ -139,22 +139,13 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
             isAdmin: true,
             token: "admin-session",
           };
-        } else {
-          // Provide Guest session so contest arena loads without barrier
-          const guestNum = Math.floor(1000 + Math.random() * 9000);
-          user = {
-            id: `guest_${guestNum}`,
-            email: `guest_${guestNum}@student.codearena`,
-            username: `GuestCoder_${guestNum}`,
-            name: `Guest Coder ${guestNum}`,
-            role: "STUDENT",
-            token: `guest-token-${guestNum}`,
-          };
-          saveAccount(user, true);
         }
       }
     }
-    if (!user) {
+    // Disallow unauthenticated or fake guest sessions from taking the contest
+    if (!user || user.id?.startsWith("guest_") || user.email?.toLowerCase().includes("@student.codearena")) {
+      setCurrentUser(null);
+      setIsLoadingContest(false);
       router.push(`/login?redirect=/contests/${contestId}`);
       return;
     }
@@ -434,6 +425,11 @@ function parseCustomArgs(raw: string): any[] {
 
   // Run Code on Public Test Cases (Real Multi-Language Execution)
   const handleRunCode = async () => {
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+      alert("Please sign in to your CodeArena account to execute code during a contest.");
+      router.push(`/login?redirect=/contests/${contestId}`);
+      return;
+    }
     if (!activeProblemDef) return;
     if (hasUserSubmittedContest && !currentUser?.isAdmin) {
       alert("You have already submitted the assignment. Code execution is disabled.");
@@ -557,8 +553,8 @@ function parseCustomArgs(raw: string): any[] {
       alert("You have already submitted the assignment. Contest submissions are disabled.");
       return;
     }
-    if (!currentUser) {
-      alert("Please log in to submit contest solutions!");
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+      alert("Please sign in to submit contest solutions!");
       router.push(`/login?redirect=/contests/${contestId}`);
       return;
     }
@@ -708,7 +704,12 @@ function parseCustomArgs(raw: string): any[] {
   };
 
   const handleConfirmSubmitWholeContest = async () => {
-    if (!currentUser || !contest) return;
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+      alert("Please sign in to submit the contest!");
+      router.push(`/login?redirect=/contests/${contestId}`);
+      return;
+    }
+    if (!contest) return;
     setIsSubmittingWhole(true);
     try {
       const res = await submitWholeContest(contest.id, currentUser.email);
@@ -755,6 +756,37 @@ function parseCustomArgs(raw: string): any[] {
           <Link href="/contests">
             <Button size="sm">Back to Contests</Button>
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Strictly block unauthenticated or guest users from entering or giving the contest
+  if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-card border border-border/80 shadow-2xl text-center space-y-5">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center text-3xl mx-auto shadow-inner">
+            🔒
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black tracking-tight text-foreground">Sign In Required</h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              You must be signed in to your CodeArena account to give this contest, access problem challenges, and submit code solutions.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2.5 pt-2">
+            <Link href={`/login?redirect=/contests/${contestId}`} className="w-full">
+              <Button className="w-full h-10 font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+                Sign In to Enter Contest &rarr;
+              </Button>
+            </Link>
+            <Link href={`/register?redirect=/contests/${contestId}`} className="w-full">
+              <Button variant="outline" className="w-full h-9 font-semibold text-xs border-border/80 text-muted-foreground hover:text-foreground">
+                Don't have an account? Register
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );

@@ -84,14 +84,21 @@ export async function PATCH(
     };
 
     if (body.registerUserEmail) {
-      const email = String(body.registerUserEmail).toLowerCase();
-      const currentUsers = updated.registeredUsers || [];
-      if (!currentUsers.includes(email)) {
-        updated.registeredUsers = [...currentUsers, email];
-        updated.participantsCount = Math.max(
-          updated.participantsCount + 1,
-          updated.registeredUsers.length
-        );
+      const email = String(body.registerUserEmail).toLowerCase().trim();
+      if (
+        email &&
+        !email.startsWith("guest_") &&
+        !email.includes("@student.codearena") &&
+        email.includes("@")
+      ) {
+        const currentUsers = updated.registeredUsers || [];
+        if (!currentUsers.includes(email)) {
+          updated.registeredUsers = [...currentUsers, email];
+          updated.participantsCount = Math.max(
+            updated.participantsCount + 1,
+            updated.registeredUsers.length
+          );
+        }
       }
     }
 

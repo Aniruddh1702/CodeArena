@@ -78,9 +78,19 @@ export default function ContestsPage() {
     return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
+  const handleEnterContest = (contestId: string, e?: React.MouseEvent) => {
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+      if (e) e.preventDefault();
+      router.push(`/login?redirect=/contests/${contestId}`);
+      return false;
+    }
+    router.push(`/contests/${contestId}`);
+    return true;
+  };
+
   const handleRegister = (contestId: string) => {
-    if (!currentUser) {
-      router.push("/login?redirect=/contests");
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+      router.push(`/login?redirect=/contests/${contestId}`);
       return;
     }
     if (currentUser.status === "BANNED" || currentUser.isBanned) {
@@ -210,11 +220,13 @@ export default function ContestsPage() {
               </span>
             </div>
 
-            <Link href={`/contests/${contestStartingSoon.id}`}>
-              <Button size="sm" className="h-7 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-black gap-1 shadow-sm">
-                <span>⚡</span> Enter Lobby Now
-              </Button>
-            </Link>
+            <Button
+              size="sm"
+              onClick={(e) => handleEnterContest(contestStartingSoon.id, e)}
+              className="h-7 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-black gap-1 shadow-sm"
+            >
+              <span>⚡</span> Enter Lobby Now
+            </Button>
           </div>
         </div>
       )}
@@ -430,10 +442,8 @@ export default function ContestsPage() {
                     </div>
 
                     <div>
-                      <CardTitle className="text-base sm:text-lg font-bold hover:text-primary transition-colors">
-                        <Link href={`/contests/${contest.id}`}>
-                          {contest.title}
-                        </Link>
+                      <CardTitle className="text-base sm:text-lg font-bold hover:text-primary transition-colors cursor-pointer" onClick={(e) => handleEnterContest(contest.id, e)}>
+                        {contest.title}
                       </CardTitle>
                       <CardDescription className="text-xs text-muted-foreground mt-1 line-clamp-2">
                         {contest.description}
@@ -498,11 +508,13 @@ export default function ContestsPage() {
                             </Link>
                           </div>
                         ) : isLive ? (
-                          <Link href={`/contests/${contest.id}`}>
-                            <Button size="sm" className="h-8 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-md shadow-emerald-600/20">
-                              <span>🚀</span> Enter Arena
-                            </Button>
-                          </Link>
+                          <Button
+                            size="sm"
+                            onClick={(e) => handleEnterContest(contest.id, e)}
+                            className="h-8 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-md shadow-emerald-600/20"
+                          >
+                            <span>🚀</span> Enter Arena
+                          </Button>
                         ) : isUpcoming ? (
                           <div className="flex items-center gap-1.5">
                             <Button
@@ -520,11 +532,14 @@ export default function ContestsPage() {
                                 <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2 py-1">
                                   ✓ Registered
                                 </Badge>
-                                <Link href={`/contests/${contest.id}`}>
-                                  <Button size="sm" variant="outline" className="h-8 text-xs font-bold border-blue-500/40 text-blue-400 hover:bg-blue-500/10 gap-1">
-                                    <span>⏱️</span> Lobby
-                                  </Button>
-                                </Link>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={(e) => handleEnterContest(contest.id, e)}
+                                  className="h-8 text-xs font-bold border-blue-500/40 text-blue-400 hover:bg-blue-500/10 gap-1"
+                                >
+                                  <span>⏱️</span> Lobby
+                                </Button>
                               </div>
                             ) : (
                               <div className="flex items-center gap-1.5">
@@ -535,11 +550,14 @@ export default function ContestsPage() {
                                 >
                                   <span>📝</span> Register
                                 </Button>
-                                <Link href={`/contests/${contest.id}`}>
-                                  <Button size="sm" variant="outline" className="h-8 text-xs font-medium text-slate-300 border-border/80 hover:bg-secondary gap-1">
-                                    <span>👁️</span> Details
-                                  </Button>
-                                </Link>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={(e) => handleEnterContest(contest.id, e)}
+                                  className="h-8 text-xs font-medium text-slate-300 border-border/80 hover:bg-secondary gap-1"
+                                >
+                                  <span>👁️</span> Details
+                                </Button>
                               </div>
                             )}
                           </div>
