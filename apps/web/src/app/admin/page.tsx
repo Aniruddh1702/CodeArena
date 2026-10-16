@@ -23,6 +23,7 @@ import {
   submitWholeContest,
   getContestById,
   getContestSubmissions,
+  getAdminAuthHeaders,
   Contest,
   ContestProblem,
   ContestSubmission,
@@ -325,7 +326,7 @@ export default function AdminPortalPage() {
     title: "",
     description: "",
     durationMinutes: 90,
-    startTimeOption: "1hour" as "now" | "15min" | "1hour" | "custom",
+    startTimeOption: "now" as "now" | "15min" | "1hour" | "custom",
     customStartTime: "",
     selectedProblems: [] as ContestProblem[],
     isRated: true,
@@ -540,7 +541,12 @@ export default function AdminPortalPage() {
 
   const loadContests = async () => {
     try {
-      const res = await fetch("/api/contests", { cache: "no-store" });
+      const headers = getAdminAuthHeaders();
+      const res = await fetch("/api/contests", {
+        cache: "no-store",
+        headers,
+        credentials: "include",
+      });
       const data = await res.json();
       if (data?.success && Array.isArray(data.contests)) {
         const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
@@ -585,6 +591,13 @@ export default function AdminPortalPage() {
         const data = await res.json().catch(() => null);
         if (res.ok && data?.success) {
           apiSuccess = true;
+          if (data.adminToken) {
+            sessionStorage.setItem("codearena_admin_token", data.adminToken);
+            localStorage.setItem("codearena_admin_token", data.adminToken);
+            if (typeof document !== "undefined") {
+              document.cookie = `codearena_admin_token=${data.adminToken}; path=/; max-age=86400; SameSite=Lax`;
+            }
+          }
         }
       } catch (networkErr) {}
 
@@ -1468,23 +1481,25 @@ export default function AdminPortalPage() {
         if (hard) problemsToUse.push({ problemSlug: hard.slug, title: hard.title, difficulty: hard.difficulty, points: 500 });
       }
 
-      const effectiveOption = forceStartNow ? "now" : contestFormData.startTimeOption;
+      const isLiveNow = forceStartNow || contestFormData.startTimeOption === "now";
+      const effectiveOption = isLiveNow ? "now" : contestFormData.startTimeOption;
       const timing = getComputedContestTiming(
         effectiveOption,
         contestFormData.customStartTime,
         contestFormData.durationMinutes
       );
 
+      const durationMs = Math.max(15, contestFormData.durationMinutes || 90) * 60 * 1000;
       const newContest: Contest = {
         id: editingContestId || `contest-${Date.now()}`,
         title: contestTitle,
         description:
           contestFormData.description.trim() ||
           "Algorithmic tournament hosted on CodeArena. Compete in real time and top the live leaderboard!",
-        startTime: timing.startTime,
+        startTime: isLiveNow ? new Date(Date.now() - 1000).toISOString() : timing.startTime,
         durationMinutes: contestFormData.durationMinutes || 90,
-        endTime: timing.endTime,
-        status: timing.status,
+        endTime: isLiveNow ? new Date(Date.now() + durationMs).toISOString() : timing.endTime,
+        status: isLiveNow ? "LIVE" : timing.status,
         problems: problemsToUse,
         participantsCount: 1,
         registeredUsers: ["admin@codearena.io"],
@@ -1503,8 +1518,8 @@ export default function AdminPortalPage() {
         type: "success",
         message: editingContestId
           ? `Contest "${newContest.title}" updated successfully!`
-          : timing.status === "LIVE"
-          ? `Contest "${newContest.title}" is now LIVE!`
+          : newContest.status === "LIVE"
+          ? `Contest "${newContest.title}" is now LIVE in real-time!`
           : `Contest "${newContest.title}" scheduled for ${timing.startFormatted}!`,
       });
 
@@ -1513,8 +1528,8 @@ export default function AdminPortalPage() {
         title: "",
         description: "",
         durationMinutes: 90,
-        startTimeOption: "1hour",
-        customStartTime: getFutureDateTimeLocalString(60),
+        startTimeOption: "now",
+        customStartTime: "",
         selectedProblems: [],
         isRated: true,
       });

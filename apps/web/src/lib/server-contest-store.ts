@@ -151,7 +151,7 @@ export function getServerContests(): Contest[] {
     let status: "UPCOMING" | "LIVE" | "ENDED" = c.status;
     if (now >= end) {
       status = "ENDED";
-    } else if (now >= start) {
+    } else if (c.status === "LIVE" || now >= start - 15000) {
       status = "LIVE";
     } else {
       status = "UPCOMING";
@@ -163,6 +163,15 @@ export function getServerContests(): Contest[] {
 }
 
 export function saveServerContest(contest: Contest): Contest {
+  if (contest.status === "LIVE") {
+    const now = Date.now();
+    const durationMs = (contest.durationMinutes || 90) * 60 * 1000;
+    const currentStart = new Date(contest.startTime).getTime();
+    if (isNaN(currentStart) || currentStart > now) {
+      contest.startTime = new Date(now - 1000).toISOString();
+      contest.endTime = new Date(now + durationMs).toISOString();
+    }
+  }
   const current = getServerContests();
   const existingIdx = current.findIndex((c) => c.id === contest.id);
   if (existingIdx >= 0) {

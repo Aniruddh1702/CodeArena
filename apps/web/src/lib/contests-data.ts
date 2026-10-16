@@ -149,7 +149,31 @@ export async function syncContestsWithServer(): Promise<Contest[]> {
   return getContests();
 }
 
+export function getAdminAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (typeof window !== "undefined") {
+    const token =
+      sessionStorage.getItem("codearena_admin_token") ||
+      localStorage.getItem("codearena_admin_token") ||
+      (typeof document !== "undefined"
+        ? document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("codearena_admin_token="))
+            ?.split("=")[1]
+        : undefined);
+    if (token) {
+      headers["x-admin-token"] = token;
+    }
+  }
+  return headers;
+}
+
 export function getContests(): Contest[] {
+  if (typeof window !== "undefined") {
+    // Check if token exists
+  }
   if (typeof window === "undefined") return DEFAULT_CONTESTS.map(enrichContestProblems);
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -183,12 +207,12 @@ export function getContests(): Contest[] {
       const end = new Date(c.endTime).getTime();
       let newStatus: Contest["status"] = c.status;
 
-      if (now < start) {
-        newStatus = "UPCOMING";
-      } else if (now >= start && now <= end) {
+      if (now >= end) {
+        newStatus = "ENDED";
+      } else if (c.status === "LIVE" || now >= start - 15000) {
         newStatus = "LIVE";
       } else {
-        newStatus = "ENDED";
+        newStatus = "UPCOMING";
       }
 
       if (c.status !== newStatus) {
@@ -315,9 +339,11 @@ export async function saveContest(contest: Contest): Promise<void> {
 
   // Sync to Backend Server API
   try {
+    const authHeaders = getAdminAuthHeaders();
     await fetch("/api/contests", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders,
+      credentials: "include",
       body: JSON.stringify(enriched),
     });
   } catch (err) {
@@ -336,7 +362,12 @@ export async function clearAllContests(): Promise<void> {
   }
 
   try {
-    await fetch("/api/contests", { method: "DELETE" });
+    const authHeaders = getAdminAuthHeaders();
+    await fetch("/api/contests?confirm=CLEAR_ALL", {
+      method: "DELETE",
+      headers: authHeaders,
+      credentials: "include",
+    });
   } catch (e) {}
 }
 
@@ -354,7 +385,12 @@ export async function deleteContest(id: string): Promise<boolean> {
   }
 
   try {
-    await fetch(`/api/contests/${id}`, { method: "DELETE" });
+    const authHeaders = getAdminAuthHeaders();
+    await fetch(`/api/contests/${id}`, {
+      method: "DELETE",
+      headers: authHeaders,
+      credentials: "include",
+    });
   } catch (e) {}
   return true;
 }
@@ -366,7 +402,8 @@ export async function startContestNow(id: string): Promise<Contest | null> {
   const now = new Date();
   const endTime = new Date(now.getTime() + contest.durationMinutes * 60 * 1000);
 
-  contest.startTime = now.toISOString();
+  // Set start time slightly in the past to ensure immediate live execution
+  contest.startTime = new Date(now.getTime() - 1000).toISOString();
   contest.endTime = endTime.toISOString();
   contest.status = "LIVE";
 
@@ -383,9 +420,11 @@ export async function startContestNow(id: string): Promise<Contest | null> {
   });
 
   try {
+    const authHeaders = getAdminAuthHeaders();
     await fetch(`/api/contests/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders,
+      credentials: "include",
       body: JSON.stringify({
         status: "LIVE",
         startTime: contest.startTime,
@@ -393,6 +432,10 @@ export async function startContestNow(id: string): Promise<Contest | null> {
       }),
     });
   } catch (e) {}
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: contest }));
+  }
 
   return contest;
 }
@@ -407,15 +450,21 @@ export async function endContestNow(id: string): Promise<Contest | null> {
   await saveContest(contest);
 
   try {
+    const authHeaders = getAdminAuthHeaders();
     await fetch(`/api/contests/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders,
+      credentials: "include",
       body: JSON.stringify({
         status: "ENDED",
         endTime: contest.endTime,
       }),
     });
   } catch (e) {}
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: contest }));
+  }
 
   return contest;
 }

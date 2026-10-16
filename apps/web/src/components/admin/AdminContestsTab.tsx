@@ -523,14 +523,60 @@ export function AdminContestsTab({
         </div>
 
         {/* Submit Actions */}
-        <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/[0.06]">
-          <Button
-            type="button"
-            onClick={() => onCreateContest(false)}
-            className="h-9 px-5 text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white rounded-xl shadow-md"
-          >
-            {editingContestId ? "Update Tournament" : "Schedule Tournament"}
-          </Button>
+        <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-white/[0.06]">
+          {editingContestId ? (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancelEditContest}
+                className="h-9 px-4 text-xs font-medium bg-white/[0.03] text-slate-300 border-white/10 rounded-xl"
+              >
+                Cancel Edit
+              </Button>
+              <Button
+                type="button"
+                onClick={() => onCreateContest(false)}
+                className="h-9 px-5 text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white rounded-xl shadow-md"
+              >
+                Update Tournament
+              </Button>
+              <Button
+                type="button"
+                onClick={() => onCreateContest(true)}
+                className="h-9 px-5 text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-1.5"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Save & Start Live Now</span>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onCreateContest(false)}
+                className="h-9 px-4 text-xs font-medium bg-white/[0.03] hover:bg-white/[0.06] text-slate-300 border-white/10 rounded-xl gap-1.5"
+              >
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <span>
+                  {contestFormData.startTimeOption === "now"
+                    ? "Schedule for Later"
+                    : "Schedule Tournament"}
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                onClick={() => onCreateContest(true)}
+                className="h-9 px-5 text-xs font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 rounded-xl shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <span className="w-2 h-2 rounded-full bg-slate-950 animate-ping" />
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Launch Live Contest Now!</span>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
