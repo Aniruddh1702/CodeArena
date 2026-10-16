@@ -7,6 +7,8 @@ services:
     runtime: node
     plan: free
     region: oregon
+    branch: main
+    autoDeployTrigger: commit
     healthCheckPath: /api/health
     buildCommand: npm install -g pnpm && pnpm install && pnpm db:generate && pnpm --filter @codearena/api build
     startCommand: node apps/api/dist/main
@@ -30,6 +32,8 @@ services:
     runtime: node
     plan: free
     region: oregon
+    branch: main
+    autoDeployTrigger: commit
     healthCheckPath: /api/health
     buildCommand: npm install -g pnpm && pnpm install && pnpm --filter @codearena/web build
     startCommand: pnpm --filter @codearena/web start
