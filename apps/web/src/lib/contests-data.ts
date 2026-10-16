@@ -134,12 +134,9 @@ export async function syncContestsWithServer(): Promise<Contest[]> {
     const res = await fetch("/api/contests", { cache: "no-store" });
     const json = await res.json().catch(() => null);
     if (json?.success && Array.isArray(json.contests)) {
-      let serverContests: Contest[] = json.contests
+      const serverContests: Contest[] = json.contests
         .filter((c: Contest) => c.id !== "contest-weekly-clash-1")
         .map(enrichContestProblems);
-      if (serverContests.length === 0) {
-        serverContests = [getOfficialScheduledContest()].map(enrichContestProblems);
-      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(serverContests));
       window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: serverContests }));
       return serverContests;
@@ -193,17 +190,13 @@ export function getContests(): Contest[] {
     } else {
       const parsed: Contest[] = JSON.parse(raw);
       // Active purge of legacy ongoing dummy contest from browser storage
-      const sanitized = parsed.filter((c) => c.id !== "contest-weekly-clash-1");
-      if (sanitized.length === 0) {
-        const enriched = DEFAULT_CONTESTS.map(enrichContestProblems);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched));
-        contests = enriched;
-      } else {
-        if (sanitized.length !== parsed.length) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
-        }
-        contests = sanitized.map(enrichContestProblems);
+      const sanitized = Array.isArray(parsed)
+        ? parsed.filter((c) => c.id !== "contest-weekly-clash-1")
+        : [];
+      if (sanitized.length !== (Array.isArray(parsed) ? parsed.length : 0)) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
       }
+      contests = sanitized.map(enrichContestProblems);
     }
 
     // Auto update status based on current time
@@ -394,13 +387,17 @@ export async function deleteContest(id: string): Promise<boolean> {
 
   try {
     const authHeaders = getAdminAuthHeaders();
-    await fetch(`/api/contests/${id}`, {
+    const res = await fetch(`/api/contests/${id}`, {
       method: "DELETE",
       headers: authHeaders,
       credentials: "include",
     });
-  } catch (e) {}
-  return true;
+    const data = await res.json().catch(() => null);
+    return Boolean(res.ok && data?.success);
+  } catch (e) {
+    console.error("Failed to delete contest on server:", e);
+    return false;
+  }
 }
 
 export async function startContestNow(id: string): Promise<Contest | null> {

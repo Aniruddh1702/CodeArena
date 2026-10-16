@@ -114,11 +114,10 @@ export function getOfficialScheduledContest(): Contest {
 export function getServerContests(): Contest[] {
   if (!global.__codearena_server_contests_initialized) {
     const fromFile = readFromFile();
-    if (fromFile && fromFile.initialized && Array.isArray(fromFile.contests) && fromFile.contests.length > 0) {
+    if (fromFile && fromFile.initialized && Array.isArray(fromFile.contests)) {
       // Purge any legacy dummy contest
       global.__codearena_server_contests = fromFile.contests.filter((c) => c.id !== "contest-weekly-clash-1");
       global.__codearena_server_contests_initialized = true;
-      writeToFile(global.__codearena_server_contests);
     } else {
       const defaultContest = getOfficialScheduledContest();
       global.__codearena_server_contests = [defaultContest];
@@ -127,15 +126,11 @@ export function getServerContests(): Contest[] {
     }
   }
 
-  // Ensure legacy contest-weekly-clash-1 is never returned and contests never remain empty
+  // Ensure legacy contest-weekly-clash-1 is never returned
   if (global.__codearena_server_contests) {
     const prevLength = global.__codearena_server_contests.length;
     global.__codearena_server_contests = global.__codearena_server_contests.filter((c) => c.id !== "contest-weekly-clash-1");
-    if (global.__codearena_server_contests.length === 0) {
-      const defaultContest = getOfficialScheduledContest();
-      global.__codearena_server_contests = [defaultContest];
-      writeToFile([defaultContest]);
-    } else if (global.__codearena_server_contests.length !== prevLength) {
+    if (global.__codearena_server_contests.length !== prevLength) {
       writeToFile(global.__codearena_server_contests);
     }
   }

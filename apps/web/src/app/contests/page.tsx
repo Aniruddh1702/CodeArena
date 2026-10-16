@@ -28,10 +28,9 @@ export default function ContestsPage() {
       .then((data) => {
         if (data?.success && Array.isArray(data.contests)) {
           const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
-          const finalContests = sanitized.length > 0 ? sanitized : getContests();
-          setContests(finalContests);
+          setContests(sanitized);
           if (typeof window !== "undefined") {
-            localStorage.setItem("codearena_contests", JSON.stringify(finalContests));
+            localStorage.setItem("codearena_contests", JSON.stringify(sanitized));
           }
         }
       })
@@ -47,10 +46,9 @@ export default function ContestsPage() {
           .then((data) => {
             if (data?.success && Array.isArray(data.contests)) {
               const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
-              const finalContests = sanitized.length > 0 ? sanitized : getContests();
-              setContests(finalContests);
+              setContests(sanitized);
               if (typeof window !== "undefined") {
-                localStorage.setItem("codearena_contests", JSON.stringify(finalContests));
+                localStorage.setItem("codearena_contests", JSON.stringify(sanitized));
               }
             }
           })

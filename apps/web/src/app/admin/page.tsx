@@ -1644,9 +1644,17 @@ export default function AdminPortalPage() {
   };
 
   const handleDeleteContestItem = async (id: string) => {
-    if (confirm("Are you sure you want to delete this contest?")) {
+    const contestToDelete = contestsList.find((c) => c.id === id);
+    const title = contestToDelete?.title || id;
+    if (confirm(`Are you sure you want to permanently delete "${title}"?`)) {
+      setContestsList((prev) => prev.filter((c) => c.id !== id));
       await deleteContest(id);
       await loadContests();
+      setContestFeedback({
+        type: "success",
+        message: `Contest "${title}" has been deleted successfully.`,
+      });
+      setTimeout(() => setContestFeedback(null), 4000);
     }
   };
 
