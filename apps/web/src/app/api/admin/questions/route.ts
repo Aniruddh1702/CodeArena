@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
-import { ProblemDefinition } from "@/lib/problems-data";
+import { ProblemDefinition, getAllProblems } from "@/lib/problems-data";
 import { ensureProblemStarterCode } from "@/lib/starter-templates";
 import {
   saveCustomProblemServer,
@@ -35,6 +35,14 @@ export async function GET(req: NextRequest) {
     }
     for (const item of serverCustom) {
       if (item.slug) map.set(item.slug, item);
+    }
+
+    // Merge standard problem bank so items always returns all questions
+    const standardProblems = getAllProblems();
+    for (const p of standardProblems) {
+      if (p.slug && !map.has(p.slug) && !deletedSlugs.includes(p.slug)) {
+        map.set(p.slug, p);
+      }
     }
 
     return NextResponse.json({

@@ -496,11 +496,37 @@ function DashboardRadarChart({
   );
 }
 
+function getInitialDashboardData(): any {
+  const currentUserName = "Learner";
+  const roadmap = calculateTopicMilestones([]);
+  return {
+    isGuest: true,
+    greeting: "Welcome to CodeArena!",
+    currentUserName,
+    dsaRating: 1200,
+    userRank: 0,
+    problemsSolved: 0,
+    accuracy: 0.0,
+    currentStreak: 0,
+    recentActivity: [],
+    radarStats: {
+      algorithms: 35,
+      dataStructures: 40,
+      speed: 45,
+      problemSolving: 45,
+      dpOptimization: 25,
+      mathLogic: 40,
+    },
+    dailyChallenge: getDailyChallenge([]),
+    roadmapLevels: roadmap,
+  };
+}
+
 export default function DashboardPage() {
   const router = useRouter();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>(getInitialDashboardData);
   const [activeAccount, setActiveAccount] = useState<UserAccount | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [matchmakingActive, setMatchmakingActive] = useState(false);
   const [matchmakingTime, setMatchmakingTime] = useState(0);

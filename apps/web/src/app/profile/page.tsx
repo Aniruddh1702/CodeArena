@@ -355,7 +355,7 @@ export default function ProfilePage() {
     joinedDate: "October 2026",
   });
 
-  const [dsaRating, setDsaRating] = useState(1450);
+  const [dsaRating, setDsaRating] = useState(1200);
   const [globalRank, setGlobalRank] = useState(0);
   const [solvedCount, setSolvedCount] = useState(0);
   const [accuracy, setAccuracy] = useState(0.0);
@@ -413,7 +413,7 @@ export default function ProfilePage() {
     // Isolated stats for this account
     const stats = active ? getUserStats(active.id) : { solvedProblems: [], problemsSolved: 0, dsaRating: 1200, recentActivity: [] };
     const totalActivity = Math.max(stats.problemsSolved, (stats.recentActivity || []).length);
-    const computedAcc = totalActivity > 0 ? Math.round((stats.problemsSolved / totalActivity) * 1000) / 10 : (stats.problemsSolved > 0 ? 85.0 : 0.0);
+    const computedAcc = totalActivity > 0 ? Math.round((stats.problemsSolved / totalActivity) * 1000) / 10 : 0.0;
     const computedStreak = stats.problemsSolved > 0 ? Math.min(14, Math.max(1, Math.ceil(stats.problemsSolved / 2))) : 0;
 
     setSolvedCount(stats.problemsSolved);
@@ -762,7 +762,7 @@ export default function ProfilePage() {
                 DSA Rating
               </span>
               <span className="font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
-                Rank #{globalRank}
+                {globalRank > 0 ? `Rank #${globalRank}` : "Unranked"}
               </span>
             </div>
             <div className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-indigo-200 to-indigo-400">
@@ -805,11 +805,11 @@ export default function ProfilePage() {
               <span className="text-purple-400 text-[11px] font-semibold">Precision</span>
             </div>
             <div className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-purple-200 to-pink-400">
-              {accuracy}%
+              {accuracy.toFixed(1)}%
             </div>
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5 text-[11px] text-slate-400">
-              <span>Verified Submissions</span>
-              <span className="text-purple-300 font-semibold">High Precision</span>
+              <span>{solvedCount > 0 ? "Verified Submissions" : "No Submissions Yet"}</span>
+              <span className="text-purple-300 font-semibold">{solvedCount > 0 ? "High Precision" : "Start Solving"}</span>
             </div>
           </TiltCard>
 

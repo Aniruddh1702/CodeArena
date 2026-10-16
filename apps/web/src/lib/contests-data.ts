@@ -131,9 +131,12 @@ export async function syncContestsWithServer(): Promise<Contest[]> {
     const res = await fetch("/api/contests", { cache: "no-store" });
     const json = await res.json().catch(() => null);
     if (json?.success && Array.isArray(json.contests)) {
-      const serverContests: Contest[] = json.contests
+      let serverContests: Contest[] = json.contests
         .filter((c: Contest) => c.id !== "contest-weekly-clash-1")
         .map(enrichContestProblems);
+      if (serverContests.length === 0) {
+        serverContests = [getOfficialScheduledContest()].map(enrichContestProblems);
+      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(serverContests));
       window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: serverContests }));
       return serverContests;

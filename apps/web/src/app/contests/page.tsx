@@ -11,7 +11,7 @@ import { saveNotification, requestBrowserNotificationPermission } from "@/lib/no
 
 export default function ContestsPage() {
   const router = useRouter();
-  const [contests, setContests] = useState<Contest[]>([]);
+  const [contests, setContests] = useState<Contest[]>(getContests);
   const [activeFilter, setActiveFilter] = useState<"ALL" | "LIVE" | "UPCOMING" | "ENDED">("ALL");
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [now, setNow] = useState(Date.now());
@@ -28,9 +28,10 @@ export default function ContestsPage() {
       .then((data) => {
         if (data?.success && Array.isArray(data.contests)) {
           const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
-          setContests(sanitized);
+          const finalContests = sanitized.length > 0 ? sanitized : getContests();
+          setContests(finalContests);
           if (typeof window !== "undefined") {
-            localStorage.setItem("codearena_contests", JSON.stringify(sanitized));
+            localStorage.setItem("codearena_contests", JSON.stringify(finalContests));
           }
         }
       })
@@ -46,9 +47,10 @@ export default function ContestsPage() {
           .then((data) => {
             if (data?.success && Array.isArray(data.contests)) {
               const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
-              setContests(sanitized);
+              const finalContests = sanitized.length > 0 ? sanitized : getContests();
+              setContests(finalContests);
               if (typeof window !== "undefined") {
-                localStorage.setItem("codearena_contests", JSON.stringify(sanitized));
+                localStorage.setItem("codearena_contests", JSON.stringify(finalContests));
               }
             }
           })

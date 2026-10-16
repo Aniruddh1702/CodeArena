@@ -291,7 +291,7 @@ export function getUserScopedKey(userId: string, key: string): string {
  */
 export function getUserStats(userId: string): UserStats {
   if (typeof window === "undefined") {
-    return { solvedProblems: [], problemsSolved: 0, dsaRating: 1450, recentActivity: [] };
+    return { solvedProblems: [], problemsSolved: 0, dsaRating: 1200, recentActivity: [] };
   }
 
   const safeId = (userId || "default").replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -314,14 +314,18 @@ export function getUserStats(userId: string): UserStats {
   }
 
   const problemsSolved = solvedProblems.length;
-  const expectedRating = 1450 + (problemsSolved * 15);
+  const expectedRating = problemsSolved > 0 ? 1200 + (problemsSolved * 15) : 1200;
   let dsaRating = expectedRating;
 
   try {
     const storedRating = localStorage.getItem(getUserScopedKey(safeId, "dsaRating"));
     if (storedRating) {
       const parsed = parseInt(storedRating, 10);
-      dsaRating = isNaN(parsed) ? expectedRating : Math.max(1450, parsed);
+      if (!isNaN(parsed) && problemsSolved > 0) {
+        dsaRating = Math.max(1200, parsed);
+      } else if (problemsSolved === 0) {
+        dsaRating = 1200;
+      }
     }
   } catch (e) {
     console.error("Error reading scoped dsaRating:", e);
@@ -357,7 +361,7 @@ export function recordUserSolve(
   memory?: string
 ): { isNewSolve: boolean; newCount: number; newRating: number } {
   if (typeof window === "undefined") {
-    return { isNewSolve: false, newCount: 0, newRating: 1450 };
+    return { isNewSolve: false, newCount: 0, newRating: 1200 };
   }
 
   const safeId = (userId || "default").replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -374,7 +378,7 @@ export function recordUserSolve(
       difficulty: problem.difficulty,
       solvedAt: new Date().toISOString(),
     });
-    newRating = 1450 + (updatedList.length * 15);
+    newRating = 1200 + (updatedList.length * 15);
   }
 
   // Deduplicate and save

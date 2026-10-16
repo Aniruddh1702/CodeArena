@@ -107,7 +107,7 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
 
   // User State
   const [activeAccount, setActiveAccount] = useState<UserAccount | null>(null);
-  const [userRating, setUserRating] = useState(1450);
+  const [userRating, setUserRating] = useState(1200);
   const [displayName, setDisplayName] = useState("You");
   const [loading, setLoading] = useState(true);
 
@@ -167,7 +167,10 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
   useEffect(() => {
     const active = getActiveAccount();
     if (!active) {
-      router.push(`/login?redirect=/battles/${params.id}`);
+      setActiveAccount(null);
+      setUserRating(1200);
+      setDisplayName("Guest Challenger");
+      setLoading(false);
       return;
     }
     setActiveAccount(active);
@@ -229,7 +232,7 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
   const handleOpponentWon = () => {
     setBattleState("lost");
     const activeAcc = getActiveAccount();
-    const stats = activeAcc ? getUserStats(activeAcc.id) : { dsaRating: 1450 };
+    const stats = activeAcc ? getUserStats(activeAcc.id) : { dsaRating: 1200 };
     const nextRating = Math.max(1000, stats.dsaRating - 15);
 
     if (activeAcc) {
@@ -260,7 +263,7 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
     setBattleState("lost");
 
     const activeAcc = getActiveAccount();
-    const stats = activeAcc ? getUserStats(activeAcc.id) : { dsaRating: 1450 };
+    const stats = activeAcc ? getUserStats(activeAcc.id) : { dsaRating: 1200 };
     const nextRating = Math.max(1000, stats.dsaRating - 15);
 
     if (activeAcc) {
@@ -293,7 +296,7 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
     setBattleState("surrendered");
 
     const activeAcc = getActiveAccount();
-    const stats = activeAcc ? getUserStats(activeAcc.id) : { dsaRating: 1450 };
+    const stats = activeAcc ? getUserStats(activeAcc.id) : { dsaRating: 1200 };
     const nextRating = Math.max(1000, stats.dsaRating - 15);
 
     if (activeAcc) {
@@ -412,7 +415,7 @@ export default function ActiveBattlePage({ params }: { params: { id: string } })
         battleOverRef.current = true;
         setBattleState("won");
         const activeAcc = getActiveAccount();
-        const stats = activeAcc ? getUserStats(activeAcc.id) : { dsaRating: 1450 };
+        const stats = activeAcc ? getUserStats(activeAcc.id) : { dsaRating: 1200 };
         const nextRating = stats.dsaRating + 25;
 
         if (activeAcc) {

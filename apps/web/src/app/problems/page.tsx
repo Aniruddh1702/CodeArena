@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, Button, Input } from "@codearena/ui";
 import { getActiveAccount, getUserStats } from "@/lib/auth-session";
@@ -61,18 +61,36 @@ const TOPIC_TAGS = [
   "Stack",
 ];
 
-function ProblemsContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+function getInitialProblemsList(): Problem[] {
+  try {
+    const list = getAllProblems();
+    return list.map((p, idx) => {
+      const mock = ALL_MOCK_QUESTIONS.find((m) => m.slug === p.slug);
+      return {
+        id: p.id || String(idx + 1),
+        slug: p.slug,
+        title: p.title,
+        difficulty: p.difficulty,
+        solveCount: mock ? mock.solveCount : 0,
+        topics: p.topics || [{ name: "Algorithms" }],
+      };
+    });
+  } catch {
+    return ALL_MOCK_QUESTIONS;
+  }
+}
 
-  const [allAvailableProblems, setAllAvailableProblems] = useState<Problem[]>([]);
-  const [questions, setQuestions] = useState<Problem[]>([]);
+export default function ProblemsPage() {
+  const router = useRouter();
+
+  const [allAvailableProblems, setAllAvailableProblems] = useState<Problem[]>(getInitialProblemsList);
+  const [questions, setQuestions] = useState<Problem[]>(getInitialProblemsList);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("ALL");
   const [selectedTopic, setSelectedTopic] = useState("ALL");
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [authChecked, setAuthChecked] = useState<boolean>(false);
+  const [authChecked, setAuthChecked] = useState<boolean>(true);
   const [solvedSlugs, setSolvedSlugs] = useState<string[]>([]);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -145,17 +163,18 @@ function ProblemsContent() {
 
   // Check URL query params for initial search or topic
   useEffect(() => {
-    const urlTopic = searchParams.get("topic");
-    const urlSearch = searchParams.get("search");
-
-    if (urlTopic) {
-      setSelectedTopic(urlTopic);
-    }
-    if (urlSearch) {
-      setSearch(urlSearch);
-    }
-
     if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTopic = urlParams.get("topic");
+      const urlSearch = urlParams.get("search");
+
+      if (urlTopic) {
+        setSelectedTopic(urlTopic);
+      }
+      if (urlSearch) {
+        setSearch(urlSearch);
+      }
+
       const active = getActiveAccount();
       if (!active) {
         setCurrentUser(null);
@@ -189,7 +208,7 @@ function ProblemsContent() {
         window.removeEventListener("codearena_account_changed", handleAccountChange);
       };
     }
-  }, [searchParams, router]);
+  }, [router]);
 
   // Filter questions based on search, difficulty, and topic
   useEffect(() => {
@@ -514,13 +533,5 @@ function ProblemsTableSkeleton() {
         </Card>
       </main>
     </div>
-  );
-}
-
-export default function ProblemsPage() {
-  return (
-    <Suspense fallback={<ProblemsTableSkeleton />}>
-      <ProblemsContent />
-    </Suspense>
   );
 }

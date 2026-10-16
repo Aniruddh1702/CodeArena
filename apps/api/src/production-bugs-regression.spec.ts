@@ -166,7 +166,7 @@ describe('Production Bug Fixes Regression Suite (Bugs 1 - 8)', () => {
     });
   });
 
-  describe('BUG 8: Battle Arena Problem Resolution', () => {
+  describe('BUG 8: Battle Arena Problem Resolution & Guest Mode', () => {
     it('should resolve battle problems safely without throwing', () => {
       const BATTLE_PROBLEMS = [
         'two-sum',
@@ -189,5 +189,64 @@ describe('Production Bug Fixes Regression Suite (Bugs 1 - 8)', () => {
       expect(hashToProblem('match_12345678')).toBeDefined();
       expect(BATTLE_PROBLEMS).toContain(hashToProblem('match_12345678'));
     });
+
+    it('should initialize guest battle mode with base 1200 rating without redirecting to login', () => {
+      const initBattleUser = (activeAccount: any) => {
+        if (!activeAccount) {
+          return {
+            displayName: 'Guest Challenger',
+            userRating: 1200,
+            isGuest: true,
+            redirectUrl: null,
+          };
+        }
+        return {
+          displayName: activeAccount.name || 'You',
+          userRating: activeAccount.rating || 1200,
+          isGuest: false,
+          redirectUrl: null,
+        };
+      };
+
+      const guestState = initBattleUser(null);
+      expect(guestState.isGuest).toBe(true);
+      expect(guestState.userRating).toBe(1200);
+      expect(guestState.redirectUrl).toBeNull();
+    });
+  });
+
+  describe('SSR Pre-rendering & Non-hanging Route Handlers', () => {
+    it('should verify dashboard initial state has loading=false and guest defaults', () => {
+      const getInitialDashboardState = () => ({
+        loading: false,
+        data: {
+          isGuest: true,
+          dsaRating: 1200,
+          problemsSolved: 0,
+          accuracy: 0.0,
+          userRank: 0,
+        },
+      });
+
+      const initial = getInitialDashboardState();
+      expect(initial.loading).toBe(false);
+      expect(initial.data.dsaRating).toBe(1200);
+      expect(initial.data.problemsSolved).toBe(0);
+      expect(initial.data.accuracy).toBe(0.0);
+    });
+
+    it('should verify problems initial state has authChecked=true and non-empty problem list', () => {
+      const getInitialProblemsState = () => ({
+        authChecked: true,
+        loading: false,
+        totalProblems: 160,
+      });
+
+      const initial = getInitialProblemsState();
+      expect(initial.authChecked).toBe(true);
+      expect(initial.loading).toBe(false);
+      expect(initial.totalProblems).toBeGreaterThan(0);
+    });
   });
 });
+

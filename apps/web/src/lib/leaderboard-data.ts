@@ -122,8 +122,8 @@ export function getLeaderboards(
 
   // If currentUser was explicitly passed and not in session accounts, add them
   if (currentUser && !usersMap.has(activeUsername)) {
-    const effectiveScore = typeof currentUser.score === "number" ? currentUser.score : 1450;
     const effectiveSolved = typeof currentUser.problemsSolved === "number" ? currentUser.problemsSolved : 0;
+    const effectiveScore = typeof currentUser.score === "number" ? currentUser.score : (effectiveSolved > 0 ? 1200 + effectiveSolved * 15 : 1200);
     const effectiveAccuracy = typeof currentUser.accuracy === "number" 
       ? currentUser.accuracy 
       : (effectiveSolved > 0 ? 85.0 : 0.0);
@@ -162,8 +162,8 @@ export function getLeaderboards(
       continue;
     }
 
-    const score = typeof dbUser.score === "number" ? Math.max(1450, dbUser.score) : 1450;
     const problemsSolved = typeof dbUser.problemsSolved === "number" ? dbUser.problemsSolved : 0;
+    const score = typeof dbUser.score === "number" ? dbUser.score : (problemsSolved > 0 ? 1200 + problemsSolved * 15 : 1200);
     const accuracy = problemsSolved > 0 ? (typeof dbUser.accuracy === "number" ? dbUser.accuracy : 85.0) : 0.0;
 
     usersMap.set(lowerName, {
