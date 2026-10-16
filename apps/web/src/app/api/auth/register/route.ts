@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
 import { recordUserLoginEvent, getUserRegistry } from "@/lib/userActivity";
+import { isEmailVerified, verifyOtp, consumeVerifiedEmail } from "@/lib/otp-store";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,6 +11,30 @@ export async function POST(req: NextRequest) {
     const normalizedEmail = (body.email || "").toLowerCase().trim();
     const normalizedUsername = (body.username || normalizedEmail.split("@")[0] || "student").trim();
     const fullName = `${body.firstName || ""} ${body.lastName || ""}`.trim() || normalizedUsername;
+
+    // Verify that the email was authenticated via OTP
+    let verified = isEmailVerified(normalizedEmail);
+    if (!verified && body.otp) {
+      const otpRes = verifyOtp(normalizedEmail, body.otp);
+      verified = otpRes.success;
+      if (!verified) {
+        return NextResponse.json(
+          { success: false, message: otpRes.message || "Invalid or expired verification code." },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (!verified) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Email verification required. Please enter the 6-digit verification code sent to your email.",
+          otpRequired: true,
+        },
+        { status: 403 }
+      );
+    }
 
     // Check if user already exists in local registry
     const registry = getUserRegistry();
@@ -76,6 +101,9 @@ export async function POST(req: NextRequest) {
       problemsSolved: 0,
       status: "ONLINE",
     });
+
+    // Consume the verified state so OTP cannot be reused
+    consumeVerifiedEmail(normalizedEmail);
 
     const token = backendData?.data?.accessToken || backendData?.accessToken || `token_jwt_${Date.now()}`;
 
