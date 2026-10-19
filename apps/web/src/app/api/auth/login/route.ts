@@ -126,6 +126,17 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Check if account is unverified (Rule 2)
+      if (registeredUser.emailVerified === false || registeredUser.status === "PENDING_VERIFICATION") {
+        return NextResponse.json(
+          {
+            message: "Your account has not been verified yet. Please check your email for the verification link or request a new one.",
+            emailVerified: false,
+          },
+          { status: 403 }
+        );
+      }
+
       clearFailedAttempts(rateLimitKey);
 
       // Generate secure session token

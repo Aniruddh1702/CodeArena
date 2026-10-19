@@ -11,9 +11,29 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { EmailService } from '../email/email.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { UserRole } from '@prisma/client';
+
+const COMPROMISED_PASSWORDS = new Set([
+  'password',
+  'password123',
+  'password123!',
+  'admin123',
+  'admin123!',
+  '12345678',
+  'qwerty123',
+  'letmein123',
+  'welcome123',
+  'codearena123',
+  'test1234',
+  'iloveyou123',
+  'secret123',
+  'pass1234',
+  'master123',
+  'dragon123',
+]);
 
 @Injectable()
 export class AuthService {
@@ -22,12 +42,20 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
     private audit: AuditService,
+    private emailService: EmailService,
   ) {}
 
   // ── Register (Students only via public registration) ──
   async register(dto: RegisterDto, ip?: string, userAgent?: string) {
     const normalizedEmail = dto.email.toLowerCase().trim();
     const normalizedUsername = dto.username.trim();
+
+    // Check compromised password list
+    if (COMPROMISED_PASSWORDS.has(dto.password.toLowerCase())) {
+      throw new BadRequestException(
+        'This password is known to be compromised and easily guessed. Please choose a more secure password.',
+      );
+    }
 
     // Check if email already exists
     const existingEmail = await this.prisma.user.findUnique({
@@ -50,11 +78,11 @@ export class AuthService {
     const saltRounds = typeof rawSalt === 'number' ? rawSalt : parseInt(String(rawSalt), 10) || 10;
     const passwordHash = await bcrypt.hash(dto.password, saltRounds);
 
-    // Generate email verification token
+    // Generate cryptographically secure email verification token
     const emailVerifyToken = uuidv4();
     const emailVerifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
 
-    // Create user (always STUDENT for public registration, ACTIVE status)
+    // Create user (PENDING_VERIFICATION status, emailVerified: false)
     const user = await this.prisma.user.create({
       data: {
         email: normalizedEmail,
@@ -63,7 +91,8 @@ export class AuthService {
         firstName: dto.firstName.trim(),
         lastName: dto.lastName.trim(),
         role: UserRole.STUDENT,
-        status: 'ACTIVE',
+        status: 'PENDING_VERIFICATION',
+        emailVerified: false,
         emailVerifyToken,
         emailVerifyExpires,
       },
@@ -78,6 +107,9 @@ export class AuthService {
       // Ignore if rating table already has row
     }
 
+    // Dispatch real verification email
+    await this.emailService.sendVerificationEmail(user.email, emailVerifyToken, user.firstName);
+
     // Audit log
     await this.audit.log({
       userId: user.id,
@@ -88,12 +120,11 @@ export class AuthService {
       userAgent,
     });
 
-    // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.role);
-
+    // Do NOT issue access/refresh tokens until email is verified (Rule 1)
     return {
       user: this.sanitizeUser(user),
-      ...tokens,
+      emailVerified: false,
+      message: 'Account registered successfully. Please verify your email before logging in.',
     };
   }
 
@@ -120,6 +151,13 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    // Enforce email verification (Rule 2)
+    if (!user.emailVerified || user.status === 'PENDING_VERIFICATION') {
+      throw new UnauthorizedException(
+        'Your account has not been verified yet. Please check your email for the verification link or request a new one.',
+      );
     }
 
     // Update login info
@@ -169,16 +207,20 @@ export class AuthService {
 
   // ── Verify Email ──
   async verifyEmail(token: string) {
+    if (!token) {
+      throw new BadRequestException('Verification token is required');
+    }
+
     const user = await this.prisma.user.findUnique({
       where: { emailVerifyToken: token },
     });
 
     if (!user) {
-      throw new BadRequestException('Invalid verification token');
+      throw new BadRequestException('Invalid or already used verification token');
     }
 
     if (user.emailVerifyExpires && user.emailVerifyExpires < new Date()) {
-      throw new BadRequestException('Verification token has expired');
+      throw new BadRequestException('Verification token has expired. Please request a new verification link.');
     }
 
     await this.prisma.user.update({
@@ -191,18 +233,74 @@ export class AuthService {
       },
     });
 
-    return { message: 'Email verified successfully' };
+    await this.audit.log({
+      userId: user.id,
+      action: 'auth.verify_email',
+      entity: 'user',
+      entityId: user.id,
+    });
+
+    return { message: 'Email verified successfully. You may now log in.' };
+  }
+
+  // ── Resend Verification Email ──
+  async resendVerification(email: string) {
+    const normalizedEmail = (email || '').toLowerCase().trim();
+    if (!normalizedEmail) {
+      return { message: 'If an unverified account with that email exists, a verification link has been sent.' };
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    // Protect privacy and avoid sending if already verified
+    if (!user || user.emailVerified || user.status === 'ACTIVE') {
+      return { message: 'If an unverified account with that email exists, a verification link has been sent.' };
+    }
+
+    // Rate-limiting: prevent requesting more than once per 60 seconds
+    if (user.emailVerifyExpires) {
+      const issuedAt = user.emailVerifyExpires.getTime() - 24 * 60 * 60 * 1000;
+      if (Date.now() - issuedAt < 60 * 1000) {
+        throw new BadRequestException('Please wait at least 60 seconds before requesting another verification email.');
+      }
+    }
+
+    const emailVerifyToken = uuidv4();
+    const emailVerifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerifyToken,
+        emailVerifyExpires,
+      },
+    });
+
+    await this.emailService.sendVerificationEmail(user.email, emailVerifyToken, user.firstName);
+
+    return { message: 'If an unverified account with that email exists, a verification link has been sent.' };
   }
 
   // ── Forgot Password ──
   async forgotPassword(email: string) {
+    const normalizedEmail = (email || '').toLowerCase().trim();
     const user = await this.prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
-    // Don't reveal if user exists
+    // Don't reveal if user exists (Rule 3)
     if (!user) {
-      return { message: 'If an account with that email exists, a reset link has been sent.' };
+      return { message: 'If an account with that email exists, instructions to reset your password have been sent.' };
+    }
+
+    // Rate limiting: do not re-send within 60 seconds
+    if (user.resetTokenExpires) {
+      const issuedAt = user.resetTokenExpires.getTime() - 60 * 60 * 1000;
+      if (Date.now() - issuedAt < 60 * 1000) {
+        return { message: 'If an account with that email exists, instructions to reset your password have been sent.' };
+      }
     }
 
     const resetToken = uuidv4();
@@ -213,12 +311,8 @@ export class AuthService {
       data: { resetToken, resetTokenExpires },
     });
 
-    // TODO: Send reset email via email provider
-    if (this.config.get('EMAIL_PROVIDER') === 'console') {
-      console.log(`\n📧 Password reset for ${email}:`);
-      console.log(`   Token: ${resetToken}`);
-      console.log(`   URL: ${this.config.get('WEB_URL')}/reset-password?token=${resetToken}\n`);
-    }
+    // Send password reset email via EmailService
+    await this.emailService.sendPasswordResetEmail(user.email, resetToken, user.firstName);
 
     await this.audit.log({
       userId: user.id,
@@ -227,24 +321,39 @@ export class AuthService {
       entityId: user.id,
     });
 
-    return { message: 'If an account with that email exists, a reset link has been sent.' };
+    return { message: 'If an account with that email exists, instructions to reset your password have been sent.' };
   }
 
   // ── Reset Password ──
   async resetPassword(token: string, newPassword: string) {
+    if (!token) {
+      throw new BadRequestException('Reset token is required');
+    }
+
     const user = await this.prisma.user.findUnique({
       where: { resetToken: token },
     });
 
     if (!user) {
-      throw new BadRequestException('Invalid reset token');
+      throw new BadRequestException('Invalid or expired reset token');
     }
 
     if (user.resetTokenExpires && user.resetTokenExpires < new Date()) {
       throw new BadRequestException('Reset token has expired');
     }
 
-    const saltRounds = this.config.get<number>('BCRYPT_SALT_ROUNDS', 12);
+    if (COMPROMISED_PASSWORDS.has(newPassword.toLowerCase())) {
+      throw new BadRequestException('This password is known to be compromised. Please choose a more secure password.');
+    }
+
+    // Reject same password
+    const isSamePassword = await bcrypt.compare(newPassword, user.passwordHash);
+    if (isSamePassword) {
+      throw new BadRequestException('New password cannot be the same as your previous password.');
+    }
+
+    const rawSalt = this.config.get('BCRYPT_SALT_ROUNDS', 10);
+    const saltRounds = typeof rawSalt === 'number' ? rawSalt : parseInt(String(rawSalt), 10) || 10;
     const passwordHash = await bcrypt.hash(newPassword, saltRounds);
 
     await this.prisma.user.update({
@@ -256,7 +365,7 @@ export class AuthService {
       },
     });
 
-    // Revoke all refresh tokens
+    // Revoke all refresh tokens (session revocation on password reset - Rule 3 & 4)
     await this.prisma.refreshToken.updateMany({
       where: { userId: user.id },
       data: { revoked: true },
@@ -269,7 +378,7 @@ export class AuthService {
       entityId: user.id,
     });
 
-    return { message: 'Password reset successfully' };
+    return { message: 'Password reset successfully. You can now log in with your new password.' };
   }
 
   // ── Refresh Token ──

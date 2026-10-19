@@ -38,13 +38,17 @@ export class AuthController {
       req.headers['user-agent'],
     );
 
-    this.setAuthCookies(res, result.accessToken, result.refreshToken);
+    // Only set auth cookies if verified tokens were generated (Rule 1)
+    if ((result as any).accessToken) {
+      this.setAuthCookies(res, (result as any).accessToken, (result as any).refreshToken);
+    }
 
     return {
       success: true,
       data: {
         user: result.user,
-        accessToken: result.accessToken,
+        message: result.message,
+        emailVerified: (result as any).emailVerified ?? false,
       },
     };
   }
@@ -105,8 +109,20 @@ export class AuthController {
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify email address' })
-  async verifyEmail(@Query('token') token: string) {
+  async verifyEmail(
+    @Query('token') queryToken?: string,
+    @Body('token') bodyToken?: string,
+  ) {
+    const token = queryToken || bodyToken || '';
     const result = await this.authService.verifyEmail(token);
+    return { success: true, ...result };
+  }
+
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resend email verification link' })
+  async resendVerification(@Body('email') email: string) {
+    const result = await this.authService.resendVerification(email);
     return { success: true, ...result };
   }
 

@@ -11,6 +11,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isAddingAccount = searchParams.get("addAccount") === "true";
+  const isVerifiedBanner = searchParams.get("verified") === "true";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -346,13 +347,29 @@ function LoginForm() {
                   />
                 </div>
 
+                {isVerifiedBanner && (
+                  <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center gap-2">
+                    <span>✓</span>
+                    <span>Email verified successfully! You can now log in with your credentials.</span>
+                  </div>
+                )}
+
                 {error && (
-                  <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium space-y-1">
+                  <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium space-y-2">
                     <div className="flex items-center gap-2">
                       <span>⚠️</span>
                       <span>{error}</span>
                     </div>
-                    <div className="pt-1 text-[11px] text-slate-400">
+                    {error.toLowerCase().includes("verif") && (
+                      <div className="pt-1">
+                        <Link href="/verify-email">
+                          <Button size="sm" variant="outline" className="h-7 text-[11px] font-bold border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10">
+                            Verify Email / Resend Link &rarr;
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
+                    <div className="text-[11px] text-slate-400">
                       Not registered yet?{" "}
                       <Link href="/register" className="text-cyan-400 font-bold hover:underline">
                         Create a student account &rarr;

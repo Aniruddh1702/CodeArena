@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
-import { verifyAndConsumeResetToken, getUserRegistry } from "@/lib/userActivity";
+import { verifyAndConsumeResetToken } from "@/lib/userActivity";
+
+const COMPROMISED_PASSWORDS = new Set([
+  "password",
+  "password123",
+  "password123!",
+  "admin123",
+  "admin123!",
+  "12345678",
+  "qwerty123",
+  "letmein123",
+  "welcome123",
+  "codearena123",
+]);
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,6 +34,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (COMPROMISED_PASSWORDS.has(password.toLowerCase())) {
+      return NextResponse.json(
+        { message: "This password is known to be compromised. Please choose a more secure password." },
+        { status: 400 }
+      );
+    }
+
     const apiUrl = getBackendApiUrl();
     let backendRes: Response | null = null;
     let backendData: any = null;
@@ -36,14 +56,19 @@ export async function POST(req: NextRequest) {
       // Backend offline or cold start
     }
 
-    // Try local token consumption and user password update
+    // Verify and consume token locally (single-use enforcement)
     const localResult = verifyAndConsumeResetToken(token, password);
 
     if ((backendRes && backendRes.ok) || localResult.success) {
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         message: "Your password has been successfully reset. You can now log in with your new password.",
       });
+
+      // Clear any residual session cookie to enforce re-login
+      response.cookies.delete("token");
+
+      return response;
     }
 
     let errMsg = "Invalid or expired password reset token.";

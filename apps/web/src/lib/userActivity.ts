@@ -15,7 +15,8 @@ export interface PlatformUserRecord {
   problemsSolved: number;
   lastLoginAt: string;
   registeredAt: string;
-  status: "ACTIVE" | "ONLINE" | "SUSPENDED";
+  status: "ACTIVE" | "ONLINE" | "SUSPENDED" | "PENDING_VERIFICATION";
+  emailVerified?: boolean;
 }
 
 const REGISTRY_FILE = path.join(os.tmpdir(), "codearena_platform_users.json");

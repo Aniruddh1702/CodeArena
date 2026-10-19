@@ -54,6 +54,10 @@ function getTransporter() {
   return null;
 }
 
+export function isEmailProviderConfigured(): boolean {
+  return getTransporter() !== null;
+}
+
 /**
  * Returns a polished, responsive HTML email template for CodeArena OTP verification.
  */
@@ -207,21 +211,12 @@ export async function sendOtpEmail({
   const cleanEmail = recipient.toLowerCase().trim();
   const transporter = getTransporter();
 
-  console.log(`[CodeArena OTP Mailer] 📬 Request to dispatch OTP to: ${cleanEmail}`);
-
   if (!transporter) {
-    const isProd = process.env.NODE_ENV === "production";
-    console.warn(
-      `[CodeArena OTP Mailer] ⚠️ SMTP/Gmail credentials not detected. ` +
-      `Set GMAIL_USER and GMAIL_APP_PASSWORD in environment to dispatch live emails.`
-    );
-    console.log(`[CodeArena OTP Mailer] 🔑 DEMO/FALLBACK OTP for ${cleanEmail}: ${otp}`);
-
     return {
       success: true,
       delivered: false,
       demoMode: true,
-      message: `Verification code generated. (Add GMAIL_USER & GMAIL_APP_PASSWORD to send live emails to inboxes)`,
+      message: `Verification code generated. (Configure GMAIL_USER & GMAIL_APP_PASSWORD to send live emails)`,
     };
   }
 
@@ -236,14 +231,191 @@ export async function sendOtpEmail({
       text: `Your CodeArena verification code is: ${otp}. It expires in 10 minutes.`,
     });
 
-    console.log(`[CodeArena OTP Mailer] ✅ Email successfully sent to ${cleanEmail}: MessageID ${info.messageId}`);
     return {
       success: true,
       delivered: true,
       message: `Verification code sent directly to ${cleanEmail}`,
     };
   } catch (err: any) {
-    console.error(`[CodeArena OTP Mailer] ❌ Failed to dispatch email via Nodemailer:`, err);
+    console.error(`[CodeArena Mailer] Failed to dispatch email via Nodemailer:`, err.message);
+    return {
+      success: false,
+      delivered: false,
+      message: `Failed to dispatch email: ${err.message || "SMTP error"}.`,
+      error: err.message,
+    };
+  }
+}
+
+/**
+ * Dispatches a password reset email containing a secure link.
+ */
+export async function sendPasswordResetEmail(
+  recipient: string,
+  token: string,
+  firstName?: string
+): Promise<SendEmailResult> {
+  const cleanEmail = recipient.toLowerCase().trim();
+  const transporter = getTransporter();
+
+  const webUrl = (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.WEB_URL ||
+    "https://codearena-web-eg2p.onrender.com"
+  ).replace(/\/$/, "");
+  const resetUrl = `${webUrl}/reset-password?token=${encodeURIComponent(token)}`;
+  const greeting = firstName ? `Hi ${firstName},` : "Hello,";
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Reset your CodeArena Password</title>
+</head>
+<body style="margin:0;padding:40px 15px;background-color:#0b0f19;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e2e8f0;">
+  <div style="max-width:520px;margin:0 auto;background:#131b2e;border:1px solid #1e293b;border-radius:16px;padding:36px 28px;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <span style="font-size:22px;font-weight:900;color:#38bdf8;padding:6px 14px;background:rgba(56,189,248,0.1);border-radius:8px;">⚡ CODEARENA</span>
+    </div>
+    <h2 style="font-size:20px;font-weight:800;color:#f8fafc;text-align:center;margin:0 0 12px 0;">Password Reset Request</h2>
+    <p style="font-size:14px;line-height:1.6;color:#94a3b8;text-align:center;margin:0 0 24px 0;">
+      ${greeting} We received a request to reset the password for your CodeArena account. Click the button below to choose a new password.
+    </p>
+    <div style="text-align:center;margin-bottom:28px;">
+      <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:10px;">
+        Reset Your Password &rarr;
+      </a>
+    </div>
+    <p style="font-size:12px;color:#64748b;text-align:center;word-break:break-all;">
+      Or copy and paste this URL into your browser:<br>
+      <a href="${resetUrl}" style="color:#38bdf8;">${resetUrl}</a>
+    </p>
+    <hr style="border:none;border-top:1px solid #1e293b;margin:24px 0;">
+    <p style="font-size:11px;color:#64748b;text-align:center;margin:0;">
+      This password reset link expires in 1 hour and can only be used once. If you did not request a password reset, please ignore this email.
+    </p>
+  </div>
+</body>
+</html>
+  `;
+
+  if (!transporter) {
+    return {
+      success: true,
+      delivered: false,
+      demoMode: true,
+      message: "Reset link generated. (Configure GMAIL_USER & GMAIL_APP_PASSWORD to send live emails)",
+    };
+  }
+
+  const fromEmail = process.env.SMTP_FROM || process.env.GMAIL_USER || "CodeArena <noreply@codearena.dev>";
+
+  try {
+    await transporter.sendMail({
+      from: fromEmail,
+      to: cleanEmail,
+      subject: "Reset your CodeArena account password",
+      html,
+      text: `Reset your CodeArena password here: ${resetUrl}`,
+    });
+
+    return {
+      success: true,
+      delivered: true,
+      message: `Password reset instructions sent to ${cleanEmail}`,
+    };
+  } catch (err: any) {
+    console.error(`[CodeArena Mailer] Failed to dispatch password reset email:`, err.message);
+    return {
+      success: false,
+      delivered: false,
+      message: `Failed to dispatch email: ${err.message || "SMTP error"}.`,
+      error: err.message,
+    };
+  }
+}
+
+/**
+ * Dispatches a link-based email verification message.
+ */
+export async function sendVerificationLinkEmail(
+  recipient: string,
+  token: string,
+  firstName?: string
+): Promise<SendEmailResult> {
+  const cleanEmail = recipient.toLowerCase().trim();
+  const transporter = getTransporter();
+
+  const webUrl = (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.WEB_URL ||
+    "https://codearena-web-eg2p.onrender.com"
+  ).replace(/\/$/, "");
+  const verificationUrl = `${webUrl}/verify-email?token=${encodeURIComponent(token)}`;
+  const greeting = firstName ? `Hi ${firstName},` : "Hello,";
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Verify your CodeArena Email</title>
+</head>
+<body style="margin:0;padding:40px 15px;background-color:#0b0f19;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e2e8f0;">
+  <div style="max-width:520px;margin:0 auto;background:#131b2e;border:1px solid #1e293b;border-radius:16px;padding:36px 28px;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <span style="font-size:22px;font-weight:900;color:#38bdf8;padding:6px 14px;background:rgba(56,189,248,0.1);border-radius:8px;">⚡ CODEARENA</span>
+    </div>
+    <h2 style="font-size:20px;font-weight:800;color:#f8fafc;text-align:center;margin:0 0 12px 0;">Verify Your Email Address</h2>
+    <p style="font-size:14px;line-height:1.6;color:#94a3b8;text-align:center;margin:0 0 24px 0;">
+      ${greeting} Please confirm your email address to activate your student account.
+    </p>
+    <div style="text-align:center;margin-bottom:28px;">
+      <a href="${verificationUrl}" style="display:inline-block;background:linear-gradient(135deg,#06b6d4,#6366f1);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:10px;">
+        Verify Email Address &rarr;
+      </a>
+    </div>
+    <p style="font-size:12px;color:#64748b;text-align:center;word-break:break-all;">
+      Or copy and paste this link into your browser:<br>
+      <a href="${verificationUrl}" style="color:#38bdf8;">${verificationUrl}</a>
+    </p>
+    <hr style="border:none;border-top:1px solid #1e293b;margin:24px 0;">
+    <p style="font-size:11px;color:#64748b;text-align:center;margin:0;">
+      This link expires in 24 hours. If you did not create a CodeArena account, please ignore this email.
+    </p>
+  </div>
+</body>
+</html>
+  `;
+
+  if (!transporter) {
+    return {
+      success: true,
+      delivered: false,
+      demoMode: true,
+      message: "Verification link generated. (Configure GMAIL_USER & GMAIL_APP_PASSWORD to send live emails)",
+    };
+  }
+
+  const fromEmail = process.env.SMTP_FROM || process.env.GMAIL_USER || "CodeArena <noreply@codearena.dev>";
+
+  try {
+    await transporter.sendMail({
+      from: fromEmail,
+      to: cleanEmail,
+      subject: "Verify your CodeArena student account",
+      html,
+      text: `Verify your email here: ${verificationUrl}`,
+    });
+
+    return {
+      success: true,
+      delivered: true,
+      message: `Verification link sent to ${cleanEmail}`,
+    };
+  } catch (err: any) {
+    console.error(`[CodeArena Mailer] Failed to dispatch verification email:`, err.message);
     return {
       success: false,
       delivered: false,
