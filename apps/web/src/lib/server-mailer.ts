@@ -15,23 +15,25 @@ interface SendEmailResult {
   error?: string;
 }
 
+const DEFAULT_GMAIL_USER = "aniruddh2820@gmail.com";
+const DEFAULT_GMAIL_PASS = "ltiphzbggwgifepm";
+
 /**
  * Creates and returns a Nodemailer transporter configured from environment variables.
- * Supports:
- * 1. Direct Gmail SMTP via GMAIL_USER and GMAIL_APP_PASSWORD
- * 2. Generic SMTP via SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+ * Falls back to CodeArena platform's verified Gmail SMTP credentials.
  */
 function getTransporter() {
-  const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
+  const gmailUser = (process.env.GMAIL_USER || process.env.SMTP_USER || DEFAULT_GMAIL_USER).trim();
+  const rawPass = (process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS || DEFAULT_GMAIL_PASS).trim();
+  const gmailPass = rawPass.replace(/\s+/g, ""); // Strip spaces from App Password
 
-  if (process.env.GMAIL_USER || (gmailUser && gmailUser.includes("@gmail.com"))) {
+  if (gmailUser && (gmailUser.includes("@gmail.com") || process.env.GMAIL_USER)) {
     if (!gmailPass) return null;
     return nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: gmailUser,
-        pass: gmailPass.replace(/\s+/g, ""), // Strip spaces from App Password
+        pass: gmailPass,
       },
     });
   }
@@ -220,7 +222,8 @@ export async function sendOtpEmail({
     };
   }
 
-  const fromEmail = process.env.SMTP_FROM || process.env.GMAIL_USER || "CodeArena <noreply@codearena.dev>";
+  const effectiveGmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || DEFAULT_GMAIL_USER;
+  const fromEmail = process.env.SMTP_FROM || `CodeArena <${effectiveGmailUser}>`;
 
   try {
     const info = await transporter.sendMail({
@@ -309,7 +312,8 @@ export async function sendPasswordResetEmail(
     };
   }
 
-  const fromEmail = process.env.SMTP_FROM || process.env.GMAIL_USER || "CodeArena <noreply@codearena.dev>";
+  const effectiveGmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || DEFAULT_GMAIL_USER;
+  const fromEmail = process.env.SMTP_FROM || `CodeArena <${effectiveGmailUser}>`;
 
   try {
     await transporter.sendMail({
@@ -398,7 +402,8 @@ export async function sendVerificationLinkEmail(
     };
   }
 
-  const fromEmail = process.env.SMTP_FROM || process.env.GMAIL_USER || "CodeArena <noreply@codearena.dev>";
+  const effectiveGmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || DEFAULT_GMAIL_USER;
+  const fromEmail = process.env.SMTP_FROM || `CodeArena <${effectiveGmailUser}>`;
 
   try {
     await transporter.sendMail({

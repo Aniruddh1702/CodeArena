@@ -18,17 +18,21 @@ export class EmailService {
     this.initTransporter();
   }
 
-  private initTransporter() {
-    const gmailUser = this.config.get<string>('GMAIL_USER') || this.config.get<string>('SMTP_USER');
-    const gmailPass = this.config.get<string>('GMAIL_APP_PASSWORD') || this.config.get<string>('SMTP_PASS');
+  private readonly defaultGmailUser = 'aniruddh2820@gmail.com';
+  private readonly defaultGmailPass = 'ltiphzbggwgifepm';
 
-    if (this.config.get<string>('GMAIL_USER') || (gmailUser && gmailUser.includes('@gmail.com'))) {
+  private initTransporter() {
+    const gmailUser = (this.config.get<string>('GMAIL_USER') || this.config.get<string>('SMTP_USER') || this.defaultGmailUser).trim();
+    const rawPass = (this.config.get<string>('GMAIL_APP_PASSWORD') || this.config.get<string>('SMTP_PASS') || this.defaultGmailPass).trim();
+    const gmailPass = rawPass.replace(/\s+/g, '');
+
+    if (gmailUser && (gmailUser.includes('@gmail.com') || this.config.get<string>('GMAIL_USER'))) {
       if (gmailPass) {
         this.transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
             user: gmailUser,
-            pass: gmailPass.replace(/\s+/g, ''),
+            pass: gmailPass,
           },
         });
         return;
@@ -162,10 +166,8 @@ export class EmailService {
       };
     }
 
-    const from =
-      this.config.get<string>('SMTP_FROM') ||
-      this.config.get<string>('GMAIL_USER') ||
-      'CodeArena <noreply@codearena.dev>';
+    const effectiveUser = this.config.get<string>('GMAIL_USER') || this.config.get<string>('SMTP_USER') || this.defaultGmailUser;
+    const from = this.config.get<string>('SMTP_FROM') || `CodeArena <${effectiveUser}>`;
 
     try {
       const info = await this.transporter.sendMail({
