@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!res.ok && !apiUrl.includes("onrender.com") && apiUrl.includes("codearena-api")) {
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
+          signal: AbortSignal.timeout(5000),
         });
       }
 
