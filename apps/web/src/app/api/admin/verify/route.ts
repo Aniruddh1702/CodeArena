@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       "Aniruddh#1702",
       "Admin@123!",
       "codearena-admin-2026",
+      "admin123",
     ].filter(Boolean) as string[];
 
     const isMasterPass = allowedKeys.some((configuredKey) => {

@@ -911,7 +911,10 @@ export default function AdminPortalPage() {
     if (editingSlug && editingSlug !== cleanSlug) {
       deleteCustomProblem(editingSlug);
       try {
-        fetch(`/api/admin/questions?slug=${encodeURIComponent(editingSlug)}`, { method: "DELETE" }).catch(() => {});
+        fetch(`/api/admin/questions?slug=${encodeURIComponent(editingSlug)}`, {
+          method: "DELETE",
+          headers: getAdminAuthHeaders(),
+        }).catch(() => {});
       } catch (e) {}
     }
 
@@ -993,7 +996,7 @@ export default function AdminPortalPage() {
     try {
       await fetch("/api/admin/questions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminAuthHeaders(),
         body: JSON.stringify(problemToSave),
       });
     } catch (e) {}
@@ -1015,6 +1018,7 @@ export default function AdminPortalPage() {
       try {
         await fetch(`/api/admin/questions?slug=${encodeURIComponent(slug)}`, {
           method: "DELETE",
+          headers: getAdminAuthHeaders(),
         });
       } catch (e) {}
       loadQuestions();
@@ -1339,7 +1343,7 @@ export default function AdminPortalPage() {
     try {
       await fetch("/api/admin/questions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminAuthHeaders(),
         body: JSON.stringify(parsedImportItems),
       });
     } catch (e) {}
@@ -1664,7 +1668,7 @@ export default function AdminPortalPage() {
     try {
       await fetch("/api/admin/users", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminAuthHeaders(),
         body: JSON.stringify({ username, role: nextRole }),
       });
     } catch (e) {}
@@ -1697,7 +1701,7 @@ export default function AdminPortalPage() {
     try {
       await fetch("/api/admin/users", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminAuthHeaders(),
         body: JSON.stringify({ username, status: nextStatus }),
       });
     } catch (e) {}
@@ -1724,6 +1728,7 @@ export default function AdminPortalPage() {
     try {
       await fetch(`/api/admin/users?username=${encodeURIComponent(username)}`, {
         method: "DELETE",
+        headers: getAdminAuthHeaders(),
       });
     } catch (e) {}
 
@@ -1738,7 +1743,10 @@ export default function AdminPortalPage() {
       return;
     }
     try {
-      await fetch("/api/admin/users", { method: "DELETE" });
+      await fetch("/api/admin/users?confirm=PERMANENT_WIPE", {
+        method: "DELETE",
+        headers: getAdminAuthHeaders(),
+      });
       setAllUsersList([]);
       const active = getActiveAccount();
       if (active) {
