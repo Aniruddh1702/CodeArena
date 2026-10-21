@@ -14,18 +14,24 @@ export function verifyAdminToken(token?: string | null): boolean {
   try {
     const [payload, sig] = token.split(".");
     const expected = crypto.createHmac("sha256", ADMIN_SECRET).update(payload).digest("hex");
-    return crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+    return (
+      crypto.timingSafeEqual(
+        Buffer.from(sig.padEnd(64, "0")),
+        Buffer.from(expected.padEnd(64, "0"))
+      ) && sig === expected
+    );
   } catch (e) {
     return false;
   }
 }
 
 const VALID_ADMIN_PASSCODES = [
+  process.env.ADMIN_PASSCODE,
   "Aniruddh#1702",
   "Admin@123!",
   "codearena-admin-2026",
   "admin123",
-];
+].filter(Boolean) as string[];
 
 export function checkAdminAuth(req: NextRequest): boolean {
   const cookieToken = req.cookies.get("codearena_admin_token")?.value;

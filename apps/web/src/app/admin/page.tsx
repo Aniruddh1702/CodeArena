@@ -472,7 +472,10 @@ export default function AdminPortalPage() {
     let custom = getCustomProblems();
 
     try {
-      const res = await fetch("/api/admin/questions", { cache: "no-store" });
+      const res = await fetch("/api/admin/questions", {
+        cache: "no-store",
+        headers: getAdminAuthHeaders(),
+      });
       const json = await res.json().catch(() => null);
       const serverCustom: ProblemDefinition[] = json?.customItems || [];
       if (Array.isArray(serverCustom) && serverCustom.length > 0) {
@@ -513,7 +516,10 @@ export default function AdminPortalPage() {
   const loadUsers = async () => {
     setLoadingUsers(true);
     try {
-      const res = await fetch("/api/admin/users", { cache: "no-store" });
+      const res = await fetch("/api/admin/users", {
+        cache: "no-store",
+        headers: getAdminAuthHeaders(),
+      });
       const json = await res.json().catch(() => null);
       const serverUsers = json?.users || [];
       const sessionAccounts = getAllAccounts();
@@ -656,8 +662,11 @@ export default function AdminPortalPage() {
 
   const handleLockAdmin = () => {
     localStorage.removeItem("codearena_admin_authorized");
+    localStorage.removeItem("codearena_admin_token");
+    sessionStorage.removeItem("codearena_admin_token");
     if (typeof document !== "undefined") {
       document.cookie = "codearena_admin_auth=; path=/; max-age=0";
+      document.cookie = "codearena_admin_token=; path=/; max-age=0";
     }
     setIsAuthorized(false);
   };
@@ -1826,8 +1835,25 @@ export default function AdminPortalPage() {
       setPasscodeUpdateMsg({ type: "error", text: "Passcode must be at least 6 characters long." });
       return;
     }
+    const trimmedPass = newPasscodeVal.trim();
     if (typeof window !== "undefined") {
-      localStorage.setItem("codearena_custom_admin_passcode", newPasscodeVal.trim());
+      localStorage.setItem("codearena_custom_admin_passcode", trimmedPass);
+      fetch("/api/admin/verify", {
+        method: "POST",
+        headers: getAdminAuthHeaders(),
+        body: JSON.stringify({ passcode: trimmedPass }),
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (d?.adminToken) {
+            sessionStorage.setItem("codearena_admin_token", d.adminToken);
+            localStorage.setItem("codearena_admin_token", d.adminToken);
+            if (typeof document !== "undefined") {
+              document.cookie = `codearena_admin_token=${d.adminToken}; path=/; max-age=86400; SameSite=Lax`;
+            }
+          }
+        })
+        .catch(() => {});
     }
     setPasscodeUpdateMsg({ type: "success", text: "Master admin passcode updated successfully!" });
     setAuditLogs((prev) => [

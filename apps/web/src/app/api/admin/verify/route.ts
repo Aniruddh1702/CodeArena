@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { signAdminToken } from "@/lib/admin-auth";
+import { signAdminToken, checkAdminAuth } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
       "admin123",
     ].filter(Boolean) as string[];
 
-    const isMasterPass = allowedKeys.some((configuredKey) => {
+    const isAlreadyAdmin = checkAdminAuth(req);
+    const isMasterPass = isAlreadyAdmin || allowedKeys.some((configuredKey) => {
       try {
         return (
           crypto.timingSafeEqual(
