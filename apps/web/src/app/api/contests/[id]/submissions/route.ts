@@ -54,7 +54,6 @@ export async function POST(
     if (
       !email ||
       email.startsWith("guest_") ||
-      email.includes("@student.codearena") ||
       email === "guest" ||
       !email.includes("@")
     ) {

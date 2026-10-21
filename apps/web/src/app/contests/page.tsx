@@ -79,7 +79,7 @@ export default function ContestsPage() {
   };
 
   const handleEnterContest = (contestId: string, e?: React.MouseEvent) => {
-    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.startsWith("guest_")) {
       if (e) e.preventDefault();
       router.push(`/login?redirect=/contests/${contestId}`);
       return false;
@@ -89,7 +89,7 @@ export default function ContestsPage() {
   };
 
   const handleRegister = (contestId: string) => {
-    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.startsWith("guest_")) {
       router.push(`/login?redirect=/contests/${contestId}`);
       return;
     }

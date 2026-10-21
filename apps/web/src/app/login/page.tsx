@@ -114,6 +114,7 @@ function LoginForm() {
           role: userPayload.role || "STUDENT",
           college: userPayload.college || "CodeArena Academy",
           status: userPayload.status || "ACTIVE",
+          password: password,
           token: token,
           joinedDate: userPayload.createdAt || userPayload.joinedDate || new Date().toISOString(),
         };

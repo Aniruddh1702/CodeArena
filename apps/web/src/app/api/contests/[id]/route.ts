@@ -88,7 +88,6 @@ export async function PATCH(
       if (
         email &&
         !email.startsWith("guest_") &&
-        !email.includes("@student.codearena") &&
         email.includes("@")
       ) {
         const currentUsers = updated.registeredUsers || [];

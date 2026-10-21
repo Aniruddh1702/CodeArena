@@ -143,7 +143,7 @@ export default function ContestArenaPage({ params }: { params: { id: string } })
       }
     }
     // Disallow unauthenticated or fake guest sessions from taking the contest
-    if (!user || user.id?.startsWith("guest_") || user.email?.toLowerCase().includes("@student.codearena")) {
+    if (!user || user.id?.startsWith("guest_") || user.email?.startsWith("guest_")) {
       setCurrentUser(null);
       setIsLoadingContest(false);
       router.push(`/login?redirect=/contests/${contestId}`);
@@ -425,7 +425,7 @@ function parseCustomArgs(raw: string): any[] {
 
   // Run Code on Public Test Cases (Real Multi-Language Execution)
   const handleRunCode = async () => {
-    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.startsWith("guest_")) {
       alert("Please sign in to your CodeArena account to execute code during a contest.");
       router.push(`/login?redirect=/contests/${contestId}`);
       return;
@@ -553,7 +553,7 @@ function parseCustomArgs(raw: string): any[] {
       alert("You have already submitted the assignment. Contest submissions are disabled.");
       return;
     }
-    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.startsWith("guest_")) {
       alert("Please sign in to submit contest solutions!");
       router.push(`/login?redirect=/contests/${contestId}`);
       return;
@@ -704,7 +704,7 @@ function parseCustomArgs(raw: string): any[] {
   };
 
   const handleConfirmSubmitWholeContest = async () => {
-    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+    if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.startsWith("guest_")) {
       alert("Please sign in to submit the contest!");
       router.push(`/login?redirect=/contests/${contestId}`);
       return;
@@ -762,7 +762,7 @@ function parseCustomArgs(raw: string): any[] {
   }
 
   // Strictly block unauthenticated or guest users from entering or giving the contest
-  if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.toLowerCase().includes("@student.codearena")) {
+  if (!currentUser || currentUser.id?.startsWith("guest_") || currentUser.email?.startsWith("guest_")) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="max-w-md w-full p-8 rounded-2xl bg-card border border-border/80 shadow-2xl text-center space-y-5">

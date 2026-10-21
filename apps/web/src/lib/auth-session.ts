@@ -40,7 +40,7 @@ export function isRealUserAccount(user: UserAccount | null | undefined): boolean
   if (!user || !user.email) return false;
   const email = user.email.toLowerCase().trim();
   const id = (user.id || "").toLowerCase().trim();
-  if (id.startsWith("guest_") || email.startsWith("guest_") || email.includes("@student.codearena")) {
+  if (id.startsWith("guest_") || email.startsWith("guest_")) {
     return false;
   }
   return true;

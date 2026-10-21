@@ -483,7 +483,6 @@ export function registerUserForContest(contestId: string, email: string): boolea
   if (
     !cleanEmail ||
     cleanEmail.startsWith("guest_") ||
-    cleanEmail.includes("@student.codearena") ||
     !cleanEmail.includes("@")
   ) {
     return false;
@@ -583,7 +582,6 @@ export function recordContestSubmission(submission: ContestSubmission): void {
   if (
     !email ||
     email.startsWith("guest_") ||
-    email.includes("@student.codearena") ||
     !email.includes("@")
   ) {
     console.warn("Unauthenticated or guest user cannot submit contest solutions.");
