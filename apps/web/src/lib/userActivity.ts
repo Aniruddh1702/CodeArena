@@ -161,7 +161,8 @@ export function recordUserLoginEvent(user: Partial<PlatformUserRecord> & { usern
     problemsSolved: user.problemsSolved !== undefined ? user.problemsSolved : (existing?.problemsSolved || 0),
     lastLoginAt: new Date().toISOString(),
     registeredAt: existing?.registeredAt || new Date().toISOString(),
-    status: "ONLINE",
+    status: user.status || existing?.status || "ONLINE",
+    emailVerified: user.emailVerified !== undefined ? user.emailVerified : (existing?.emailVerified !== undefined ? existing.emailVerified : true),
   };
 
   map.set(unameKey, updated);

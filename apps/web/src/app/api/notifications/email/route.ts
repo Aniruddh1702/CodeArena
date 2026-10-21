@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendGeneralEmail } from "@/lib/server-mailer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,14 +15,16 @@ export async function POST(req: NextRequest) {
 
     console.log(`[CodeArena Mailer] 📧 Dispatched ${type || "EMAIL"} to ${recipient}: "${subject}"`);
 
-    // In a production setup with SMTP:
-    // const transporter = nodemailer.createTransport({ ... });
-    // await transporter.sendMail({ from: '"CodeArena" <noreply@codearena.dev>', to: recipient, subject, html: htmlBody });
+    const result = await sendGeneralEmail(
+      recipient,
+      subject,
+      htmlBody || `<p>${subject}</p>`
+    );
 
     return NextResponse.json({
-      success: true,
-      delivered: true,
-      message: `Email successfully delivered to ${recipient}`,
+      success: result.success,
+      delivered: result.delivered,
+      message: result.message,
       timestamp: new Date().toISOString(),
       recipient,
       subject,

@@ -102,6 +102,7 @@ export async function POST(req: NextRequest) {
       score: 1450,
       problemsSolved: 0,
       status: "ONLINE",
+      emailVerified: true,
     });
 
     // Consume the verified state so OTP cannot be reused

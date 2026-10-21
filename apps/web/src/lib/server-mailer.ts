@@ -433,3 +433,51 @@ export async function sendVerificationLinkEmail(
     };
   }
 }
+
+/**
+ * Dispatches a general notification or contest alert email.
+ */
+export async function sendGeneralEmail(
+  recipient: string,
+  subject: string,
+  htmlContent: string
+): Promise<SendEmailResult> {
+  const cleanEmail = recipient.toLowerCase().trim();
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    return {
+      success: true,
+      delivered: false,
+      demoMode: true,
+      message: "Email dispatch processed in local mode.",
+    };
+  }
+
+  const effectiveGmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || DEFAULT_GMAIL_USER;
+  const fromEmail = process.env.SMTP_FROM || `CodeArena <${effectiveGmailUser}>`;
+
+  try {
+    await transporter.sendMail({
+      from: fromEmail,
+      to: cleanEmail,
+      subject,
+      html: htmlContent,
+      text: htmlContent.replace(/<[^>]+>/g, " "),
+    });
+
+    return {
+      success: true,
+      delivered: true,
+      message: `Notification email successfully delivered to ${cleanEmail}`,
+    };
+  } catch (err: any) {
+    console.error(`[CodeArena Mailer] Failed to dispatch general email:`, err.message);
+    return {
+      success: false,
+      delivered: false,
+      message: `Failed to dispatch email: ${err.message || "SMTP error"}.`,
+      error: err.message,
+    };
+  }
+}
