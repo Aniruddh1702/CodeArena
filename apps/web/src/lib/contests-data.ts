@@ -99,7 +99,7 @@ function getOfficialScheduledContest(): Contest {
   };
 }
 
-const DEFAULT_CONTESTS: Contest[] = [getOfficialScheduledContest()];
+const DEFAULT_CONTESTS: Contest[] = [];
 
 const DEFAULT_SUBMISSIONS: Record<string, ContestSubmission[]> = {};
 
@@ -136,7 +136,7 @@ export async function syncContestsWithServer(): Promise<Contest[]> {
     const json = await res.json().catch(() => null);
     if (json?.success && Array.isArray(json.contests)) {
       const serverContests: Contest[] = json.contests
-        .filter((c: Contest) => c.id !== "contest-weekly-clash-1")
+        .filter((c: Contest) => c.id !== "contest-weekly-clash-1" && c.id !== "weekly-contest-42")
         .map(enrichContestProblems);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(serverContests));
       window.dispatchEvent(new CustomEvent("codearena_contests_updated", { detail: serverContests }));
@@ -180,19 +180,18 @@ export function getContests(): Contest[] {
   if (typeof window !== "undefined") {
     // Check if token exists
   }
-  if (typeof window === "undefined") return DEFAULT_CONTESTS.map(enrichContestProblems);
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     let contests: Contest[];
     if (raw === null) {
-      const enriched = DEFAULT_CONTESTS.map(enrichContestProblems);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched));
-      contests = enriched;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+      contests = [];
     } else {
       const parsed: Contest[] = JSON.parse(raw);
-      // Active purge of legacy ongoing dummy contest from browser storage
+      // Active purge of legacy dummy contests from browser storage
       const sanitized = Array.isArray(parsed)
-        ? parsed.filter((c) => c.id !== "contest-weekly-clash-1")
+        ? parsed.filter((c) => c.id !== "contest-weekly-clash-1" && c.id !== "weekly-contest-42")
         : [];
       if (sanitized.length !== (Array.isArray(parsed) ? parsed.length : 0)) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));

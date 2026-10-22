@@ -577,7 +577,9 @@ export default function AdminPortalPage() {
       });
       const data = await res.json();
       if (data?.success && Array.isArray(data.contests)) {
-        const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
+        const sanitized = data.contests.filter(
+          (c: any) => c.id !== "contest-weekly-clash-1" && c.id !== "weekly-contest-42"
+        );
         setContestsList(sanitized);
         if (typeof window !== "undefined") {
           localStorage.setItem("codearena_contests", JSON.stringify(sanitized));

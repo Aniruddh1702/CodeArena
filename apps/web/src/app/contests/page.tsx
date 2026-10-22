@@ -27,7 +27,9 @@ export default function ContestsPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.contests)) {
-          const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
+          const sanitized = data.contests.filter(
+            (c: any) => c.id !== "contest-weekly-clash-1" && c.id !== "weekly-contest-42"
+          );
           setContests(sanitized);
           if (typeof window !== "undefined") {
             localStorage.setItem("codearena_contests", JSON.stringify(sanitized));
@@ -45,7 +47,9 @@ export default function ContestsPage() {
           .then((res) => res.json())
           .then((data) => {
             if (data?.success && Array.isArray(data.contests)) {
-              const sanitized = data.contests.filter((c: any) => c.id !== "contest-weekly-clash-1");
+              const sanitized = data.contests.filter(
+                (c: any) => c.id !== "contest-weekly-clash-1" && c.id !== "weekly-contest-42"
+              );
               setContests(sanitized);
               if (typeof window !== "undefined") {
                 localStorage.setItem("codearena_contests", JSON.stringify(sanitized));

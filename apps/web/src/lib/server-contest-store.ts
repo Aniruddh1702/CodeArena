@@ -116,20 +116,23 @@ export function getServerContests(): Contest[] {
     const fromFile = readFromFile();
     if (fromFile && fromFile.initialized && Array.isArray(fromFile.contests)) {
       // Purge any legacy dummy contest
-      global.__codearena_server_contests = fromFile.contests.filter((c) => c.id !== "contest-weekly-clash-1");
+      global.__codearena_server_contests = fromFile.contests.filter(
+        (c) => c.id !== "contest-weekly-clash-1" && c.id !== "weekly-contest-42"
+      );
       global.__codearena_server_contests_initialized = true;
     } else {
-      const defaultContest = getOfficialScheduledContest();
-      global.__codearena_server_contests = [defaultContest];
+      global.__codearena_server_contests = [];
       global.__codearena_server_contests_initialized = true;
-      writeToFile([defaultContest]);
+      writeToFile([]);
     }
   }
 
-  // Ensure legacy contest-weekly-clash-1 is never returned
+  // Ensure legacy dummy contests are never returned
   if (global.__codearena_server_contests) {
     const prevLength = global.__codearena_server_contests.length;
-    global.__codearena_server_contests = global.__codearena_server_contests.filter((c) => c.id !== "contest-weekly-clash-1");
+    global.__codearena_server_contests = global.__codearena_server_contests.filter(
+      (c) => c.id !== "contest-weekly-clash-1" && c.id !== "weekly-contest-42"
+    );
     if (global.__codearena_server_contests.length !== prevLength) {
       writeToFile(global.__codearena_server_contests);
     }
